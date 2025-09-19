@@ -24,13 +24,13 @@ enum class TitleScreenActions{
 }
 @Composable
 fun TitleScreen(
-    mod: Modifier,
+    modifier: Modifier,
     onNavigate: (TitleScreenActions) -> Unit = {}
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
-        modifier = mod.fillMaxSize()
+        modifier = modifier.fillMaxSize()
     ) {
         Row(
             horizontalArrangement = Arrangement.Center,
