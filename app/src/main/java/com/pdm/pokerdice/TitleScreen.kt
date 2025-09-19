@@ -1,6 +1,7 @@
 package com.pdm.pokerdice
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.Arrangement
@@ -12,13 +13,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.material3.Text
+import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-
-
 enum class TitleScreenActions{
     About, Profile, StartGame
 }
@@ -30,7 +30,9 @@ fun TitleScreen(
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
-        modifier = mod.fillMaxSize()
+        modifier = mod
+            .fillMaxSize()
+            .background(color = Color.White)
     ) {
         Row(
             horizontalArrangement = Arrangement.Center,

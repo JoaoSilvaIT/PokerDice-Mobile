@@ -1,5 +1,7 @@
 package com.pdm.pokerdice
 
+import android.content.Intent
+import android.icu.text.CaseMap
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -20,28 +22,23 @@ class MainActivity : ComponentActivity() {
         setContent {
             PokerDiceTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
+                    TitleScreen(
+                        mod = Modifier.padding(innerPadding),
+                        onNavigate = {
+                            navigateTo(it)
+                        }
                     )
                 }
             }
         }
     }
-}
 
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    PokerDiceTheme {
-        Greeting("Android")
+    private fun navigateTo(whereto : TitleScreenActions) {
+        val intent = when (whereto) {
+            TitleScreenActions.About -> TODO()
+            TitleScreenActions.Profile -> Intent()
+            TitleScreenActions.StartGame -> TODO()
+        }
+        startActivity(intent)
     }
 }
