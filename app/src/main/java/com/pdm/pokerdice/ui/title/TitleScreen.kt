@@ -1,4 +1,4 @@
-package com.pdm.pokerdice
+package com.pdm.pokerdice.ui.title
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
@@ -17,6 +17,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.pdm.pokerdice.R
 
 
 enum class TitleScreenActions{

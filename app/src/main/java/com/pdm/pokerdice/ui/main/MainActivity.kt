@@ -1,4 +1,4 @@
-package com.pdm.pokerdice
+package com.pdm.pokerdice.ui.main
 
 import android.content.Intent
 import android.os.Bundle
@@ -9,9 +9,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
-import com.pdm.pokerdice.about.AboutActivity
-import com.pdm.pokerdice.profile.ProfileActivity
+import com.pdm.pokerdice.ui.about.AboutActivity
+import com.pdm.pokerdice.ui.profile.ProfileActivity
 import com.pdm.pokerdice.ui.theme.PokerDiceTheme
+import com.pdm.pokerdice.ui.title.TitleScreen
+import com.pdm.pokerdice.ui.title.TitleScreenActions
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -19,10 +21,10 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             PokerDiceTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+                Scaffold(modifier = Modifier.Companion.fillMaxSize()) { innerPadding ->
                     TitleScreen(
-                        modifier= Modifier.padding(innerPadding),
-                        onNavigate = { navigateTo(it)}
+                        modifier = Modifier.Companion.padding(innerPadding),
+                        onNavigate = { navigateTo(it) }
                     )
                 }
             }

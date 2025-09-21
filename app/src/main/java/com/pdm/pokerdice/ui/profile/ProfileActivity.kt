@@ -1,4 +1,4 @@
-package com.pdm.pokerdice.profile
+package com.pdm.pokerdice.ui.profile
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
-import com.pdm.pokerdice.about.AboutScreen
 import com.pdm.pokerdice.ui.theme.PokerDiceTheme
 
 class ProfileActivity : ComponentActivity() {

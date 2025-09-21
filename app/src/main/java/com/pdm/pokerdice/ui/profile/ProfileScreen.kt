@@ -1,4 +1,4 @@
-package com.pdm.pokerdice.profile
+package com.pdm.pokerdice.ui.profile
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
