@@ -18,6 +18,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.pdm.pokerdice.R
+import com.pdm.pokerdice.ui.theme.PokerDiceTheme
 
 
 enum class TitleScreenActions{
@@ -56,7 +57,7 @@ fun TitleScreen(
             }
             Button(
                 onClick = {onNavigate(TitleScreenActions.Profile)},
-                colors = ButtonDefaults.buttonColors(containerColor = Color.Black)
+                colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
             ) {
                 Text("Profile")
             }
@@ -71,8 +72,10 @@ fun TitleScreen(
 }
 
 
-@Preview
+@Preview()
 @Composable
 fun TitleScreenPreview() {
-    TitleScreen(Modifier)
+    PokerDiceTheme {
+        TitleScreen(Modifier)
+    }
 }

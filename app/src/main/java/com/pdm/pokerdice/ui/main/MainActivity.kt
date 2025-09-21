@@ -21,9 +21,9 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             PokerDiceTheme {
-                Scaffold(modifier = Modifier.Companion.fillMaxSize()) { innerPadding ->
+                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     TitleScreen(
-                        modifier = Modifier.Companion.padding(innerPadding),
+                        modifier = Modifier.padding(innerPadding),
                         onNavigate = { navigateTo(it) }
                     )
                 }
