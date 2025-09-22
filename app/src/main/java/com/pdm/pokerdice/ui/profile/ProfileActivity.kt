@@ -18,7 +18,7 @@ class ProfileActivity : ComponentActivity() {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     ProfileScreen(
                         mod = Modifier.padding(innerPadding),
-                        onNavigate = { handleProfileNavigation(it) }
+                        onNavigate = { handleProfileNavigation(it) },
                     )
                 }
             }

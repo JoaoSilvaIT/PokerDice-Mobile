@@ -24,7 +24,7 @@ class MainActivity : ComponentActivity() {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     TitleScreen(
                         modifier = Modifier.padding(innerPadding),
-                        onNavigate = { navigateTo(it) }
+                        onNavigate = { navigateTo(it) },
                     )
                 }
             }
@@ -32,12 +32,12 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun navigateTo(action: TitleScreenActions) {
-        val intent = when(action){
-            TitleScreenActions.About -> Intent(this, AboutActivity::class.java)
-            TitleScreenActions.Profile -> Intent(this, ProfileActivity::class.java)
-            TitleScreenActions.StartGame -> TODO()
-        }
+        val intent =
+            when (action) {
+                TitleScreenActions.About -> Intent(this, AboutActivity::class.java)
+                TitleScreenActions.Profile -> Intent(this, ProfileActivity::class.java)
+                TitleScreenActions.StartGame -> TODO()
+            }
         startActivity(intent)
     }
-
 }

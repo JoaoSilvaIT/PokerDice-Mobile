@@ -22,6 +22,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ProgressIndicatorDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -36,22 +37,26 @@ import com.pdm.pokerdice.R
 
 sealed class ProfileNavigation {
     object EditProfile : ProfileNavigation()
+
     object GameHistory : ProfileNavigation()
 }
 
 @Composable
-fun ProfileScreen(mod: Modifier, onNavigate: (ProfileNavigation) -> Unit = {}) {
+fun ProfileScreen(
+    mod: Modifier,
+    onNavigate: (ProfileNavigation) -> Unit = {},
+) {
     LazyColumn(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = mod.fillMaxSize().padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+        verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         item {
             Text(
                 "Your Profile",
                 fontSize = 38.sp,
                 fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.primary
+                color = MaterialTheme.colorScheme.primary,
             )
         }
 
@@ -59,47 +64,50 @@ fun ProfileScreen(mod: Modifier, onNavigate: (ProfileNavigation) -> Unit = {}) {
         item {
             Card(
                 modifier = Modifier.fillMaxWidth(),
-                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
             ) {
                 Column(
                     modifier = Modifier.padding(16.dp),
                     horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                    verticalArrangement = Arrangement.spacedBy(16.dp),
                 ) {
                     Image(
                         painter = painterResource(id = R.drawable.dice),
                         contentDescription = "Profile Picture",
-                        modifier = Modifier
-                            .size(100.dp)
-                            .clip(CircleShape)
-                            .border(2.dp, MaterialTheme.colorScheme.primary, CircleShape)
+                        modifier =
+                            Modifier
+                                .size(100.dp)
+                                .clip(CircleShape)
+                                .border(2.dp, MaterialTheme.colorScheme.primary, CircleShape),
                     )
 
                     Text(
                         "Player Name",
                         fontSize = 24.sp,
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.Bold,
                     )
 
                     Text(
                         "Level 5 Dice Master",
                         fontSize = 16.sp,
-                        color = MaterialTheme.colorScheme.secondary
+                        color = MaterialTheme.colorScheme.secondary,
                     )
 
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
+                        verticalAlignment = Alignment.CenterVertically,
                     ) {
                         Text("Experience")
                         Text("75/100")
                     }
 
                     LinearProgressIndicator(
-                        progress = 0.75f,
+                        progress = { 0.75f },
                         modifier = Modifier.fillMaxWidth(),
-                        color = MaterialTheme.colorScheme.primary
+                        color = MaterialTheme.colorScheme.primary,
+                        trackColor = ProgressIndicatorDefaults.linearTrackColor,
+                        strokeCap = ProgressIndicatorDefaults.LinearStrokeCap,
                     )
                 }
             }
@@ -109,23 +117,23 @@ fun ProfileScreen(mod: Modifier, onNavigate: (ProfileNavigation) -> Unit = {}) {
         item {
             Card(
                 modifier = Modifier.fillMaxWidth(),
-                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
             ) {
                 Column(
                     modifier = Modifier.padding(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
                     Text(
                         "Game Statistics",
                         fontSize = 20.sp,
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.Bold,
                     )
 
                     Spacer(modifier = Modifier.height(8.dp))
 
                     Row(
                         modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween
+                        horizontalArrangement = Arrangement.SpaceBetween,
                     ) {
                         Text("Games Played")
                         Text("42")
@@ -133,7 +141,7 @@ fun ProfileScreen(mod: Modifier, onNavigate: (ProfileNavigation) -> Unit = {}) {
 
                     Row(
                         modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween
+                        horizontalArrangement = Arrangement.SpaceBetween,
                     ) {
                         Text("Wins")
                         Text("28")
@@ -141,7 +149,7 @@ fun ProfileScreen(mod: Modifier, onNavigate: (ProfileNavigation) -> Unit = {}) {
 
                     Row(
                         modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween
+                        horizontalArrangement = Arrangement.SpaceBetween,
                     ) {
                         Text("Losses")
                         Text("14")
@@ -149,7 +157,7 @@ fun ProfileScreen(mod: Modifier, onNavigate: (ProfileNavigation) -> Unit = {}) {
 
                     Row(
                         modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween
+                        horizontalArrangement = Arrangement.SpaceBetween,
                     ) {
                         Text("Win Rate")
                         Text("66.7%")
@@ -157,7 +165,7 @@ fun ProfileScreen(mod: Modifier, onNavigate: (ProfileNavigation) -> Unit = {}) {
 
                     Button(
                         onClick = { onNavigate(ProfileNavigation.GameHistory) },
-                        modifier = Modifier.align(Alignment.End)
+                        modifier = Modifier.align(Alignment.End),
                     ) {
                         Text("Game History")
                     }
@@ -169,16 +177,16 @@ fun ProfileScreen(mod: Modifier, onNavigate: (ProfileNavigation) -> Unit = {}) {
         item {
             Card(
                 modifier = Modifier.fillMaxWidth(),
-                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
             ) {
                 Column(
                     modifier = Modifier.padding(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
                     Text(
                         "Achievements",
                         fontSize = 20.sp,
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.Bold,
                     )
 
                     // These achievements would ideally be loaded from a database
@@ -186,7 +194,7 @@ fun ProfileScreen(mod: Modifier, onNavigate: (ProfileNavigation) -> Unit = {}) {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
+                        verticalAlignment = Alignment.CenterVertically,
                     ) {
                         Text("First Victory")
                         Text("✓")
@@ -195,7 +203,7 @@ fun ProfileScreen(mod: Modifier, onNavigate: (ProfileNavigation) -> Unit = {}) {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
+                        verticalAlignment = Alignment.CenterVertically,
                     ) {
                         Text("Five Game Streak")
                         Text("✓")
@@ -204,7 +212,7 @@ fun ProfileScreen(mod: Modifier, onNavigate: (ProfileNavigation) -> Unit = {}) {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
+                        verticalAlignment = Alignment.CenterVertically,
                     ) {
                         Text("Royal Flush")
                         Text("✗")
@@ -218,11 +226,11 @@ fun ProfileScreen(mod: Modifier, onNavigate: (ProfileNavigation) -> Unit = {}) {
             Button(
                 onClick = { onNavigate(ProfileNavigation.EditProfile) },
                 colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
             ) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
                     Icon(Icons.Default.Edit, contentDescription = "Edit")
                     Text("Edit Profile", fontSize = 18.sp)
