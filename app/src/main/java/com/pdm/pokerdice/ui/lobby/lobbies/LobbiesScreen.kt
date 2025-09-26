@@ -22,12 +22,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.pdm.pokerdice.domain.Lobby
+import com.pdm.pokerdice.ui.lobby.lobbyCreation.LobbyCreationNavigation
 import com.pdm.pokerdice.ui.theme.PokerDiceTheme
 
 const val CREATE_LOBBY = "create_button"
 sealed class LobbiesNavigation {
-    object SelectLobby : LobbiesNavigation()
-
+    class SelectLobby(lobby: Lobby = Lobby(0, "Default Name", "Default Description")) : LobbiesNavigation()
     object CreatLobby : LobbiesNavigation()
 }
 @Composable
@@ -38,10 +39,10 @@ fun LobbiesScreen(
 
     //Vai ser mudado, só para ficar de exemplo
     val lobbies = listOf(
-        "High Rollers",
-        "Casual Dice",
-        "Late Night Lobby",
-        "Fast Game"
+        Lobby(1, "High Rollers", ""),
+        Lobby(2, "Casual Dice", ""),
+        Lobby(3, "Late Night Lobby", ""),
+        Lobby(4, "Fast Game", "")
     )
 
     Column(
@@ -60,7 +61,7 @@ fun LobbiesScreen(
                 .weight(1f)
                 .fillMaxWidth()
         ) {
-            items(lobbies) { lobbyName ->
+            items(lobbies) { lobby ->
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -76,11 +77,11 @@ fun LobbiesScreen(
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         Text(
-                            text = lobbyName,
+                            text = lobby.name,
                             style = MaterialTheme.typography.bodyLarge
                         )
                         Button(
-                            onClick = { onNavigate(LobbiesNavigation.SelectLobby) }
+                            onClick = { onNavigate(LobbiesNavigation.SelectLobby(lobby)) }
 
                         ) {
                             Text(
