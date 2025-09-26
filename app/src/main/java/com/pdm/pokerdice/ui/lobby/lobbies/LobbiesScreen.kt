@@ -19,10 +19,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.pdm.pokerdice.ui.theme.PokerDiceTheme
 
+const val CREATE_LOBBY = "create_button"
 sealed class LobbiesNavigation {
     object SelectLobby : LobbiesNavigation()
 
@@ -30,7 +32,7 @@ sealed class LobbiesNavigation {
 }
 @Composable
 fun LobbiesScreen(
-    mod: Modifier,
+    mod: Modifier = Modifier,
     onNavigate: (LobbiesNavigation) -> Unit = {}
 ) {
 
@@ -96,7 +98,8 @@ fun LobbiesScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(top = 16.dp)
-                .height(56.dp),
+                .height(56.dp)
+                .testTag(CREATE_LOBBY),
             shape = RoundedCornerShape(12.dp)
         ) {
             Text(text = "Create Lobby")

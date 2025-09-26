@@ -1,4 +1,4 @@
-package com.pdm.pokerdice.ui.lobby
+package com.pdm.pokerdice.ui.lobby.lobbyCreation
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -6,12 +6,8 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
@@ -29,6 +25,10 @@ import androidx.compose.ui.unit.dp
 const val PLAYER_MIN = 2
 const val PLAYER_MAX = 10
 
+sealed class LobbyCreationNavigation {
+
+    object Lobby : LobbyCreationNavigation()
+}
 @Composable
 fun LobbyCreationScreen(modifier: Modifier){
     var playerLimit by remember { mutableStateOf(2) }

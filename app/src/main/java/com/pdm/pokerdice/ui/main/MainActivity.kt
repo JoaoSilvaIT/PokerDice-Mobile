@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
 import com.pdm.pokerdice.ui.about.AboutActivity
+import com.pdm.pokerdice.ui.lobby.lobbies.LobbiesActivity
 import com.pdm.pokerdice.ui.profile.ProfileActivity
 import com.pdm.pokerdice.ui.theme.PokerDiceTheme
 import com.pdm.pokerdice.ui.title.TitleScreen
@@ -36,7 +37,7 @@ class MainActivity : ComponentActivity() {
             when (action) {
                 TitleScreenActions.About -> Intent(this, AboutActivity::class.java)
                 TitleScreenActions.Profile -> Intent(this, ProfileActivity::class.java)
-                TitleScreenActions.StartGame -> TODO()
+                TitleScreenActions.StartGame -> Intent(this, LobbiesActivity::class.java)
             }
         startActivity(intent)
     }
