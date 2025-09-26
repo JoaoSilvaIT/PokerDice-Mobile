@@ -12,8 +12,8 @@ import com.pdm.pokerdice.ui.theme.PokerDiceTheme
 
 class LobbyCreationActivity : ComponentActivity() {
 
-    override fun onCreate(savedInstanceState: Bundle?, persistentState: PersistableBundle?) {
-        super.onCreate(savedInstanceState, persistentState)
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
         setContent {
             PokerDiceTheme {
                 Scaffold (modifier = Modifier.fillMaxSize()) { innerPadding ->
