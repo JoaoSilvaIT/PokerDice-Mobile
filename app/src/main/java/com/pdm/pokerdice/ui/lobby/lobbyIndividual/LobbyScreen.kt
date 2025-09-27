@@ -24,6 +24,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.ui.graphics.Color
 import com.pdm.pokerdice.domain.Lobby
 import com.pdm.pokerdice.domain.User
+import com.pdm.pokerdice.domain.lobbies
 import com.pdm.pokerdice.ui.lobby.lobbies.LobbiesNavigation
 import com.pdm.pokerdice.ui.theme.PokerDiceTheme
 
@@ -97,7 +98,10 @@ fun LobbyScreen(
         }
 
         Button(
-            onClick = { onNavigate(LobbyNavigation.TitleScreen) },
+            onClick = {
+                onNavigate(LobbyNavigation.TitleScreen)
+                lobby.users.removeAt(lobby.users.lastIndex)
+                if (lobby.users.isEmpty()) lobbies.removeAt(lobby.lid) },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(top = 8.dp),
