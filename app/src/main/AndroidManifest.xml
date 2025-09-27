@@ -12,7 +12,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.PokerDice">
         <activity
-            android:name=".ui.main.MainActivity"
+            android:name=".ui.title.MainActivity"
             android:exported="true"
             android:theme="@style/Theme.PokerDice">
             <intent-filter>
@@ -28,6 +28,8 @@
         <activity android:name=".ui.lobby.lobbies.LobbiesActivity"
             android:exported="false" />
         <activity android:name=".ui.lobby.lobbyCreation.LobbyCreationActivity"
+            android:exported="false"/>
+        <activity android:name=".ui.lobby.lobbyIndividual.LobbyActivity"
             android:exported="false"/>
     </application>
 

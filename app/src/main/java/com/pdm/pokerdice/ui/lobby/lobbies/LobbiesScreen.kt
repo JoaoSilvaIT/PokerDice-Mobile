@@ -23,12 +23,15 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.pdm.pokerdice.domain.Lobby
+import com.pdm.pokerdice.domain.User
+import com.pdm.pokerdice.domain.lobbies
 import com.pdm.pokerdice.ui.lobby.lobbyCreation.LobbyCreationNavigation
 import com.pdm.pokerdice.ui.theme.PokerDiceTheme
+import kotlinx.serialization.builtins.UIntArraySerializer
 
 const val CREATE_LOBBY = "create_button"
 sealed class LobbiesNavigation {
-    class SelectLobby(lobby: Lobby = Lobby(0, "Default Name", "Default Description")) : LobbiesNavigation()
+    class SelectLobby(val lobby: Lobby) : LobbiesNavigation()
     object CreatLobby : LobbiesNavigation()
 }
 @Composable
@@ -36,15 +39,6 @@ fun LobbiesScreen(
     mod: Modifier = Modifier,
     onNavigate: (LobbiesNavigation) -> Unit = {}
 ) {
-
-    //Vai ser mudado, só para ficar de exemplo
-    val lobbies = listOf(
-        Lobby(1, "High Rollers", ""),
-        Lobby(2, "Casual Dice", ""),
-        Lobby(3, "Late Night Lobby", ""),
-        Lobby(4, "Fast Game", "")
-    )
-
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -81,7 +75,10 @@ fun LobbiesScreen(
                             style = MaterialTheme.typography.bodyLarge
                         )
                         Button(
-                            onClick = { onNavigate(LobbiesNavigation.SelectLobby(lobby)) }
+                            onClick = {
+                                onNavigate(LobbiesNavigation.SelectLobby(lobby))
+                                lobby.users.add(User(69, "YOU"))
+                            }
 
                         ) {
                             Text(

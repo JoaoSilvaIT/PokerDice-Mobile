@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
 import com.pdm.pokerdice.ui.lobby.lobbyCreation.LobbyCreationActivity
+import com.pdm.pokerdice.ui.lobby.lobbyIndividual.LobbyActivity
 import com.pdm.pokerdice.ui.theme.PokerDiceTheme
 
 class LobbiesActivity : ComponentActivity() {
@@ -28,8 +29,13 @@ class LobbiesActivity : ComponentActivity() {
 
     private fun handleNavigation(it: LobbiesNavigation) {
        val intent = when (it) {
-                LobbiesNavigation.CreatLobby -> Intent(this, LobbyCreationActivity::class.java)
-                is LobbiesNavigation.SelectLobby -> TODO()
+           LobbiesNavigation.CreatLobby ->
+               Intent(this, LobbyCreationActivity::class.java)
+
+           is LobbiesNavigation.SelectLobby ->
+               Intent(this, LobbyActivity::class.java).apply {
+                     putExtra("lobby", it.lobby)
+               }
        }
         startActivity(intent)
     }

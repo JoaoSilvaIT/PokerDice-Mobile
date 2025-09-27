@@ -1,4 +1,4 @@
-package com.pdm.pokerdice.ui.main
+package com.pdm.pokerdice.ui.title
 
 import android.content.Intent
 import android.os.Bundle
@@ -13,8 +13,6 @@ import com.pdm.pokerdice.ui.about.AboutActivity
 import com.pdm.pokerdice.ui.lobby.lobbies.LobbiesActivity
 import com.pdm.pokerdice.ui.profile.ProfileActivity
 import com.pdm.pokerdice.ui.theme.PokerDiceTheme
-import com.pdm.pokerdice.ui.title.TitleScreen
-import com.pdm.pokerdice.ui.title.TitleScreenActions
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -22,9 +20,9 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             PokerDiceTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+                Scaffold(modifier = Modifier.Companion.fillMaxSize()) { innerPadding ->
                     TitleScreen(
-                        modifier = Modifier.padding(innerPadding),
+                        modifier = Modifier.Companion.padding(innerPadding),
                         onNavigate = { navigateTo(it) },
                     )
                 }
