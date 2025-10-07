@@ -13,6 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -25,6 +26,10 @@ enum class TitleScreenActions {
     Profile,
     StartGame,
 }
+
+const val START_GAME = "start_game_button"
+const val PROFILE = "profile_button"
+const val ABOUT = "about_button"
 
 @Composable
 fun TitleScreen(
@@ -54,18 +59,21 @@ fun TitleScreen(
             Button(
                 onClick = { onNavigate(TitleScreenActions.StartGame) },
                 colors = ButtonDefaults.buttonColors(containerColor = Color.Red),
+                modifier = Modifier.testTag(START_GAME)
             ) {
                 Text("Start Game")
             }
             Button(
                 onClick = { onNavigate(TitleScreenActions.Profile) },
                 colors = ButtonDefaults.buttonColors(containerColor = Color.Red),
+                modifier = Modifier.testTag(PROFILE)
             ) {
                 Text("Profile")
             }
             Button(
                 onClick = { onNavigate(TitleScreenActions.About) },
                 colors = ButtonDefaults.buttonColors(containerColor = Color.Red),
+                modifier = Modifier.testTag(ABOUT)
             ) {
                 Text("About")
             }

@@ -1,6 +1,5 @@
 package com.pdm.pokerdice.ui.lobby.lobbyIndividual
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -13,18 +12,14 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SegmentedButtonDefaults.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.material3.Icon
 import androidx.compose.ui.graphics.Color
 import com.pdm.pokerdice.domain.Lobby
-import com.pdm.pokerdice.domain.User
-import com.pdm.pokerdice.ui.lobby.lobbies.LobbiesNavigation
 import com.pdm.pokerdice.ui.theme.PokerDiceTheme
 
 sealed class LobbyNavigation {
@@ -37,14 +32,13 @@ sealed class LobbyNavigation {
 fun LobbyScreen(
     mod: Modifier = Modifier,
     onNavigate: (LobbyNavigation) -> Unit = {},
-    lobby: Lobby = Lobby(0, "Default Name", "Default Description", mutableListOf()),
+    lobby: Lobby = Lobby(0, "Default Name", "Default Description", mutableListOf(), 10),
 ) {
     Column(
         modifier = mod
             .fillMaxSize()
             .padding(16.dp)
     ) {
-        // Lobby Information
         Text(
             text = lobby.name,
             style = MaterialTheme.typography.headlineLarge,

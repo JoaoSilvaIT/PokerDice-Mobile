@@ -6,12 +6,15 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -19,20 +22,33 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.pdm.pokerdice.domain.Lobby
+import com.pdm.pokerdice.domain.users1st
+import com.pdm.pokerdice.ui.lobby.lobbies.LobbiesNavigation
 
 const val PLAYER_MIN = 2
 const val PLAYER_MAX = 10
 
-sealed class LobbyCreationNavigation {
+sealed class LobbyCreationNavigation() {
 
-    object Lobby : LobbyCreationNavigation()
+    class CreatedLobby(val lobby: Lobby) : LobbyCreationNavigation()
 }
+
+const val DESCRIPTION = "lobby_description"
+const val LOBBY_NAME = "lobby_name"
+
+const val INCREMENT_LIMIT = "increment_player_limit"
+const val DECREMENT_LIMIT = "decrement_player_limit"
+
+const val CREATE_LOBBY = "create_lobby_button"
 @Composable
-fun LobbyCreationScreen(modifier: Modifier){
+fun LobbyCreationScreen(modifier: Modifier, onNavigate: (LobbyCreationNavigation) -> Unit = {}) {
     var playerLimit by remember { mutableStateOf(2) }
-    var isPrivate by remember { mutableStateOf(false) }
+    var lobbyName by remember { mutableStateOf("") }
+    var lobbyInfo by remember { mutableStateOf("") }
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -52,11 +68,23 @@ fun LobbyCreationScreen(modifier: Modifier){
                     horizontalArrangement = Arrangement.Center,
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text("Private lobby", style = MaterialTheme.typography.titleMedium)
-                    Switch(
-                        checked = isPrivate,
-                        onCheckedChange = { isPrivate = it },
-                        modifier = Modifier.padding(start = 16.dp)
+                    OutlinedTextField(
+                        value = lobbyName,
+                        onValueChange = { lobbyName = it },
+                        label = { Text("Lobby Name") },
+                        modifier = Modifier.testTag(LOBBY_NAME)
+                    )
+                }
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center,
+                    modifier = Modifier.fillMaxWidth()
+                ){
+                    OutlinedTextField(
+                        value = lobbyInfo,
+                        onValueChange = { lobbyInfo = it },
+                        label = { Text("Description") },
+                        modifier = Modifier.testTag(DESCRIPTION)
                     )
                 }
                 Row(
@@ -66,7 +94,8 @@ fun LobbyCreationScreen(modifier: Modifier){
                 ) {
                     IconButton(
                         enabled = playerLimit > PLAYER_MIN,
-                        onClick = { playerLimit-- }
+                        onClick = { playerLimit-- },
+                        modifier = Modifier.testTag(DECREMENT_LIMIT)
                     ) {
                         Text("<", style = MaterialTheme.typography.titleLarge)
                     }
@@ -77,11 +106,19 @@ fun LobbyCreationScreen(modifier: Modifier){
                     )
                     IconButton(
                         enabled = playerLimit < PLAYER_MAX,
-                        onClick = { playerLimit++ }
+                        onClick = { playerLimit++ },
+                        modifier = Modifier.testTag(INCREMENT_LIMIT)
                     ) {
                         Text(">", style = MaterialTheme.typography.titleLarge)
                     }
+
                 }
+            }
+            Button(onClick = {onNavigate(LobbyCreationNavigation.CreatedLobby(Lobby(4, lobbyName, lobbyInfo,
+                users1st, playerLimit)))},
+                modifier = Modifier.testTag(CREATE_LOBBY)
+            ) {
+                Text("Create Lobby")
             }
         }
     }

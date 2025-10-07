@@ -16,6 +16,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -28,11 +29,17 @@ sealed class AboutNavigation {
     object ContactUs : AboutNavigation()
 }
 
+const val GAME_RULES = "game_rules_button"
+const val CONTACT_US = "contact_us_button"
+const val CREATOR1 = "creator1_button"
+const val CREATOR2 = "creator2_button"
+const val CREATOR3 = "creator3_button"
+
 @Composable
-fun AboutScreen(mod: Modifier, onNavigate: (AboutNavigation) -> Unit = {}) {
+fun AboutScreen(modifier: Modifier, onNavigate: (AboutNavigation) -> Unit = {}) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = mod.fillMaxSize().padding(16.dp),
+        modifier = modifier.fillMaxSize().padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(24.dp)
     ){
         Text("About Poker Dice",
@@ -62,7 +69,7 @@ fun AboutScreen(mod: Modifier, onNavigate: (AboutNavigation) -> Unit = {}) {
                 )
                 Button(
                     onClick = { onNavigate(AboutNavigation.GameRules) },
-                    modifier = Modifier.align(Alignment.End)
+                    modifier = Modifier.align(Alignment.End).testTag(GAME_RULES)
                 ) {
                     Text("Game Rules")
                 }
@@ -89,7 +96,9 @@ fun AboutScreen(mod: Modifier, onNavigate: (AboutNavigation) -> Unit = {}) {
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text("Pedro Monteiro (51457)")
-                    Button(onClick = { onNavigate(AboutNavigation.Creator("https://github.com/pedrowlv")) }) {
+                    Button(onClick = { onNavigate(AboutNavigation.Creator("https://github.com/pedrowlv")) },
+                        modifier = Modifier.testTag(CREATOR1)
+                    ) {
                         Text("GitHub")
                     }
                 }
@@ -100,7 +109,9 @@ fun AboutScreen(mod: Modifier, onNavigate: (AboutNavigation) -> Unit = {}) {
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text("João Silva (51682)")
-                    Button(onClick = { onNavigate(AboutNavigation.Creator("https://github.com/JoaoSilvaIT")) }) {
+                    Button(onClick = { onNavigate(AboutNavigation.Creator("https://github.com/JoaoSilvaIT")) },
+                        modifier = Modifier.testTag(CREATOR2)
+                        ) {
                         Text("GitHub")
                     }
                 }
@@ -111,7 +122,9 @@ fun AboutScreen(mod: Modifier, onNavigate: (AboutNavigation) -> Unit = {}) {
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text("Bernardo Jaco (51690)")
-                    Button(onClick = { onNavigate(AboutNavigation.Creator("https://github.com/jacaoo")) }) {
+                    Button(onClick = { onNavigate(AboutNavigation.Creator("https://github.com/jacaoo")) },
+                        modifier = Modifier.testTag(CREATOR3)
+                        ) {
                         Text("GitHub")
                     }
                 }
@@ -121,7 +134,7 @@ fun AboutScreen(mod: Modifier, onNavigate: (AboutNavigation) -> Unit = {}) {
         Button(
             onClick = { onNavigate(AboutNavigation.ContactUs) },
             colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth().testTag(CONTACT_US)
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,

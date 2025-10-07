@@ -36,7 +36,7 @@ sealed class LobbiesNavigation {
 }
 @Composable
 fun LobbiesScreen(
-    mod: Modifier = Modifier,
+    modifier: Modifier = Modifier,
     onNavigate: (LobbiesNavigation) -> Unit = {}
 ) {
     Column(
@@ -78,7 +78,8 @@ fun LobbiesScreen(
                             onClick = {
                                 onNavigate(LobbiesNavigation.SelectLobby(lobby))
                                 lobby.users.add(User(69, "YOU"))
-                            }
+                            },
+                            modifier = Modifier.testTag("join_button_${lobby.lid}")
 
                         ) {
                             Text(
