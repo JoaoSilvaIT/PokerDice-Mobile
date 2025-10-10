@@ -6,7 +6,8 @@ import kotlinx.parcelize.Parcelize
 @Parcelize
 data class User (
     val uid : Int,
-    val name : String
+    val name : String,
+    val email : String = ""
 ) : Parcelable
 
 val users1st = mutableListOf(
