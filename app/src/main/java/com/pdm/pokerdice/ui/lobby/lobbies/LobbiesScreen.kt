@@ -18,21 +18,18 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.pdm.pokerdice.domain.Lobby
 import com.pdm.pokerdice.domain.User
 import com.pdm.pokerdice.domain.lobbies
-import com.pdm.pokerdice.ui.lobby.lobbyCreation.LobbyCreationNavigation
 import com.pdm.pokerdice.ui.theme.PokerDiceTheme
-import kotlinx.serialization.builtins.UIntArraySerializer
 
 const val CREATE_LOBBY = "create_button"
 sealed class LobbiesNavigation {
     class SelectLobby(val lobby: Lobby) : LobbiesNavigation()
-    object CreatLobby : LobbiesNavigation()
+    object CreateLobby : LobbiesNavigation()
 }
 @Composable
 fun LobbiesScreen(
@@ -93,7 +90,7 @@ fun LobbiesScreen(
 
         }
         Button(
-            onClick = { onNavigate(LobbiesNavigation.CreatLobby) },
+            onClick = { onNavigate(LobbiesNavigation.CreateLobby) },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(top = 16.dp)

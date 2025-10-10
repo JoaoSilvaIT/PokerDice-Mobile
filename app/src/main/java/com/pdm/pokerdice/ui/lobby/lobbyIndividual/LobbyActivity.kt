@@ -9,19 +9,15 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
 import com.pdm.pokerdice.domain.Lobby
-import com.pdm.pokerdice.domain.User
-import com.pdm.pokerdice.ui.lobby.lobbies.LobbiesActivity
-import com.pdm.pokerdice.ui.lobby.lobbies.LobbiesScreen
 import com.pdm.pokerdice.ui.theme.PokerDiceTheme
 import com.pdm.pokerdice.ui.title.MainActivity
-import com.pdm.pokerdice.ui.title.TitleScreen
 
 class LobbyActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val lobby = intent.getParcelableExtra("lobby", Lobby::class.java) ?: Lobby(0, "Default Name", "Default Description", mutableListOf(), 10)
+        val lobby = intent.getParcelableExtra("lobby", Lobby::class.java) ?: Lobby(0, "Default Name", "Default Description", mutableListOf(), 10, 10)
 
         setContent {
             PokerDiceTheme {

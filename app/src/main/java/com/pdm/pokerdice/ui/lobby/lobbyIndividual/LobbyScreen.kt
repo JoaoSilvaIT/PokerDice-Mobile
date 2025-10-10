@@ -32,7 +32,7 @@ sealed class LobbyNavigation {
 fun LobbyScreen(
     mod: Modifier = Modifier,
     onNavigate: (LobbyNavigation) -> Unit = {},
-    lobby: Lobby = Lobby(0, "Default Name", "Default Description", mutableListOf(), 10),
+    lobby: Lobby
 ) {
     Column(
         modifier = mod
@@ -106,6 +106,6 @@ fun LobbyScreen(
 @Composable
 fun LobbyScreenPreview(){
     PokerDiceTheme {
-        LobbyScreen(Modifier)
+        LobbyScreen(Modifier, lobby = Lobby(69, "Test Lobby", "This is a test lobby", mutableListOf(), 10, 10) )
     }
 }

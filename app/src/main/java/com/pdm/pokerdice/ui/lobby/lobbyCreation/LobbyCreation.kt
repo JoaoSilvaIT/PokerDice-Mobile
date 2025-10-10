@@ -39,16 +39,17 @@ sealed class LobbyCreationNavigation() {
 
 const val DESCRIPTION = "lobby_description"
 const val LOBBY_NAME = "lobby_name"
-
 const val INCREMENT_LIMIT = "increment_player_limit"
 const val DECREMENT_LIMIT = "decrement_player_limit"
-
 const val CREATE_LOBBY = "create_lobby_button"
+const val INCREMENT_ROUNDS = "increment_rounds"
+const val DECREMENT_ROUNDS = "decrement_rounds"
 @Composable
 fun LobbyCreationScreen(modifier: Modifier, onNavigate: (LobbyCreationNavigation) -> Unit = {}) {
     var playerLimit by remember { mutableStateOf(2) }
     var lobbyName by remember { mutableStateOf("") }
     var lobbyInfo by remember { mutableStateOf("") }
+    var rounds by remember { mutableStateOf(playerLimit) }
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -87,6 +88,11 @@ fun LobbyCreationScreen(modifier: Modifier, onNavigate: (LobbyCreationNavigation
                         modifier = Modifier.testTag(DESCRIPTION)
                     )
                 }
+                Text(
+                    text = "Player Limit",
+                    style = MaterialTheme.typography.labelLarge,
+                    modifier = Modifier.padding(bottom = 4.dp)
+                )
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.Center,
@@ -111,11 +117,40 @@ fun LobbyCreationScreen(modifier: Modifier, onNavigate: (LobbyCreationNavigation
                     ) {
                         Text(">", style = MaterialTheme.typography.titleLarge)
                     }
-
+                }
+                Text(
+                    text = "Rounds",
+                    style = MaterialTheme.typography.labelLarge,
+                    modifier = Modifier.padding(top = 12.dp, bottom = 4.dp)
+                )
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center,
+                    modifier = Modifier.fillMaxWidth()
+                ){
+                    IconButton(
+                        enabled = rounds >= playerLimit,
+                        onClick = { rounds-- },
+                        modifier = Modifier.testTag(DECREMENT_ROUNDS)
+                    ) {
+                        Text("<", style = MaterialTheme.typography.titleLarge)
+                    }
+                    Text(
+                        text = "$rounds",
+                        style = MaterialTheme.typography.titleLarge,
+                        modifier = Modifier.padding(horizontal = 24.dp)
+                    )
+                    IconButton(
+                        enabled = rounds <= playerLimit,
+                        onClick = { rounds++ },
+                        modifier = Modifier.testTag(INCREMENT_ROUNDS)
+                    ) {
+                        Text(">", style = MaterialTheme.typography.titleLarge)
+                    }
                 }
             }
             Button(onClick = {onNavigate(LobbyCreationNavigation.CreatedLobby(Lobby(4, lobbyName, lobbyInfo,
-                users1st, playerLimit)))},
+                users1st, playerLimit, rounds)))},
                 modifier = Modifier.testTag(CREATE_LOBBY)
             ) {
                 Text("Create Lobby")

@@ -29,7 +29,7 @@ class LobbiesActivity : ComponentActivity() {
 
     private fun handleNavigation(it: LobbiesNavigation) {
        val intent = when (it) {
-           LobbiesNavigation.CreatLobby ->
+           LobbiesNavigation.CreateLobby ->
                Intent(this, LobbyCreationActivity::class.java)
 
            is LobbiesNavigation.SelectLobby ->
