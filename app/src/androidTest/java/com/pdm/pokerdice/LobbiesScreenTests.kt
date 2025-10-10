@@ -24,7 +24,7 @@ class LobbiesScreenTests {
             LobbiesScreen(onNavigate = {event = it})
         }
         composeTestRule.onNodeWithTag(testTag = CREATE_LOBBY).performClick()
-        assert(event == LobbiesNavigation.CreatLobby)
+        assert(event == LobbiesNavigation.CreateLobby)
     }
 
     @Test

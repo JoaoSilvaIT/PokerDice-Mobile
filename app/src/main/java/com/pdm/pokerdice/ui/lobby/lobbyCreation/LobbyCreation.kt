@@ -26,7 +26,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.pdm.pokerdice.domain.Lobby
-import com.pdm.pokerdice.domain.User
+import com.pdm.pokerdice.domain.users1st
 import com.pdm.pokerdice.ui.lobby.lobbies.LobbiesNavigation
 
 const val PLAYER_MIN = 2
@@ -44,11 +44,14 @@ const val INCREMENT_LIMIT = "increment_player_limit"
 const val DECREMENT_LIMIT = "decrement_player_limit"
 
 const val CREATE_LOBBY = "create_lobby_button"
+const val INCREMENT_ROUNDS = "increment_rounds"
+const val DECREMENT_ROUNDS = "decrement_rounds"
 @Composable
 fun LobbyCreationScreen(modifier: Modifier, onNavigate: (LobbyCreationNavigation) -> Unit = {}, user: User) {
     var playerLimit by remember { mutableStateOf(2) }
     var lobbyName by remember { mutableStateOf("") }
     var lobbyInfo by remember { mutableStateOf("") }
+    var rounds by remember { mutableStateOf(playerLimit) }
     var maxPlayers by remember { mutableStateOf("") }
 
     Column(
@@ -128,7 +131,36 @@ fun LobbyCreationScreen(modifier: Modifier, onNavigate: (LobbyCreationNavigation
                     ) {
                         Text(">", style = MaterialTheme.typography.titleLarge)
                     }
-
+                }
+                Text(
+                    text = "Rounds",
+                    style = MaterialTheme.typography.labelLarge,
+                    modifier = Modifier.padding(top = 12.dp, bottom = 4.dp)
+                )
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center,
+                    modifier = Modifier.fillMaxWidth()
+                ){
+                    IconButton(
+                        enabled = rounds >= playerLimit,
+                        onClick = { rounds-- },
+                        modifier = Modifier.testTag(DECREMENT_ROUNDS)
+                    ) {
+                        Text("<", style = MaterialTheme.typography.titleLarge)
+                    }
+                    Text(
+                        text = "$rounds",
+                        style = MaterialTheme.typography.titleLarge,
+                        modifier = Modifier.padding(horizontal = 24.dp)
+                    )
+                    IconButton(
+                        enabled = rounds <= playerLimit,
+                        onClick = { rounds++ },
+                        modifier = Modifier.testTag(INCREMENT_ROUNDS)
+                    ) {
+                        Text(">", style = MaterialTheme.typography.titleLarge)
+                    }
                 }
             }
             Button(onClick = {onNavigate(LobbyCreationNavigation.CreatedLobby(Lobby(4, lobbyName, lobbyInfo,

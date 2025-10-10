@@ -20,7 +20,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.graphics.Color
 import com.pdm.pokerdice.domain.Lobby
-import com.pdm.pokerdice.domain.User
 import com.pdm.pokerdice.ui.theme.PokerDiceTheme
 
 sealed class LobbyNavigation {
@@ -80,6 +79,7 @@ fun LobbyScreen(
                 }
             }
         }
+
         // Start Match button (navigate)
         Button(
             onClick = { }, // In the future will be used to start a game
