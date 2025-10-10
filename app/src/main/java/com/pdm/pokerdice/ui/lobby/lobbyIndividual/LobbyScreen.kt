@@ -20,6 +20,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.graphics.Color
 import com.pdm.pokerdice.domain.Lobby
+import com.pdm.pokerdice.domain.User
 import com.pdm.pokerdice.ui.theme.PokerDiceTheme
 
 sealed class LobbyNavigation {
@@ -106,12 +107,15 @@ fun LobbyScreen(
 @Composable
 fun LobbyScreenPreview(){
     PokerDiceTheme {
-        LobbyScreen(Modifier, lobby = Lobby(1,
-            "Test Lobby",
-            "This is a test lobby description",
-            mutableListOf(),
-            10,
-            User(1, "null", "null")
+        LobbyScreen(
+            Modifier, lobby = Lobby(
+                1,
+                "Test Lobby",
+                "This is a test lobby description",
+                mutableListOf(),
+                10,
+                User(1, "null", "null"),
+                10
             )
         )
     }

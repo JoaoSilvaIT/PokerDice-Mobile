@@ -10,5 +10,6 @@ data class Lobby (
     val description : String,
     val users : List<User>,
     val maxUsers : Int,
-    val host : User
+    val host : User,
+    val rounds : Int
 ) : Parcelable

@@ -25,7 +25,8 @@ class LobbyActivity : ComponentActivity() {
             Lobby::class.java) ?: Lobby(0, "Default Name", "Default Description",
             mutableListOf(),
             10,
-                User(0, "Default User", ""))
+                User(0, "Default User", ""),
+                2)
 
         setContent {
             PokerDiceTheme {

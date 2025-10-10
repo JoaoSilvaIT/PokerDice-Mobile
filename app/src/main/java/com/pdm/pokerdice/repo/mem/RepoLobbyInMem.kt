@@ -13,7 +13,9 @@ class RepoLobbyInMem : RepositoryLobby {
             "This is a test lobby",
             listOf(User(2, "jj", "")),
             2,
-            User(2, "jj", ""))
+            User(2, "jj", ""),
+            2
+            )
     )
     var lid = 2
 
@@ -21,9 +23,10 @@ class RepoLobbyInMem : RepositoryLobby {
         name: String,
         description: String,
         maxPlayers: Int,
+        rounds : Int,
         host: User
     ): Lobby {
-        val newLobby = Lobby(lid, name, description, listOf(host),maxPlayers, host)
+        val newLobby = Lobby(lid, name, description, listOf(host),maxPlayers, host, rounds)
         lid++
         lobbies.add(newLobby)
         return newLobby

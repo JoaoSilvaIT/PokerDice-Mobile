@@ -12,11 +12,10 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -26,8 +25,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.pdm.pokerdice.domain.Lobby
-import com.pdm.pokerdice.domain.users1st
-import com.pdm.pokerdice.ui.lobby.lobbies.LobbiesNavigation
+import com.pdm.pokerdice.domain.User
 
 const val PLAYER_MIN = 2
 const val PLAYER_MAX = 10
@@ -48,11 +46,10 @@ const val INCREMENT_ROUNDS = "increment_rounds"
 const val DECREMENT_ROUNDS = "decrement_rounds"
 @Composable
 fun LobbyCreationScreen(modifier: Modifier, onNavigate: (LobbyCreationNavigation) -> Unit = {}, user: User) {
-    var playerLimit by remember { mutableStateOf(2) }
+    var maxPlayers by remember { mutableIntStateOf(2) }
     var lobbyName by remember { mutableStateOf("") }
     var lobbyInfo by remember { mutableStateOf("") }
-    var rounds by remember { mutableStateOf(playerLimit) }
-    var maxPlayers by remember { mutableStateOf("") }
+    var rounds by remember { mutableIntStateOf(maxPlayers) }
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -91,42 +88,31 @@ fun LobbyCreationScreen(modifier: Modifier, onNavigate: (LobbyCreationNavigation
                         modifier = Modifier.testTag(DESCRIPTION)
                     )
                 }
-                Row (
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Center,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    TextField(
-                        value = maxPlayers,
-                        onValueChange = { newValue ->
-                            // Filtra apenas números
-                            if (newValue.all { it.isDigit() }) {
-                                maxPlayers = newValue
-                            }
-                        },
-                        label = { Text("Número Máximo de Players") }
-                    )
-                }
+                Text(
+                    text = "Max Players",
+                    style = MaterialTheme.typography.labelLarge,
+                    modifier = Modifier.padding(top = 12.dp, bottom = 4.dp)
+                )
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.Center,
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     IconButton(
-                        enabled = playerLimit > PLAYER_MIN,
-                        onClick = { playerLimit-- },
+                        enabled = maxPlayers > PLAYER_MIN,
+                        onClick = { maxPlayers-- },
                         modifier = Modifier.testTag(DECREMENT_LIMIT)
                     ) {
                         Text("<", style = MaterialTheme.typography.titleLarge)
                     }
                     Text(
-                        text = "$playerLimit",
+                        text = "$maxPlayers",
                         style = MaterialTheme.typography.titleLarge,
                         modifier = Modifier.padding(horizontal = 24.dp)
                     )
                     IconButton(
-                        enabled = playerLimit < PLAYER_MAX,
-                        onClick = { playerLimit++ },
+                        enabled = maxPlayers < PLAYER_MAX,
+                        onClick = { maxPlayers++ },
                         modifier = Modifier.testTag(INCREMENT_LIMIT)
                     ) {
                         Text(">", style = MaterialTheme.typography.titleLarge)
@@ -143,7 +129,7 @@ fun LobbyCreationScreen(modifier: Modifier, onNavigate: (LobbyCreationNavigation
                     modifier = Modifier.fillMaxWidth()
                 ){
                     IconButton(
-                        enabled = rounds >= playerLimit,
+                        enabled = rounds >= maxPlayers,
                         onClick = { rounds-- },
                         modifier = Modifier.testTag(DECREMENT_ROUNDS)
                     ) {
@@ -155,7 +141,7 @@ fun LobbyCreationScreen(modifier: Modifier, onNavigate: (LobbyCreationNavigation
                         modifier = Modifier.padding(horizontal = 24.dp)
                     )
                     IconButton(
-                        enabled = rounds <= playerLimit,
+                        enabled = rounds <= maxPlayers,
                         onClick = { rounds++ },
                         modifier = Modifier.testTag(INCREMENT_ROUNDS)
                     ) {
@@ -164,7 +150,7 @@ fun LobbyCreationScreen(modifier: Modifier, onNavigate: (LobbyCreationNavigation
                 }
             }
             Button(onClick = {onNavigate(LobbyCreationNavigation.CreatedLobby(Lobby(4, lobbyName, lobbyInfo,
-                listOf(user), maxPlayers.toInt(), user)))},
+                listOf(user), maxPlayers, user, rounds)))},
                 modifier = Modifier.testTag(CREATE_LOBBY)
             ) {
                 Text("Create Lobby")
