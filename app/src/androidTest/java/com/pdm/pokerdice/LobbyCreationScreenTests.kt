@@ -3,7 +3,6 @@ package com.pdm.pokerdice
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
-import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
 import com.pdm.pokerdice.ui.lobby.lobbyCreation.CREATE_LOBBY
@@ -12,7 +11,6 @@ import com.pdm.pokerdice.ui.lobby.lobbyCreation.INCREMENT_LIMIT
 import com.pdm.pokerdice.ui.lobby.lobbyCreation.LOBBY_NAME
 import com.pdm.pokerdice.ui.lobby.lobbyCreation.LobbyCreationNavigation
 import com.pdm.pokerdice.ui.lobby.lobbyCreation.LobbyCreationScreen
-import com.pdm.pokerdice.ui.lobby.lobbyCreation.PLAYER_MIN
 import org.junit.Rule
 import org.junit.Test
 
@@ -41,6 +39,6 @@ class LobbyCreationScreenTests {
         val createdLobby = (event as LobbyCreationNavigation.CreatedLobby).lobby
         assert(createdLobby.name == lobbyName)
         assert(createdLobby.description == lobbyDescription)
-        assert(createdLobby.limit == 3)
+        assert(createdLobby.maxUsers == 3)
     }
 }

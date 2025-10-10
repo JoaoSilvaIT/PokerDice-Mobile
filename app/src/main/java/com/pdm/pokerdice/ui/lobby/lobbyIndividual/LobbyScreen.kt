@@ -20,6 +20,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.graphics.Color
 import com.pdm.pokerdice.domain.Lobby
+import com.pdm.pokerdice.domain.User
 import com.pdm.pokerdice.ui.theme.PokerDiceTheme
 
 sealed class LobbyNavigation {
@@ -32,7 +33,7 @@ sealed class LobbyNavigation {
 fun LobbyScreen(
     mod: Modifier = Modifier,
     onNavigate: (LobbyNavigation) -> Unit = {},
-    lobby: Lobby = Lobby(0, "Default Name", "Default Description", mutableListOf(), 10),
+    lobby: Lobby
 ) {
     Column(
         modifier = mod
@@ -79,7 +80,6 @@ fun LobbyScreen(
                 }
             }
         }
-
         // Start Match button (navigate)
         Button(
             onClick = { }, // In the future will be used to start a game
@@ -106,6 +106,13 @@ fun LobbyScreen(
 @Composable
 fun LobbyScreenPreview(){
     PokerDiceTheme {
-        LobbyScreen(Modifier)
+        LobbyScreen(Modifier, lobby = Lobby(1,
+            "Test Lobby",
+            "This is a test lobby description",
+            mutableListOf(),
+            10,
+            User(1, "null", "null")
+            )
+        )
     }
 }

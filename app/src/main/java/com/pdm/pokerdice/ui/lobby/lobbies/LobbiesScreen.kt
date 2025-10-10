@@ -24,7 +24,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.pdm.pokerdice.domain.Lobby
 import com.pdm.pokerdice.domain.User
-import com.pdm.pokerdice.domain.lobbies
+import com.pdm.pokerdice.repo.RepositoryLobby
+import com.pdm.pokerdice.repo.mem.RepoLobbyInMem
 import com.pdm.pokerdice.ui.lobby.lobbyCreation.LobbyCreationNavigation
 import com.pdm.pokerdice.ui.theme.PokerDiceTheme
 import kotlinx.serialization.builtins.UIntArraySerializer
@@ -32,10 +33,12 @@ import kotlinx.serialization.builtins.UIntArraySerializer
 const val CREATE_LOBBY = "create_button"
 sealed class LobbiesNavigation {
     class SelectLobby(val lobby: Lobby) : LobbiesNavigation()
-    object CreatLobby : LobbiesNavigation()
+    class CreateLobby(val user: User) : LobbiesNavigation()
 }
 @Composable
 fun LobbiesScreen(
+    user : User,
+    dataLobby : RepositoryLobby,
     modifier: Modifier = Modifier,
     onNavigate: (LobbiesNavigation) -> Unit = {}
 ) {
@@ -55,7 +58,7 @@ fun LobbiesScreen(
                 .weight(1f)
                 .fillMaxWidth()
         ) {
-            items(lobbies) { lobby ->
+            items(dataLobby.findAll()) { lobby ->
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -76,8 +79,8 @@ fun LobbiesScreen(
                         )
                         Button(
                             onClick = {
-                                onNavigate(LobbiesNavigation.SelectLobby(lobby))
-                                lobby.users.add(User(69, "YOU"))
+                                val newLobby = dataLobby.joinLobby(user, lobby)
+                                onNavigate(LobbiesNavigation.SelectLobby(newLobby))
                             },
                             modifier = Modifier.testTag("join_button_${lobby.lid}")
 
@@ -93,7 +96,7 @@ fun LobbiesScreen(
 
         }
         Button(
-            onClick = { onNavigate(LobbiesNavigation.CreatLobby) },
+            onClick = { onNavigate(LobbiesNavigation.CreateLobby(user)) },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(top = 16.dp)
@@ -109,7 +112,8 @@ fun LobbiesScreen(
 @Preview()
 @Composable
 fun LobbiesScreenPreview() {
+    val repositoryLobby = RepoLobbyInMem()
     PokerDiceTheme {
-        LobbiesScreen(Modifier)
+        LobbiesScreen(User(1, "NULL", "null"),repositoryLobby, Modifier)
     }
 }

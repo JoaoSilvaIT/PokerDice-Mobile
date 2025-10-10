@@ -26,7 +26,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.pdm.pokerdice.domain.Lobby
-import com.pdm.pokerdice.domain.users1st
+import com.pdm.pokerdice.domain.User
 import com.pdm.pokerdice.ui.lobby.lobbies.LobbiesNavigation
 
 const val PLAYER_MIN = 2
@@ -45,10 +45,11 @@ const val DECREMENT_LIMIT = "decrement_player_limit"
 
 const val CREATE_LOBBY = "create_lobby_button"
 @Composable
-fun LobbyCreationScreen(modifier: Modifier, onNavigate: (LobbyCreationNavigation) -> Unit = {}) {
+fun LobbyCreationScreen(modifier: Modifier, onNavigate: (LobbyCreationNavigation) -> Unit = {}, user: User) {
     var playerLimit by remember { mutableStateOf(2) }
     var lobbyName by remember { mutableStateOf("") }
     var lobbyInfo by remember { mutableStateOf("") }
+    var maxPlayers by remember { mutableStateOf("") }
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -87,6 +88,22 @@ fun LobbyCreationScreen(modifier: Modifier, onNavigate: (LobbyCreationNavigation
                         modifier = Modifier.testTag(DESCRIPTION)
                     )
                 }
+                Row (
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    TextField(
+                        value = maxPlayers,
+                        onValueChange = { newValue ->
+                            // Filtra apenas números
+                            if (newValue.all { it.isDigit() }) {
+                                maxPlayers = newValue
+                            }
+                        },
+                        label = { Text("Número Máximo de Players") }
+                    )
+                }
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.Center,
@@ -115,7 +132,7 @@ fun LobbyCreationScreen(modifier: Modifier, onNavigate: (LobbyCreationNavigation
                 }
             }
             Button(onClick = {onNavigate(LobbyCreationNavigation.CreatedLobby(Lobby(4, lobbyName, lobbyInfo,
-                users1st, playerLimit)))},
+                listOf(user), maxPlayers.toInt(), user)))},
                 modifier = Modifier.testTag(CREATE_LOBBY)
             ) {
                 Text("Create Lobby")
@@ -128,5 +145,5 @@ fun LobbyCreationScreen(modifier: Modifier, onNavigate: (LobbyCreationNavigation
 @Preview
 @Composable
 fun LobbyCreationPreview() {
-    LobbyCreationScreen(Modifier.fillMaxSize())
+    LobbyCreationScreen(Modifier.fillMaxSize(), user = User(1, "null", "null")) // Mock User
 }

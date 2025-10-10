@@ -21,7 +21,11 @@ class LobbyActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val lobby = intent.getParcelableExtra("lobby", Lobby::class.java) ?: Lobby(0, "Default Name", "Default Description", mutableListOf(), 10)
+        val lobby = intent.getParcelableExtra("lobby",
+            Lobby::class.java) ?: Lobby(0, "Default Name", "Default Description",
+            mutableListOf(),
+            10,
+                User(0, "Default User", ""))
 
         setContent {
             PokerDiceTheme {
