@@ -26,6 +26,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.pdm.pokerdice.domain.Lobby
 import com.pdm.pokerdice.domain.User
+import kotlin.random.Random
 
 const val PLAYER_MIN = 2
 const val PLAYER_MAX = 10
@@ -58,6 +59,7 @@ fun LobbyCreationScreen(modifier: Modifier, onNavigate: (LobbyCreationNavigation
     ) {
         Card(
             modifier = Modifier.fillMaxWidth(),
+            shape = MaterialTheme.shapes.medium,
             elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
         ) {
             Column(
@@ -72,8 +74,10 @@ fun LobbyCreationScreen(modifier: Modifier, onNavigate: (LobbyCreationNavigation
                     OutlinedTextField(
                         value = lobbyName,
                         onValueChange = { lobbyName = it },
-                        label = { Text("Lobby Name") },
-                        modifier = Modifier.testTag(LOBBY_NAME)
+                        label = { Text("Lobby Name", style = MaterialTheme.typography.labelLarge) },
+                        placeholder = { Text("e.g., Royal Flush", style = MaterialTheme.typography.bodyMedium) },
+                        modifier = Modifier.testTag(LOBBY_NAME),
+                        shape = MaterialTheme.shapes.small
                     )
                 }
                 Row(
@@ -84,8 +88,10 @@ fun LobbyCreationScreen(modifier: Modifier, onNavigate: (LobbyCreationNavigation
                     OutlinedTextField(
                         value = lobbyInfo,
                         onValueChange = { lobbyInfo = it },
-                        label = { Text("Description") },
-                        modifier = Modifier.testTag(DESCRIPTION)
+                        label = { Text("Description", style = MaterialTheme.typography.labelLarge) },
+                        placeholder = { Text("e.g., Casual games, 10 rounds", style = MaterialTheme.typography.bodyMedium) },
+                        modifier = Modifier.testTag(DESCRIPTION),
+                        shape = MaterialTheme.shapes.small
                     )
                 }
                 Text(
@@ -149,16 +155,47 @@ fun LobbyCreationScreen(modifier: Modifier, onNavigate: (LobbyCreationNavigation
                     }
                 }
             }
-            Button(onClick = {onNavigate(LobbyCreationNavigation.CreatedLobby(Lobby(4, lobbyName, lobbyInfo,
-                listOf(user), maxPlayers, user, rounds)))},
-                modifier = Modifier.testTag(CREATE_LOBBY)
+            Button(
+                onClick = {
+                    val normalizedName = lobbyName.normalizedLobbyName()
+                    onNavigate(
+                        LobbyCreationNavigation.CreatedLobby(
+                            Lobby(
+                                4,
+                                normalizedName,
+                                lobbyInfo.trim(),
+                                listOf(user),
+                                maxPlayers,
+                                user,
+                                rounds
+                            )
+                        )
+                    )
+                },
+                modifier = Modifier.testTag(CREATE_LOBBY),
+                shape = MaterialTheme.shapes.medium
             ) {
-                Text("Create Lobby")
+                Text("Create Lobby", style = MaterialTheme.typography.titleSmall)
             }
         }
     }
 }
 
+private fun String.normalizedLobbyName(): String {
+    val raw = this.trim()
+    val needsDefault = raw.isBlank() || raw.equals("LobbyTest", ignoreCase = true) || raw.equals("Lobby", ignoreCase = true)
+    val base = if (needsDefault) generateFriendlyLobbyName() else raw
+    return base.split(Regex("\\s+")).joinToString(" ") { part ->
+        part.lowercase().replaceFirstChar { c -> c.titlecase() }
+    }
+}
+
+private fun generateFriendlyLobbyName(): String {
+    val adjectives = listOf("Royal", "Lucky", "Golden", "Wild", "Rolling", "Crimson", "Silver")
+    val nouns = listOf("Flush", "Aces", "Dice", "Hands", "Sevens", "Stacks", "Pairs")
+    val number = Random.nextInt(100, 999)
+    return "${adjectives.random()} ${nouns.random()} #$number"
+}
 
 @Preview
 @Composable

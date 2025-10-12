@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -20,7 +19,6 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 
 
 sealed class AboutNavigation {
@@ -42,14 +40,16 @@ fun AboutScreen(modifier: Modifier, onNavigate: (AboutNavigation) -> Unit = {}) 
         modifier = modifier.fillMaxSize().padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(24.dp)
     ){
-        Text("About Poker Dice",
-            fontSize = 40.sp,
-            fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.primary // MUDAR SE QUISEREM
+        Text(
+            "About Poker Dice",
+            // Use theme typography for consistency
+            style = MaterialTheme.typography.headlineLarge,
+            color = MaterialTheme.colorScheme.primary
         )
 
         Card(
             modifier = Modifier.fillMaxWidth(),
+            shape = MaterialTheme.shapes.medium,
             elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
         ) {
             Column(
@@ -58,17 +58,18 @@ fun AboutScreen(modifier: Modifier, onNavigate: (AboutNavigation) -> Unit = {}) 
             ) {
                 Text(
                     "Game Description",
-                    fontSize = 20.sp,
+                    style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold
                 )
                 Text(
                     "Poker Dice is a game where players roll five dice " +
                             "to make poker-style combinations. Each player gets " +
                             "three rolls per turn to achieve the best hand possible.",
-                    fontSize = 16.sp
+                    style = MaterialTheme.typography.bodyMedium
                 )
                 Button(
                     onClick = { onNavigate(AboutNavigation.GameRules) },
+                    shape = MaterialTheme.shapes.small,
                     modifier = Modifier.align(Alignment.End).testTag(GAME_RULES)
                 ) {
                     Text("Game Rules")
@@ -78,6 +79,7 @@ fun AboutScreen(modifier: Modifier, onNavigate: (AboutNavigation) -> Unit = {}) 
 
         Card(
             modifier = Modifier.fillMaxWidth(),
+            shape = MaterialTheme.shapes.medium,
             elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
         ) {
             Column(
@@ -86,7 +88,7 @@ fun AboutScreen(modifier: Modifier, onNavigate: (AboutNavigation) -> Unit = {}) 
             ) {
                 Text(
                     "Authors",
-                    fontSize = 20.sp,
+                    style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold
                 )
 
@@ -95,8 +97,10 @@ fun AboutScreen(modifier: Modifier, onNavigate: (AboutNavigation) -> Unit = {}) 
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text("Pedro Monteiro (51457)")
-                    Button(onClick = { onNavigate(AboutNavigation.Creator("https://github.com/pedrowlv")) },
+                    Text("Pedro Monteiro (51457)", style = MaterialTheme.typography.bodyLarge)
+                    Button(
+                        onClick = { onNavigate(AboutNavigation.Creator("https://github.com/pedrowlv")) },
+                        shape = MaterialTheme.shapes.small,
                         modifier = Modifier.testTag(CREATOR1)
                     ) {
                         Text("GitHub")
@@ -108,8 +112,10 @@ fun AboutScreen(modifier: Modifier, onNavigate: (AboutNavigation) -> Unit = {}) 
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text("João Silva (51682)")
-                    Button(onClick = { onNavigate(AboutNavigation.Creator("https://github.com/JoaoSilvaIT")) },
+                    Text("João Silva (51682)", style = MaterialTheme.typography.bodyLarge)
+                    Button(
+                        onClick = { onNavigate(AboutNavigation.Creator("https://github.com/JoaoSilvaIT")) },
+                        shape = MaterialTheme.shapes.small,
                         modifier = Modifier.testTag(CREATOR2)
                         ) {
                         Text("GitHub")
@@ -121,8 +127,10 @@ fun AboutScreen(modifier: Modifier, onNavigate: (AboutNavigation) -> Unit = {}) 
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text("Bernardo Jaco (51690)")
-                    Button(onClick = { onNavigate(AboutNavigation.Creator("https://github.com/jacaoo")) },
+                    Text("Bernardo Jaco (51690)", style = MaterialTheme.typography.bodyLarge)
+                    Button(
+                        onClick = { onNavigate(AboutNavigation.Creator("https://github.com/jacaoo")) },
+                        shape = MaterialTheme.shapes.small,
                         modifier = Modifier.testTag(CREATOR3)
                         ) {
                         Text("GitHub")
@@ -133,7 +141,8 @@ fun AboutScreen(modifier: Modifier, onNavigate: (AboutNavigation) -> Unit = {}) 
 
         Button(
             onClick = { onNavigate(AboutNavigation.ContactUs) },
-            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
+            // Default button colors for consistent theme usage
+            shape = MaterialTheme.shapes.medium,
             modifier = Modifier.fillMaxWidth().testTag(CONTACT_US)
         ) {
             Row(
@@ -141,7 +150,7 @@ fun AboutScreen(modifier: Modifier, onNavigate: (AboutNavigation) -> Unit = {}) 
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 Icon(Icons.Default.Email, contentDescription = "Email")
-                Text("Contact Us", fontSize = 18.sp)
+                Text("Contact Us", style = MaterialTheme.typography.titleSmall)
             }
         }
     }
