@@ -60,11 +60,3 @@ class AboutActivity : ComponentActivity() {
         startActivity(intent)
     }
 }
-
-@Preview
-@Composable
-fun AboutPreview() {
-    PokerDiceTheme {
-        AboutScreen(Modifier.fillMaxSize())
-    }
-}

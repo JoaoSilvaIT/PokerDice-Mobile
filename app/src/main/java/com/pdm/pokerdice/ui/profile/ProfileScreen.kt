@@ -16,7 +16,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -32,7 +31,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.pdm.pokerdice.R
 
 sealed class ProfileNavigation {
@@ -54,8 +52,7 @@ fun ProfileScreen(
         item {
             Text(
                 "Your Profile",
-                fontSize = 38.sp,
-                fontWeight = FontWeight.Bold,
+                style = MaterialTheme.typography.headlineLarge,
                 color = MaterialTheme.colorScheme.primary,
             )
         }
@@ -65,6 +62,7 @@ fun ProfileScreen(
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+                shape = MaterialTheme.shapes.medium
             ) {
                 Column(
                     modifier = Modifier.padding(16.dp),
@@ -83,13 +81,13 @@ fun ProfileScreen(
 
                     Text(
                         "Player Name",
-                        fontSize = 24.sp,
+                        style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold,
                     )
 
                     Text(
                         "Level 5 Dice Master",
-                        fontSize = 16.sp,
+                        style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.secondary,
                     )
 
@@ -98,8 +96,8 @@ fun ProfileScreen(
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
-                        Text("Experience")
-                        Text("75/100")
+                        Text("Experience", style = MaterialTheme.typography.bodyMedium)
+                        Text("75/100", style = MaterialTheme.typography.bodyMedium)
                     }
 
                     LinearProgressIndicator(
@@ -118,6 +116,7 @@ fun ProfileScreen(
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+                shape = MaterialTheme.shapes.medium
             ) {
                 Column(
                     modifier = Modifier.padding(16.dp),
@@ -125,7 +124,7 @@ fun ProfileScreen(
                 ) {
                     Text(
                         "Game Statistics",
-                        fontSize = 20.sp,
+                        style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
                     )
 
@@ -135,39 +134,40 @@ fun ProfileScreen(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween,
                     ) {
-                        Text("Games Played")
-                        Text("42")
+                        Text("Games Played", style = MaterialTheme.typography.bodyMedium)
+                        Text("42", style = MaterialTheme.typography.bodyMedium)
                     }
 
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween,
                     ) {
-                        Text("Wins")
-                        Text("28")
+                        Text("Wins", style = MaterialTheme.typography.bodyMedium)
+                        Text("28", style = MaterialTheme.typography.bodyMedium)
                     }
 
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween,
                     ) {
-                        Text("Losses")
-                        Text("14")
+                        Text("Losses", style = MaterialTheme.typography.bodyMedium)
+                        Text("14", style = MaterialTheme.typography.bodyMedium)
                     }
 
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween,
                     ) {
-                        Text("Win Rate")
-                        Text("66.7%")
+                        Text("Win Rate", style = MaterialTheme.typography.bodyMedium)
+                        Text("66.7%", style = MaterialTheme.typography.bodyMedium)
                     }
 
                     Button(
                         onClick = { onNavigate(ProfileNavigation.GameHistory) },
                         modifier = Modifier.align(Alignment.End),
+                        shape = MaterialTheme.shapes.small
                     ) {
-                        Text("Game History")
+                        Text("Game History", style = MaterialTheme.typography.labelLarge)
                     }
                 }
             }
@@ -178,6 +178,7 @@ fun ProfileScreen(
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+                shape = MaterialTheme.shapes.medium
             ) {
                 Column(
                     modifier = Modifier.padding(16.dp),
@@ -185,7 +186,7 @@ fun ProfileScreen(
                 ) {
                     Text(
                         "Achievements",
-                        fontSize = 20.sp,
+                        style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
                     )
 
@@ -196,8 +197,8 @@ fun ProfileScreen(
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
-                        Text("First Victory")
-                        Text("✓")
+                        Text("First Victory", style = MaterialTheme.typography.bodyMedium)
+                        Text("✓", style = MaterialTheme.typography.bodyMedium)
                     }
 
                     Row(
@@ -205,8 +206,8 @@ fun ProfileScreen(
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
-                        Text("Five Game Streak")
-                        Text("✓")
+                        Text("Five Game Streak", style = MaterialTheme.typography.bodyMedium)
+                        Text("✓", style = MaterialTheme.typography.bodyMedium)
                     }
 
                     Row(
@@ -214,8 +215,8 @@ fun ProfileScreen(
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
-                        Text("Royal Flush")
-                        Text("✗")
+                        Text("Royal Flush", style = MaterialTheme.typography.bodyMedium)
+                        Text("✗", style = MaterialTheme.typography.bodyMedium)
                     }
                 }
             }
@@ -225,15 +226,15 @@ fun ProfileScreen(
         item {
             Button(
                 onClick = { onNavigate(ProfileNavigation.EditProfile) },
-                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
                 modifier = Modifier.fillMaxWidth(),
+                shape = MaterialTheme.shapes.medium
             ) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
                     Icon(Icons.Default.Edit, contentDescription = "Edit")
-                    Text("Edit Profile", fontSize = 18.sp)
+                    Text("Edit Profile", style = MaterialTheme.typography.titleSmall)
                 }
             }
         }
