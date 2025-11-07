@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.pdm.pokerdice.domain.Lobby
+import com.pdm.pokerdice.domain.User
 import com.pdm.pokerdice.service.LobbyService
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -11,6 +12,11 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 
+sealed interface JoinLobbyState {
+    data object Idle : JoinLobbyState
+    data class Success(val lobby : Lobby) : JoinLobbyState
+    data class Error(val exception: Throwable) : JoinLobbyState
+}
 class LobbiesViewModel (private val lobbyService: LobbyService) : ViewModel() {
 
     companion object {
@@ -28,6 +34,9 @@ class LobbiesViewModel (private val lobbyService: LobbyService) : ViewModel() {
     private val _lobbies = MutableStateFlow<List<Lobby>>(emptyList())
     val lobbies = _lobbies.asStateFlow()
 
+    private val _joinLobbyState = MutableStateFlow<JoinLobbyState>(JoinLobbyState.Idle)
+    val joinLobbyState = _joinLobbyState.asStateFlow()
+
     init {
         viewModelScope.launch {
             lobbyService.lobbies
@@ -36,4 +45,14 @@ class LobbiesViewModel (private val lobbyService: LobbyService) : ViewModel() {
         }
     }
 
+    fun joinLobby(user: User, lobbyId: Int) {
+        viewModelScope.launch {
+            try {
+                val lobby = lobbyService.joinLobby(user, lobbyId)
+                _joinLobbyState.value = JoinLobbyState.Success(lobby)
+            } catch (e: Exception) {
+                _joinLobbyState.value = JoinLobbyState.Error(e)
+            }
+        }
+    }
 }

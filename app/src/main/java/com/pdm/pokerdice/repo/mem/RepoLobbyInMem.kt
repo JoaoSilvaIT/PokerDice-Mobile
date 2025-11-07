@@ -55,7 +55,7 @@ class RepoLobbyInMem : RepositoryLobby {
     }
 
     override fun findById(id: Int): Lobby? {
-        TODO("Not yet implemented")
+        return lobbies.find { it.lid == id }
     }
 
     override fun findAll(): List<Lobby> {
