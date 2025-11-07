@@ -12,6 +12,8 @@ interface LobbyService {
 
     fun joinLobby(usr: User, lobbyId: Int) : Lobby
 
+    fun leaveLobby(usr: User, lobbyId: Int)
+
 }
 
 class FakeLobbyService(val repositoryLobby: RepositoryLobby) : LobbyService {
@@ -27,5 +29,9 @@ class FakeLobbyService(val repositoryLobby: RepositoryLobby) : LobbyService {
         val lobby = repositoryLobby.findById(lobbyId) ?: throw Exception("Lobby not found")
         val newLobby = repositoryLobby.joinLobby(usr, lobby)
         return newLobby
+    }
+
+    override fun leaveLobby(usr: User, lobbyId: Int) {
+        TODO("Not yet implemented")
     }
 }

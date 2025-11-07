@@ -32,6 +32,14 @@ class RepoLobbyInMem : RepositoryLobby {
         return newLobby
     }
 
+    override fun leaveLobby(user: User, lobby: Lobby) {
+        val newLobby = lobby.copy(users = (lobby.users - user))
+        val index = lobbies.indexOfFirst { it.lid == lobby.lid }
+        if (index != -1) {
+            lobbies[index] = newLobby
+        }
+    }
+
     override fun findByName(name: String): Lobby? {
         TODO("Not yet implemented")
     }

@@ -29,7 +29,7 @@ import com.pdm.pokerdice.domain.User
 
 const val CREATE_LOBBY = "create_button"
 sealed class LobbiesNavigation {
-    class SelectLobby(val lobby: Lobby) : LobbiesNavigation()
+    class SelectLobby(val lobby: Lobby, val user: User) : LobbiesNavigation()
     class CreateLobby(val user: User) : LobbiesNavigation()
 }
 @Composable
@@ -45,7 +45,7 @@ fun LobbiesScreen(
     LaunchedEffect(currentJoinState) {
         if (currentJoinState is JoinLobbyState.Success) {
             val lobbyToJoin = (currentJoinState as JoinLobbyState.Success).lobby
-            onNavigate(LobbiesNavigation.SelectLobby(lobbyToJoin))
+            onNavigate(LobbiesNavigation.SelectLobby(lobbyToJoin, user))
         }
     }
     Column(

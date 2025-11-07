@@ -24,7 +24,6 @@
 
             val user = intent.getParcelableExtra("user", User::class.java) ?:
                 User(0, "Default User", "")
-            val dataLobby = RepoLobbyInMem()
 
             setContent {
                 PokerDiceTheme {
@@ -54,6 +53,7 @@
                is LobbiesNavigation.SelectLobby ->
                    Intent(this, LobbyActivity::class.java).apply {
                          putExtra("lobby", it.lobby)
+                            putExtra("user", it.user)
                    }
            }
             startActivity(intent)

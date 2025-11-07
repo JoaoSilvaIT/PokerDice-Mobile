@@ -4,10 +4,12 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
+import com.pdm.pokerdice.DependenciesContainer
 import com.pdm.pokerdice.domain.Lobby
 import com.pdm.pokerdice.domain.User
 import com.pdm.pokerdice.ui.lobby.lobbies.LobbiesActivity
@@ -20,6 +22,9 @@ class LobbyActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        val user = intent.getParcelableExtra("user", User::class.java) ?:
+        User(0, "Default User", "")
 
         val lobby = intent.getParcelableExtra("lobby",
             Lobby::class.java) ?: Lobby(0, "Default Name", "Default Description",
@@ -34,11 +39,19 @@ class LobbyActivity : ComponentActivity() {
                     LobbyScreen(
                         Modifier.padding(innerPadding),
                         onNavigate = { handleNavigation(it) },
-                        lobby = lobby
+                        lobby = lobby,
+                        user = user,
+                        viewModel
                     )
                 }
             }
         }
+    }
+
+    private val viewModel: LobbyViewModel by viewModels {
+        LobbyViewModel.getFactory(
+            service = (application as DependenciesContainer).lobbyService
+        )
     }
 
     private fun handleNavigation(it: LobbyNavigation) {

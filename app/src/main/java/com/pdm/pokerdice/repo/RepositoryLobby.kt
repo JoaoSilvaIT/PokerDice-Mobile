@@ -17,6 +17,8 @@ interface RepositoryLobby : Repository<Lobby> {
 
     fun joinLobby(user: User, lobby: Lobby) : Lobby
 
+    fun leaveLobby(user: User, lobby: Lobby)
+
     fun deleteLobbyByHost(host: User)
 
     fun deleteLobbyById(id: Int)
