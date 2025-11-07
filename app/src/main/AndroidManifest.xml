@@ -10,7 +10,8 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.PokerDice">
+        android:theme="@style/Theme.PokerDice"
+        android:name=".PokerDice">
         <activity
             android:name=".ui.title.MainActivity"
             android:exported="true"

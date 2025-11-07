@@ -4,16 +4,19 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
+import com.pdm.pokerdice.DependenciesContainer
 import com.pdm.pokerdice.domain.User
 import com.pdm.pokerdice.repo.RepositoryLobby
 import com.pdm.pokerdice.repo.mem.RepoLobbyInMem
 import com.pdm.pokerdice.ui.lobby.lobbyCreation.LobbyCreationActivity
 import com.pdm.pokerdice.ui.lobby.lobbyIndividual.LobbyActivity
 import com.pdm.pokerdice.ui.theme.PokerDiceTheme
+import kotlin.getValue
 
 class LobbiesActivity : ComponentActivity() {
 
@@ -30,10 +33,17 @@ class LobbiesActivity : ComponentActivity() {
                     LobbiesScreen(user,
                         dataLobby,
                         Modifier.padding(innerPadding),
-                        onNavigate = { handleNavigation(it) })
+                        onNavigate = { handleNavigation(it) },
+                        viewModel)
                 }
             }
         }
+    }
+
+    private val viewModel: LobbiesViewModel by viewModels {
+        LobbiesViewModel.Companion.getFactory(
+            service = (application as DependenciesContainer).lobbyService
+        )
     }
 
     private fun handleNavigation(it: LobbiesNavigation) {

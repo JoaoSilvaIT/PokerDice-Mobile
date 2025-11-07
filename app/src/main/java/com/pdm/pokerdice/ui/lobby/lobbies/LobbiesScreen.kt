@@ -16,11 +16,14 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewModelScope
 import com.pdm.pokerdice.domain.Lobby
 import com.pdm.pokerdice.domain.User
 import com.pdm.pokerdice.repo.RepositoryLobby
@@ -36,8 +39,10 @@ fun LobbiesScreen(
     user : User,
     dataLobby : RepositoryLobby,
     modifier: Modifier = Modifier,
-    onNavigate: (LobbiesNavigation) -> Unit = {}
+    onNavigate: (LobbiesNavigation) -> Unit = {},
+    viewModel: LobbiesViewModel
 ) {
+    val lobbies  by viewModel.lobbies.collectAsState()
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -54,7 +59,7 @@ fun LobbiesScreen(
                 .weight(1f)
                 .fillMaxWidth()
         ) {
-            items(dataLobby.findAll()) { lobby ->
+            items(lobbies) { lobby ->
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -73,6 +78,7 @@ fun LobbiesScreen(
                             text = lobby.name,
                             style = MaterialTheme.typography.bodyLarge
                         )
+                        /*
                         Button(
                             onClick = {
                                 val newLobby = dataLobby.joinLobby(user, lobby)
@@ -86,6 +92,8 @@ fun LobbiesScreen(
                             )
 
                         }
+
+                         */
                     }
                 }
             }
@@ -105,6 +113,7 @@ fun LobbiesScreen(
     }
 }
 
+/*
 @Preview()
 @Composable
 fun LobbiesScreenPreview() {
@@ -113,3 +122,5 @@ fun LobbiesScreenPreview() {
         LobbiesScreen(User(1, "NULL", "null"),repositoryLobby, Modifier)
     }
 }
+
+ */
