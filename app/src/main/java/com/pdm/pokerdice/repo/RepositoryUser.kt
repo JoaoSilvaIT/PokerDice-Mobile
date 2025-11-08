@@ -10,4 +10,5 @@ interface RepositoryUser : Repository<User> {
     ): User
 
     fun findByEmail(email: String): User?
+    fun findByName(name: String): User?
 }

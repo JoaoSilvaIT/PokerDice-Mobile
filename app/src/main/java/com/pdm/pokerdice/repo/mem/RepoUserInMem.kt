@@ -6,9 +6,11 @@ import com.pdm.pokerdice.repo.RepositoryUser
 class RepoUserInMem : RepositoryUser {
 
     val users = mutableListOf(
-        User(1, "admin", "admin@gmail.com")
+        User(1, "admin", "admin@gmail.com", "admin123"),
+        User(2, "user1", "user1@test.com", "password1"),
+        User(3, "user2", "user2@test.com", "password2")
     )
-    var uid = 2
+    var uid = 4
 
     override fun createUser(
         name: String,
@@ -21,7 +23,18 @@ class RepoUserInMem : RepositoryUser {
     }
 
     override fun findByEmail(email: String): User? {
-        TODO("Not yet implemented")
+        return users.find { it.email == email }
+    }
+
+    override fun findByName(name: String): User? {
+        return users.find { it.name == name }
+    }
+
+    fun createUserWithPassword(name: String, password: String): User {
+        val newUser = User(uid, name, password = password)
+        uid++
+        users.add(newUser)
+        return newUser
     }
 
     override fun findById(id: Int): User? {
