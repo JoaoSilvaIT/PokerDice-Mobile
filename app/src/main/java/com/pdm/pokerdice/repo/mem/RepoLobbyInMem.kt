@@ -40,6 +40,10 @@ class RepoLobbyInMem : RepositoryLobby {
         }
     }
 
+    override fun addAll(entities: List<Lobby>) {
+        lobbies.addAll(entities)
+    }
+
     override fun findByName(name: String): Lobby? {
         TODO("Not yet implemented")
     }

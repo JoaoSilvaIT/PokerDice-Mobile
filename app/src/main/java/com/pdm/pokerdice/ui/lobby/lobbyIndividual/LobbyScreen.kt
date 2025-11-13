@@ -16,13 +16,19 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewModelScope
 import com.pdm.pokerdice.domain.Lobby
 import com.pdm.pokerdice.domain.User
 import com.pdm.pokerdice.ui.theme.PokerDiceTheme
+import kotlinx.coroutines.launch
 
 sealed class LobbyNavigation {
     object GameLobby : LobbyNavigation()
@@ -35,16 +41,22 @@ fun LobbyScreen(
     modifier: Modifier = Modifier,
     onNavigate: (LobbyNavigation) -> Unit = {},
     lobby: Lobby,
-    user: User,
     viewModel: LobbyViewModel
 ) {
     val currentLeaveState = viewModel.leaveLobbyState.collectAsState(LeaveLobbyState.Idle)
+    var usr by remember { mutableStateOf<User?>(null) }
+
+    LaunchedEffect(Unit) {
+        usr = viewModel.getLoggedUser()
+    }
+
 
     LaunchedEffect(currentLeaveState) {
         if (currentLeaveState.value is LeaveLobbyState.Success) {
             onNavigate(LobbyNavigation.TitleScreen)
         }
     }
+
 
     Column(
         modifier = modifier
@@ -86,7 +98,15 @@ fun LobbyScreen(
                             .padding(12.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Text(text = user.name, style = MaterialTheme.typography.bodyLarge)
+                        if (user.name == usr?.name) {
+                            Text(
+                                text = "(You) ",
+                                style = MaterialTheme.typography.bodyLarge,
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                        } else {
+                            Text(text = user.name, style = MaterialTheme.typography.bodyLarge)
+                        }
                     }
                 }
             }
@@ -104,7 +124,10 @@ fun LobbyScreen(
         }
 
         Button(
-            onClick = { viewModel.leaveLobby(user, lobby.lid) },
+            onClick = {
+                val user = usr ?: return@Button
+                viewModel.leaveLobby(user, lobby.lid)
+                      },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(top = 8.dp),

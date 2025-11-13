@@ -1,47 +1,54 @@
-package com.pdm.pokerdice.ui.lobby.lobbyIndividual
+    package com.pdm.pokerdice.ui.lobby.lobbyIndividual
 
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewModelScope
-import com.pdm.pokerdice.domain.User
-import com.pdm.pokerdice.service.LobbyService
-import com.pdm.pokerdice.ui.lobby.lobbies.LobbiesViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.launch
+    import androidx.lifecycle.ViewModel
+    import androidx.lifecycle.ViewModelProvider
+    import androidx.lifecycle.viewModelScope
+    import com.pdm.pokerdice.domain.User
+    import com.pdm.pokerdice.login_signup.AuthInfoRepo
+    import com.pdm.pokerdice.service.LobbyService
+    import kotlinx.coroutines.flow.MutableStateFlow
+    import kotlinx.coroutines.flow.asStateFlow
+    import kotlinx.coroutines.launch
 
-interface LeaveLobbyState {
-    data object Idle : LeaveLobbyState
-    data class Success(val message: String) : LeaveLobbyState
-    data class Error(val exception: Throwable) : LeaveLobbyState
-}
-
-class LobbyViewModel (private val lobbyService: LobbyService) : ViewModel() {
-
-    companion object {
-        fun getFactory(service: LobbyService
-        ) = object : ViewModelProvider.Factory {
-            @Suppress("UNCHECKED_CAST")
-            override fun <T : ViewModel> create(modelClass: Class<T>): T =
-                if (modelClass.isAssignableFrom(LobbyViewModel::class.java)) {
-                    LobbyViewModel(lobbyService = service) as T
-                }
-                else throw IllegalArgumentException("Unknown ViewModel class")
-        }
+    interface LeaveLobbyState {
+        data object Idle : LeaveLobbyState
+        data class Success(val message: String) : LeaveLobbyState
+        data class Error(val exception: Throwable) : LeaveLobbyState
     }
 
-    private val _leaveLobbyState = MutableStateFlow<LeaveLobbyState>(LeaveLobbyState.Idle)
-    val leaveLobbyState = _leaveLobbyState.asStateFlow()
+    class LobbyViewModel (private val service: LobbyService, private val repo : AuthInfoRepo) : ViewModel() {
 
-    fun leaveLobby(user: User, lobbyId: Int) {
-        viewModelScope.launch {
-            try {
-                lobbyService.leaveLobby(user,lobbyId)
-                _leaveLobbyState.value = LeaveLobbyState.Success("Left lobby successfully")
-            } catch (e: Exception) {
-                _leaveLobbyState.value = LeaveLobbyState.Error(e)
+        companion object {
+            fun getFactory(service: LobbyService, repo: AuthInfoRepo
+            ) = object : ViewModelProvider.Factory {
+                @Suppress("UNCHECKED_CAST")
+                override fun <T : ViewModel> create(modelClass: Class<T>): T =
+                    if (modelClass.isAssignableFrom(LobbyViewModel::class.java)) {
+                        LobbyViewModel(service = service, repo = repo) as T
+                    }
+                    else throw IllegalArgumentException("Unknown ViewModel class")
             }
         }
-    }
 
-}
+        suspend fun getLoggedUser(): User? {
+            val authInfo = repo.getAuthInfo()
+            return if (authInfo != null) {
+                service.getUserByToken(authInfo.authToken)
+            } else null
+        }
+        private val _leaveLobbyState = MutableStateFlow<LeaveLobbyState>(LeaveLobbyState.Idle)
+        val leaveLobbyState = _leaveLobbyState.asStateFlow()
+
+        fun leaveLobby(user: User, lobbyId: Int) {
+            viewModelScope.launch {
+                try {
+
+                    service.leaveLobby(user,lobbyId)
+                    _leaveLobbyState.value = LeaveLobbyState.Success("Left lobby successfully")
+                } catch (e: Exception) {
+                    _leaveLobbyState.value = LeaveLobbyState.Error(e)
+                }
+            }
+        }
+
+    }

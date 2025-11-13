@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.pdm.pokerdice.domain.Lobby
 import com.pdm.pokerdice.domain.User
+import com.pdm.pokerdice.login_signup.AuthInfoRepo
 import com.pdm.pokerdice.service.LobbyService
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -17,15 +18,13 @@ sealed interface JoinLobbyState {
     data class Success(val lobby : Lobby) : JoinLobbyState
     data class Error(val exception: Throwable) : JoinLobbyState
 }
-class LobbiesViewModel (private val lobbyService: LobbyService) : ViewModel() {
-
+class LobbiesViewModel (private val service: LobbyService, private val repo : AuthInfoRepo) : ViewModel() {
     companion object {
-        fun getFactory(service: LobbyService
-        ) = object : ViewModelProvider.Factory {
+        fun getFactory(service: LobbyService, repo: AuthInfoRepo) = object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel> create(modelClass: Class<T>): T =
                 if (modelClass.isAssignableFrom(LobbiesViewModel::class.java)) {
-                    LobbiesViewModel(lobbyService = service) as T
+                    LobbiesViewModel(service, repo) as T
                 }
                 else throw IllegalArgumentException("Unknown ViewModel class")
         }
@@ -39,16 +38,27 @@ class LobbiesViewModel (private val lobbyService: LobbyService) : ViewModel() {
 
     init {
         viewModelScope.launch {
-            lobbyService.lobbies
+            service.lobbies
                 .distinctUntilChanged()
                 .collectLatest { _lobbies.value = it }
         }
     }
 
-    fun joinLobby(user: User, lobbyId: Int) {
+    suspend fun getLoggedUser(): User? {
+        val authInfo = repo.getAuthInfo()
+        return if (authInfo != null) {
+            service.getUserByToken(authInfo.authToken)
+        } else null
+    }
+
+    fun joinLobby(lobbyId: Int) {
         viewModelScope.launch {
+            val user = getLoggedUser() ?: run {
+                _joinLobbyState.value = JoinLobbyState.Error(Exception("User not logged in"))
+                return@launch
+            }
             try {
-                val lobby = lobbyService.joinLobby(user, lobbyId)
+                val lobby = service.joinLobby(user, lobbyId)
                 _joinLobbyState.value = JoinLobbyState.Success(lobby)
             } catch (e: Exception) {
                 _joinLobbyState.value = JoinLobbyState.Error(e)

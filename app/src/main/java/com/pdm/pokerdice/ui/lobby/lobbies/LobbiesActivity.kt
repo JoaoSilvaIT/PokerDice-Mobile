@@ -22,13 +22,10 @@
         override fun onCreate(savedInstanceState: Bundle?) {
             super.onCreate(savedInstanceState)
 
-            val user = intent.getParcelableExtra("user", User::class.java) ?:
-                User(0, "Default User", "")
-
             setContent {
                 PokerDiceTheme {
                     Scaffold (modifier = Modifier.fillMaxSize()) { innerPadding ->
-                        LobbiesScreen(user,
+                        LobbiesScreen(
                             Modifier.padding(innerPadding),
                             onNavigate = { handleNavigation(it) },
                             viewModel)
@@ -39,7 +36,8 @@
 
         private val viewModel: LobbiesViewModel by viewModels {
             LobbiesViewModel.Companion.getFactory(
-                service = (application as DependenciesContainer).lobbyService
+                service = (application as DependenciesContainer).lobbyService,
+                repo = (application as DependenciesContainer).authInfoRepo
             )
         }
 
@@ -47,13 +45,11 @@
            val intent = when (it) {
                is LobbiesNavigation.CreateLobby ->
                    Intent(this, LobbyCreationActivity::class.java).apply {
-                         putExtra("user", it.user)
                    }
 
                is LobbiesNavigation.SelectLobby ->
                    Intent(this, LobbyActivity::class.java).apply {
                          putExtra("lobby", it.lobby)
-                            putExtra("user", it.user)
                    }
            }
             startActivity(intent)

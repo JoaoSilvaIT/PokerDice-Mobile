@@ -23,15 +23,12 @@ class LobbyActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val user = intent.getParcelableExtra("user", User::class.java) ?:
-        User(0, "Default User", "")
-
         val lobby = intent.getParcelableExtra("lobby",
             Lobby::class.java) ?: Lobby(0, "Default Name", "Default Description",
             mutableListOf(),
             10,
-                User(0, "Default User", ""),
-                2)
+            User(0, "Default User", ""),
+            2)
 
         setContent {
             PokerDiceTheme {
@@ -40,7 +37,6 @@ class LobbyActivity : ComponentActivity() {
                         Modifier.padding(innerPadding),
                         onNavigate = { handleNavigation(it) },
                         lobby = lobby,
-                        user = user,
                         viewModel
                     )
                 }
@@ -50,7 +46,8 @@ class LobbyActivity : ComponentActivity() {
 
     private val viewModel: LobbyViewModel by viewModels {
         LobbyViewModel.getFactory(
-            service = (application as DependenciesContainer).lobbyService
+            service = (application as DependenciesContainer).lobbyService,
+            repo = (application as DependenciesContainer).authInfoRepo
         )
     }
 

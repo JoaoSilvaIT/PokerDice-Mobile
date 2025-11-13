@@ -22,10 +22,10 @@ import com.pdm.pokerdice.ui.theme.PokerDiceTheme
 enum class TitleScreenActions {
     About,
     Profile,
-    StartGame,
+    SignUp,
 }
 
-const val START_GAME = "start_game_button"
+const val SIGNUP = "sign_up_button"
 const val PROFILE = "profile_button"
 const val ABOUT = "about_button"
 
@@ -55,11 +55,11 @@ fun TitleScreen(
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             Button(
-                onClick = { onNavigate(TitleScreenActions.StartGame) },
+                onClick = { onNavigate(TitleScreenActions.SignUp) },
                 shape = MaterialTheme.shapes.medium,
-                modifier = Modifier.testTag(START_GAME)
+                modifier = Modifier.testTag(SIGNUP)
             ) {
-                Text("Start Game", style = MaterialTheme.typography.titleSmall)
+                Text("Sign Up", style = MaterialTheme.typography.titleSmall)
             }
             Button(
                 onClick = { onNavigate(TitleScreenActions.Profile) },

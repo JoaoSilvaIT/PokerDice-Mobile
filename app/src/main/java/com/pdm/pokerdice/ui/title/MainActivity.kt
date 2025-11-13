@@ -11,8 +11,8 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
 import com.pdm.pokerdice.repo.mem.RepoUserInMem
 import com.pdm.pokerdice.ui.about.AboutActivity
-import com.pdm.pokerdice.ui.lobby.lobbies.LobbiesActivity
 import com.pdm.pokerdice.ui.profile.ProfileActivity
+import com.pdm.pokerdice.ui.signUp.SignUpActivity
 import com.pdm.pokerdice.ui.theme.PokerDiceTheme
 
 class MainActivity : ComponentActivity() {
@@ -38,10 +38,7 @@ class MainActivity : ComponentActivity() {
             when (action) {
                 TitleScreenActions.About -> Intent(this, AboutActivity::class.java)
                 TitleScreenActions.Profile -> Intent(this, ProfileActivity::class.java)
-                TitleScreenActions.StartGame -> Intent(this, LobbiesActivity::class.java).apply {
-                    // in this stage before login, we use admin user
-                    putExtra("user", repoUser.findById(1))
-                }
+                TitleScreenActions.SignUp -> Intent(this, SignUpActivity::class.java)
             }
         startActivity(intent)
     }

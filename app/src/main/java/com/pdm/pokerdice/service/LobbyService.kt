@@ -3,6 +3,7 @@ package com.pdm.pokerdice.service
 import com.pdm.pokerdice.domain.Lobby
 import com.pdm.pokerdice.domain.User
 import com.pdm.pokerdice.repo.RepositoryLobby
+import com.pdm.pokerdice.repo.tm.Manager
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -14,22 +15,29 @@ interface LobbyService {
 
     fun leaveLobby(usr: User, lobbyId: Int)
 
+    fun getUserByToken(token: String) : User?
 }
 
-class FakeLobbyService(val repositoryLobby: RepositoryLobby) : LobbyService {
+class FakeLobbyService(val manager : Manager) : LobbyService {
+
     override val lobbies: Flow<List<Lobby>>
         get() = flow {
-            while (true) {
-                emit(repositoryLobby.findAll())
-                delay(10000)
+                while (true) {
+                    emit(manager.repoLobby.findAll())
+                    delay(10000)
+                }
             }
-        }
 
-    override fun joinLobby(usr: User, lobbyId: Int) : Lobby  {
-        val lobby = repositoryLobby.findById(lobbyId) ?: throw Exception("Lobby not found")
-        val newLobby = repositoryLobby.joinLobby(usr, lobby)
+
+
+    override fun getUserByToken(token: String): User? = manager.repoUser.findUserByToken(token)
+
+    override fun joinLobby(usr: User, lobbyId: Int) : Lobby {
+        val lobby = manager.repoLobby.findById(lobbyId) ?: throw Exception("Lobby not found")
+        val newLobby = manager.repoLobby.joinLobby(usr, lobby)
         return newLobby
     }
+
 
     override fun leaveLobby(usr: User, lobbyId: Int) {
         TODO("Not yet implemented")
