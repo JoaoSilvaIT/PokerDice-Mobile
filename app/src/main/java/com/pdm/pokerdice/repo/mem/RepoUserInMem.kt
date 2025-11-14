@@ -25,6 +25,15 @@ class RepoUserInMem : RepositoryUser {
         return newUser
     }
 
+    override fun findTokenByUser(user: User) : String? {
+        val index = users.indexOf(user)
+        return if (index != -1) {
+            tokens[index]
+        } else {
+            null
+        }
+    }
+
     override fun findUserByToken(token: String): User? {
         val index = tokens.indexOf(token)
         return if (index != -1) {

@@ -11,6 +11,8 @@ interface RepositoryUser : Repository<User> {
 
     fun findByEmail(email: String): User?
 
+    fun findTokenByUser(user: User) : String?
+
     fun findUserByToken(token: String): User?
 
     fun addToken(token: String): String

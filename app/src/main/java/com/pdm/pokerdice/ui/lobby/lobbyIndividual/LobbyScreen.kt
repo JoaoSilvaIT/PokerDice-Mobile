@@ -43,20 +43,18 @@ fun LobbyScreen(
     lobby: Lobby,
     viewModel: LobbyViewModel
 ) {
-    val currentLeaveState = viewModel.leaveLobbyState.collectAsState(LeaveLobbyState.Idle)
+    val currentLeaveState by viewModel.leaveLobbyState.collectAsState(LeaveLobbyState.Idle)
     var usr by remember { mutableStateOf<User?>(null) }
 
     LaunchedEffect(Unit) {
         usr = viewModel.getLoggedUser()
     }
 
-
     LaunchedEffect(currentLeaveState) {
-        if (currentLeaveState.value is LeaveLobbyState.Success) {
+        if (currentLeaveState is LeaveLobbyState.Success) {
             onNavigate(LobbyNavigation.TitleScreen)
         }
     }
-
 
     Column(
         modifier = modifier
@@ -100,7 +98,7 @@ fun LobbyScreen(
                     ) {
                         if (user.name == usr?.name) {
                             Text(
-                                text = "(You) ",
+                                text = "${user.name} (You)",
                                 style = MaterialTheme.typography.bodyLarge,
                                 color = MaterialTheme.colorScheme.primary
                             )
@@ -127,7 +125,7 @@ fun LobbyScreen(
             onClick = {
                 val user = usr ?: return@Button
                 viewModel.leaveLobby(user, lobby.lid)
-                      },
+            },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(top = 8.dp),

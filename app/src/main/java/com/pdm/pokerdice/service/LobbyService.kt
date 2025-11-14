@@ -13,7 +13,7 @@ interface LobbyService {
 
     fun joinLobby(usr: User, lobbyId: Int) : Lobby
 
-    fun leaveLobby(usr: User, lobbyId: Int)
+    fun leaveLobby(usr: User, lobbyId: Int) : Boolean
 
     fun getUserByToken(token: String) : User?
 }
@@ -39,7 +39,10 @@ class FakeLobbyService(val manager : Manager) : LobbyService {
     }
 
 
-    override fun leaveLobby(usr: User, lobbyId: Int) {
-        TODO("Not yet implemented")
+    override fun leaveLobby(usr: User, lobbyId: Int) : Boolean {
+        val lobby = manager.repoLobby.findById(lobbyId) ?: throw Exception("Lobby not found")
+        val value = manager.repoLobby.leaveLobby(usr, lobby)
+        print(value)
+        return manager.repoLobby.leaveLobby(usr, lobby)
     }
 }

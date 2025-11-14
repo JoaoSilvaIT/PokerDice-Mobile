@@ -1,4 +1,4 @@
-package com.pdm.pokerdice.ui.signUp
+package com.pdm.pokerdice.ui.authentication.signUp
 
 import android.content.Intent
 import android.os.Bundle

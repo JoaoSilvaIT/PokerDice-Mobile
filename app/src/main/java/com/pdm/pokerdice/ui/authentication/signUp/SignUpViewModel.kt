@@ -1,4 +1,4 @@
-package com.pdm.pokerdice.ui.signUp
+package com.pdm.pokerdice.ui.authentication.signUp
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -6,7 +6,6 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.pdm.pokerdice.login_signup.AuthInfo
 import com.pdm.pokerdice.login_signup.AuthInfoRepo
 import com.pdm.pokerdice.login_signup.InvalidCredentialsException
 import com.pdm.pokerdice.login_signup.NewUserCredentials

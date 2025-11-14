@@ -31,19 +31,17 @@ typealias SignUpUseCase = suspend (
  * @param authInfoRepo The repository to store the authentication information.
  * @return The authentication information upon successful login.
  */
-/*
 suspend fun performLogin(
     credentials: UserCredentials,
     loginService: LoginService,
     authInfoRepo: AuthInfoRepo
 ): AuthInfo {
-    val authToken = loginService.login(credentials)
-    val authInfo = AuthInfo(userEmail = credentials.email, authToken = authToken)
+    val (user, token) = loginService.login(credentials)
+    val authInfo = AuthInfo(user.uid, token)
     authInfoRepo.saveAuthInfo(authInfo)
     return authInfo
 }
 
- */
 
 /**
  * Performs the implementation of the login use case.

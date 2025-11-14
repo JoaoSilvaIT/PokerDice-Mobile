@@ -12,7 +12,7 @@
 
     interface LeaveLobbyState {
         data object Idle : LeaveLobbyState
-        data class Success(val message: String) : LeaveLobbyState
+        data object Success : LeaveLobbyState
         data class Error(val exception: Throwable) : LeaveLobbyState
     }
 
@@ -42,9 +42,11 @@
         fun leaveLobby(user: User, lobbyId: Int) {
             viewModelScope.launch {
                 try {
-
-                    service.leaveLobby(user,lobbyId)
-                    _leaveLobbyState.value = LeaveLobbyState.Success("Left lobby successfully")
+                    if (service.leaveLobby(user,lobbyId)) {
+                        _leaveLobbyState.value = LeaveLobbyState.Success
+                    } else {
+                        throw Exception("Failed to leave lobby")
+                    }
                 } catch (e: Exception) {
                     _leaveLobbyState.value = LeaveLobbyState.Error(e)
                 }
