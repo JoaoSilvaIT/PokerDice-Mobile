@@ -9,7 +9,7 @@ import android.util.Patterns
  */
 data class UserCredentials(val email: String, val password: String) {
     init {
-        require(value = isValidCredentialsData("", email, password)) { "Invalid user credentials: $this"}
+        require(value = isValidNewCredentialsData("", email, password)) { "Invalid user credentials: $this"}
     }
 }
 
@@ -21,7 +21,7 @@ data class UserCredentials(val email: String, val password: String) {
  */
 data class NewUserCredentials(val userName : String, val email: String, val password: String) {
     init {
-        require(value = isValidCredentialsData(userName,email, password)) { "Invalid new user credentials: $this"}
+        require(value = isValidNewCredentialsData(userName,email, password)) { "Invalid new user credentials: $this"}
     }
 }
 
@@ -52,5 +52,7 @@ fun String.isValidUserName(): Boolean = isNotBlank()
  * @param password The user's password.
  * @return True if both email and password are valid, false otherwise.
  */
-fun isValidCredentialsData(name: String, email: String, password: String): Boolean = email.isValidEmail() && password.isValidPassword() && name.isValidUserName()
+fun isValidNewCredentialsData(name: String, email: String, password: String): Boolean = email.isValidEmail() && password.isValidPassword() && name.isValidUserName()
+
+fun isValidCredentialsData(email: String, password: String): Boolean = email.isValidEmail() && password.isValidPassword()
 

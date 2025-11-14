@@ -10,7 +10,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.pdm.pokerdice.login_signup.isValidCredentialsData
+import com.pdm.pokerdice.login_signup.isValidNewCredentialsData
 
 
 sealed class SignUpNavigation {
@@ -45,7 +45,7 @@ fun SignUpScreen(
                 loading = observedState is SignUpState.SignUpInProgress,
                 error = if (observedState is SignUpState.SignUpError) observedState.errorMessage else "",
                 onSignUp = { tentativeCredentials -> viewModel.signUp(tentativeCredentials) },
-                validateCredentials = ::isValidCredentialsData,
+                validateCredentials = ::isValidNewCredentialsData,
                 modifier = modifier
             )
         }

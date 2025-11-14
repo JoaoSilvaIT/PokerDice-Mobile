@@ -19,6 +19,8 @@ import com.pdm.pokerdice.service.LobbyService
 
 interface DependenciesContainer {
     val lobbyService: LobbyService
+
+    val loginService : LoginService
     val signUpService: SignUpService
     val authInfoRepo : AuthInfoRepo
 }
@@ -33,4 +35,6 @@ class PokerDice : DependenciesContainer, Application() {
     override val signUpService: SignUpService by lazy { FakeSignUpService(manager) }
 
     override val lobbyService: LobbyService by lazy { FakeLobbyService(manager) }
+
+    override val loginService: LoginService by lazy { FakeLoginService(manager) }
 }

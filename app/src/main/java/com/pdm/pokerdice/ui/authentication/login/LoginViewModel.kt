@@ -1,15 +1,20 @@
 package com.pdm.pokerdice.ui.authentication.login
 
+
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
 import com.pdm.pokerdice.login_signup.AuthInfoRepo
+import com.pdm.pokerdice.login_signup.InvalidCredentialsException
 import com.pdm.pokerdice.login_signup.LoginService
 import com.pdm.pokerdice.login_signup.LoginUseCase
-import com.pdm.pokerdice.login_signup.SignUpService
 import com.pdm.pokerdice.login_signup.UserCredentials
 import com.pdm.pokerdice.login_signup.performLogin
-import com.pdm.pokerdice.login_signup.performSignUp
 import com.pdm.pokerdice.ui.authentication.signUp.SignUpViewModel
+import kotlinx.coroutines.launch
 
 interface LoginState {
 
@@ -46,6 +51,22 @@ class LoginViewModel(
                     ) as T
                 }
                 else throw IllegalArgumentException("Unknown ViewModel class")
+        }
+    }
+
+    /**
+     * The current state of the login screen.
+     */
+    var currentState: LoginState by mutableStateOf(LoginState.Idle)
+
+    fun login(credentials : UserCredentials) {
+        viewModelScope.launch {
+            currentState = try {
+                val token = loginUseCase(credentials, service, authRepo).authToken
+                LoginState.LoginSuccess(token)
+            } catch (e: InvalidCredentialsException) {
+                LoginState.LoginError("Invalid credentials provided")
+            }
         }
     }
 }

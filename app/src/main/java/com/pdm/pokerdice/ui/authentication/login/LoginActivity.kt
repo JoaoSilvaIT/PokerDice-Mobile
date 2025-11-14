@@ -12,7 +12,7 @@ import com.pdm.pokerdice.ui.theme.PokerDiceTheme
 import com.pdm.pokerdice.DependenciesContainer
 import com.pdm.pokerdice.ui.authentication.AuthenticationNavigation
 import com.pdm.pokerdice.ui.lobby.lobbies.LobbiesActivity
-/*
+
 class LoginActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,5 +47,3 @@ class LoginActivity : ComponentActivity() {
     }
 
 }
-
- */
