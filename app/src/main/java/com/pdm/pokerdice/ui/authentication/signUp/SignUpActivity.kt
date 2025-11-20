@@ -10,13 +10,35 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
 import com.pdm.pokerdice.DependenciesContainer
-import com.pdm.pokerdice.ui.lobby.lobbies.LobbiesActivity
+import com.pdm.pokerdice.login_signup.AuthInfoRepo
 import com.pdm.pokerdice.ui.theme.PokerDiceTheme
+import com.pdm.pokerdice.ui.title.TitleActivity
 
 class SignUpActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
+        // For future use
+        /*
+        lifecycleScope.launch {
+            val loggedIn =
+                checkLoggedUser((application as com.pdm.pokerdice.PokerDice).authInfoRepo)
+            if (loggedIn) {
+                startActivity(Intent(this@MainActivity, LobbiesActivity::class.java))
+                finish()
+            } else {
+                setContent {
+                    PokerDiceTheme {
+                        Scaffold(modifier = Modifier.Companion.fillMaxSize()) { innerPadding ->
+                            TitleScreen(
+                                modifier = Modifier.Companion.padding(innerPadding),
+                                onNavigate = { navigateTo(it) },
+                            )
+                        }
+                    }
+                }
+            }
+        }
+         */
         setContent {
             PokerDiceTheme {
                 Scaffold(Modifier.fillMaxSize()) { innerPadding ->
@@ -39,11 +61,14 @@ class SignUpActivity : ComponentActivity() {
     private fun handleNavigation(it: SignUpNavigation) {
         val intent = when (it) {
             is SignUpNavigation.LobbiesScreen ->
-                Intent(this, LobbiesActivity::class.java).apply {
-                    putExtra("token", it.token)
-                }
-
+                Intent(this, TitleActivity::class.java)
         }
         startActivity(intent)
+    }
+
+    // For future use
+    private suspend fun checkLoggedUser(repo : AuthInfoRepo): Boolean {
+        val loggedUser = repo.getAuthInfo()
+        return loggedUser != null
     }
 }

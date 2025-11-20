@@ -22,13 +22,11 @@ import com.pdm.pokerdice.ui.theme.PokerDiceTheme
 enum class TitleScreenActions {
     About,
     Profile,
-    SignUp,
+    Lobbies,
 }
-
-const val SIGNUP = "sign_up_button"
+const val LOBBIES = "lobbies_button"
 const val PROFILE = "profile_button"
 const val ABOUT = "about_button"
-
 @Composable
 fun TitleScreen(
     modifier: Modifier,
@@ -55,11 +53,11 @@ fun TitleScreen(
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             Button(
-                onClick = { onNavigate(TitleScreenActions.SignUp) },
+                onClick = { onNavigate(TitleScreenActions.Lobbies) },
                 shape = MaterialTheme.shapes.medium,
-                modifier = Modifier.testTag(SIGNUP)
+                modifier = Modifier.testTag(LOBBIES)
             ) {
-                Text("Sign Up", style = MaterialTheme.typography.titleSmall)
+                Text("Lobbies Available", style = MaterialTheme.typography.titleSmall)
             }
             Button(
                 onClick = { onNavigate(TitleScreenActions.Profile) },

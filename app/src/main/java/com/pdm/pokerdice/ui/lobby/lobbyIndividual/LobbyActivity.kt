@@ -12,11 +12,8 @@ import androidx.compose.ui.Modifier
 import com.pdm.pokerdice.DependenciesContainer
 import com.pdm.pokerdice.domain.Lobby
 import com.pdm.pokerdice.domain.User
-import com.pdm.pokerdice.ui.lobby.lobbies.LobbiesActivity
-import com.pdm.pokerdice.ui.lobby.lobbies.LobbiesScreen
 import com.pdm.pokerdice.ui.theme.PokerDiceTheme
-import com.pdm.pokerdice.ui.title.MainActivity
-import com.pdm.pokerdice.ui.title.TitleScreen
+import com.pdm.pokerdice.ui.title.TitleActivity
 
 class LobbyActivity : ComponentActivity() {
 
@@ -54,7 +51,7 @@ class LobbyActivity : ComponentActivity() {
     private fun handleNavigation(it: LobbyNavigation) {
         val intent = when (it) {
             LobbyNavigation.GameLobby -> TODO()
-            LobbyNavigation.TitleScreen -> Intent(this, MainActivity::class.java)
+            LobbyNavigation.TitleScreen -> Intent(this, TitleActivity::class.java)
         }
 
         startActivity(intent)

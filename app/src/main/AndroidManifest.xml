@@ -13,15 +13,16 @@
         android:theme="@style/Theme.PokerDice"
         android:name=".PokerDice">
         <activity
-            android:name=".ui.title.MainActivity"
+            android:name=".ui.authentication.signUp.SignUpActivity"
             android:exported="true"
             android:theme="@style/Theme.PokerDice">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".ui.title.TitleActivity"
+            android:exported="false" />
         <activity android:name=".ui.about.AboutActivity"
             android:exported="false" />
         <activity android:name=".ui.profile.ProfileActivity"
@@ -31,8 +32,6 @@
         <activity android:name=".ui.lobby.lobbyCreation.LobbyCreationActivity"
             android:exported="false"/>
         <activity android:name=".ui.lobby.lobbyIndividual.LobbyActivity"
-            android:exported="false"/>
-        <activity android:name=".ui.authentication.signUp.SignUpActivity"
             android:exported="false"/>
     </application>
 
