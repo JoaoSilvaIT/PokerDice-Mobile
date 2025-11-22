@@ -14,6 +14,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -24,12 +26,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.pdm.pokerdice.domain.Lobby
+import com.pdm.pokerdice.domain.lobby.Lobby
 import com.pdm.pokerdice.domain.User
+import com.pdm.pokerdice.domain.lobby.LobbyInfo
 import kotlin.random.Random
 
 const val PLAYER_MIN = 2
 const val PLAYER_MAX = 10
+
+const val MAX_ROUNDS = 60
 
 sealed class LobbyCreationNavigation() {
 
@@ -46,11 +51,23 @@ const val CREATE_LOBBY = "create_lobby_button"
 const val INCREMENT_ROUNDS = "increment_rounds"
 const val DECREMENT_ROUNDS = "decrement_rounds"
 @Composable
-fun LobbyCreationScreen(modifier: Modifier, onNavigate: (LobbyCreationNavigation) -> Unit = {}, user: User) {
-    var maxPlayers by remember { mutableIntStateOf(2) }
+fun LobbyCreationScreen(
+    modifier: Modifier,
+    onNavigate: (LobbyCreationNavigation) -> Unit = {},
+    viewModel : LobbyCreationViewModel,
+) {
+    var expectedPlayers by remember { mutableIntStateOf(2) }
     var lobbyName by remember { mutableStateOf("") }
-    var lobbyInfo by remember { mutableStateOf("") }
-    var rounds by remember { mutableIntStateOf(maxPlayers) }
+    var lobbyDescription by remember { mutableStateOf("") }
+    var rounds by remember { mutableIntStateOf(expectedPlayers) }
+    val currentCreationState by viewModel.createLobbyState.collectAsState(LobbyCreationState.Idle)
+
+    LaunchedEffect(currentCreationState) {
+        if (currentCreationState is LobbyCreationState.Success) {
+            val createdLobby = (currentCreationState as LobbyCreationState.Success).lobby
+            onNavigate(LobbyCreationNavigation.CreatedLobby(createdLobby))
+        }
+    }
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -86,8 +103,8 @@ fun LobbyCreationScreen(modifier: Modifier, onNavigate: (LobbyCreationNavigation
                     modifier = Modifier.fillMaxWidth()
                 ){
                     OutlinedTextField(
-                        value = lobbyInfo,
-                        onValueChange = { lobbyInfo = it },
+                        value = lobbyDescription,
+                        onValueChange = { lobbyDescription = it },
                         label = { Text("Description", style = MaterialTheme.typography.labelLarge) },
                         placeholder = { Text("e.g., Casual games, 10 rounds", style = MaterialTheme.typography.bodyMedium) },
                         modifier = Modifier.testTag(DESCRIPTION),
@@ -95,7 +112,7 @@ fun LobbyCreationScreen(modifier: Modifier, onNavigate: (LobbyCreationNavigation
                     )
                 }
                 Text(
-                    text = "Max Players",
+                    text = "Expected Players",
                     style = MaterialTheme.typography.labelLarge,
                     modifier = Modifier.padding(top = 12.dp, bottom = 4.dp)
                 )
@@ -105,20 +122,20 @@ fun LobbyCreationScreen(modifier: Modifier, onNavigate: (LobbyCreationNavigation
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     IconButton(
-                        enabled = maxPlayers > PLAYER_MIN,
-                        onClick = { maxPlayers-- },
+                        enabled = expectedPlayers > PLAYER_MIN,
+                        onClick = { expectedPlayers-- },
                         modifier = Modifier.testTag(DECREMENT_LIMIT)
                     ) {
                         Text("<", style = MaterialTheme.typography.titleLarge)
                     }
                     Text(
-                        text = "$maxPlayers",
+                        text = "$expectedPlayers",
                         style = MaterialTheme.typography.titleLarge,
                         modifier = Modifier.padding(horizontal = 24.dp)
                     )
                     IconButton(
-                        enabled = maxPlayers < PLAYER_MAX,
-                        onClick = { maxPlayers++ },
+                        enabled = expectedPlayers < PLAYER_MAX,
+                        onClick = { expectedPlayers++ },
                         modifier = Modifier.testTag(INCREMENT_LIMIT)
                     ) {
                         Text(">", style = MaterialTheme.typography.titleLarge)
@@ -135,7 +152,7 @@ fun LobbyCreationScreen(modifier: Modifier, onNavigate: (LobbyCreationNavigation
                     modifier = Modifier.fillMaxWidth()
                 ){
                     IconButton(
-                        enabled = rounds >= maxPlayers,
+                        enabled = rounds%expectedPlayers == 0 && rounds > 1,
                         onClick = { rounds-- },
                         modifier = Modifier.testTag(DECREMENT_ROUNDS)
                     ) {
@@ -147,7 +164,7 @@ fun LobbyCreationScreen(modifier: Modifier, onNavigate: (LobbyCreationNavigation
                         modifier = Modifier.padding(horizontal = 24.dp)
                     )
                     IconButton(
-                        enabled = rounds <= maxPlayers,
+                        enabled = rounds%expectedPlayers == 0 && rounds <= MAX_ROUNDS,
                         onClick = { rounds++ },
                         modifier = Modifier.testTag(INCREMENT_ROUNDS)
                     ) {
@@ -157,20 +174,13 @@ fun LobbyCreationScreen(modifier: Modifier, onNavigate: (LobbyCreationNavigation
             }
             Button(
                 onClick = {
-                    val normalizedName = lobbyName.normalizedLobbyName()
-                    onNavigate(
-                        LobbyCreationNavigation.CreatedLobby(
-                            Lobby(
-                                4,
-                                normalizedName,
-                                lobbyInfo.trim(),
-                                listOf(user),
-                                maxPlayers,
-                                user,
-                                rounds
-                            )
-                        )
+                    val lobbyInfo = LobbyInfo(
+                        name = lobbyName.normalizedLobbyName(),
+                        description = lobbyDescription.trim(),
+                        expectedPlayers = expectedPlayers,
+                        rounds = rounds
                     )
+                    viewModel.createLobby(lobbyInfo)
                 },
                 modifier = Modifier.testTag(CREATE_LOBBY),
                 shape = MaterialTheme.shapes.medium
@@ -196,9 +206,11 @@ private fun generateFriendlyLobbyName(): String {
     val number = Random.nextInt(100, 999)
     return "${adjectives.random()} ${nouns.random()} #$number"
 }
-
+/*
 @Preview
 @Composable
 fun LobbyCreationPreview() {
     LobbyCreationScreen(Modifier.fillMaxSize(), user = User(1, "null", "null")) // Mock User
 }
+
+ */

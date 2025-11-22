@@ -1,6 +1,6 @@
 package com.pdm.pokerdice.repo
 
-import com.pdm.pokerdice.domain.Lobby
+import com.pdm.pokerdice.domain.lobby.Lobby
 import com.pdm.pokerdice.domain.User
 
 
@@ -8,7 +8,7 @@ interface RepositoryLobby : Repository<Lobby> {
     fun createLobby(
         name: String,
         description: String,
-        maxPlayers: Int,
+        expectedPlayers: Int,
         rounds : Int,
         host: User,
     ): Lobby

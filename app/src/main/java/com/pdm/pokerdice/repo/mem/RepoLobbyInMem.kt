@@ -1,6 +1,6 @@
 package com.pdm.pokerdice.repo.mem
 
-import com.pdm.pokerdice.domain.Lobby
+import com.pdm.pokerdice.domain.lobby.Lobby
 import com.pdm.pokerdice.domain.User
 import com.pdm.pokerdice.repo.RepositoryLobby
 import com.pdm.pokerdice.repo.RepositoryUser
@@ -14,7 +14,7 @@ class RepoLobbyInMem : RepositoryLobby {
             listOf(User(2, "jj", "")),
             2,
             User(2, "jj", ""),
-            2
+            1
             )
     )
     var lid = 2
@@ -22,11 +22,11 @@ class RepoLobbyInMem : RepositoryLobby {
     override fun createLobby(
         name: String,
         description: String,
-        maxPlayers: Int,
+        expectedPlayers: Int,
         rounds : Int,
         host: User
     ): Lobby {
-        val newLobby = Lobby(lid, name, description, listOf(host),maxPlayers, host, rounds)
+        val newLobby = Lobby(lid, name, description, listOf(host),expectedPlayers, host, rounds)
         lid++
         lobbies.add(newLobby)
         return newLobby

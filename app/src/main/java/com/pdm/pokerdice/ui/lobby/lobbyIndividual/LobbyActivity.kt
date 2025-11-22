@@ -10,7 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
 import com.pdm.pokerdice.DependenciesContainer
-import com.pdm.pokerdice.domain.Lobby
+import com.pdm.pokerdice.domain.lobby.Lobby
 import com.pdm.pokerdice.domain.User
 import com.pdm.pokerdice.ui.theme.PokerDiceTheme
 import com.pdm.pokerdice.ui.title.TitleActivity
@@ -27,6 +27,9 @@ class LobbyActivity : ComponentActivity() {
             User(0, "Default User", ""),
             2)
 
+        val user = intent.getParcelableExtra("user",
+            User::class.java) ?: User(0, "Default User", "")
+
         setContent {
             PokerDiceTheme {
                 Scaffold (modifier = Modifier.fillMaxSize()) { innerPadding ->
@@ -34,6 +37,7 @@ class LobbyActivity : ComponentActivity() {
                         Modifier.padding(innerPadding),
                         onNavigate = { handleNavigation(it) },
                         lobby = lobby,
+                        user = user,
                         viewModel
                     )
                 }

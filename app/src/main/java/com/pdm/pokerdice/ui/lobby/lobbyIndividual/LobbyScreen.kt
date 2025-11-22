@@ -25,7 +25,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewModelScope
-import com.pdm.pokerdice.domain.Lobby
+import com.pdm.pokerdice.domain.lobby.Lobby
 import com.pdm.pokerdice.domain.User
 import com.pdm.pokerdice.ui.theme.PokerDiceTheme
 import kotlinx.coroutines.launch
@@ -41,14 +41,10 @@ fun LobbyScreen(
     modifier: Modifier = Modifier,
     onNavigate: (LobbyNavigation) -> Unit = {},
     lobby: Lobby,
+    user: User,
     viewModel: LobbyViewModel
 ) {
     val currentLeaveState by viewModel.leaveLobbyState.collectAsState(LeaveLobbyState.Idle)
-    var usr by remember { mutableStateOf<User?>(null) }
-
-    LaunchedEffect(Unit) {
-        usr = viewModel.getLoggedUser()
-    }
 
     LaunchedEffect(currentLeaveState) {
         if (currentLeaveState is LeaveLobbyState.Success) {
@@ -82,7 +78,7 @@ fun LobbyScreen(
         LazyColumn(
             modifier = Modifier.weight(1f) // ocupa o resto do espaço
         ) {
-            items(lobby.users) { user ->
+            items(lobby.users) { usr ->
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -96,14 +92,14 @@ fun LobbyScreen(
                             .padding(12.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        if (user.name == usr?.name) {
+                        if (usr.name == user.name) {
                             Text(
                                 text = "${user.name} (You)",
                                 style = MaterialTheme.typography.bodyLarge,
                                 color = MaterialTheme.colorScheme.primary
                             )
                         } else {
-                            Text(text = user.name, style = MaterialTheme.typography.bodyLarge)
+                            Text(text = usr.name, style = MaterialTheme.typography.bodyLarge)
                         }
                     }
                 }
@@ -123,7 +119,6 @@ fun LobbyScreen(
 
         Button(
             onClick = {
-                val user = usr ?: return@Button
                 viewModel.leaveLobby(user, lobby.lid)
             },
             modifier = Modifier

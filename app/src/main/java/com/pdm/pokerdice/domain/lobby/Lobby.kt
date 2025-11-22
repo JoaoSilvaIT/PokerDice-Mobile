@@ -1,6 +1,7 @@
-package com.pdm.pokerdice.domain
+package com.pdm.pokerdice.domain.lobby
 
 import android.os.Parcelable
+import com.pdm.pokerdice.domain.User
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
@@ -9,7 +10,7 @@ data class Lobby (
     val name: String,
     val description : String,
     val users : List<User>,
-    val maxUsers : Int,
+    val expectedPlayers : Int,
     val host : User,
     val rounds : Int
 ) : Parcelable

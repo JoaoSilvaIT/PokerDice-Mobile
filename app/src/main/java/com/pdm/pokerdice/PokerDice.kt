@@ -34,7 +34,7 @@ class PokerDice : DependenciesContainer, Application() {
 
     override val signUpService: SignUpService by lazy { FakeSignUpService(manager) }
 
-    override val lobbyService: LobbyService by lazy { FakeLobbyService(manager) }
+    override val lobbyService: LobbyService by lazy { FakeLobbyService(manager, authInfoRepo) }
 
     override val loginService: LoginService by lazy { FakeLoginService(manager) }
 }

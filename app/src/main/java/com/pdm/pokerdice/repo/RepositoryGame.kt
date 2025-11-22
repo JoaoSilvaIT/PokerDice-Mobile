@@ -1,6 +1,6 @@
 package com.pdm.pokerdice.repo
 
-import com.pdm.pokerdice.domain.Lobby
+import com.pdm.pokerdice.domain.lobby.Lobby
 import com.pdm.pokerdice.domain.User
 import com.pdm.pokerdice.domain.game.Dice
 import com.pdm.pokerdice.domain.game.Game

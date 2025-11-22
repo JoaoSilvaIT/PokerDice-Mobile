@@ -1,37 +1,15 @@
 package com.pdm.pokerdice.ui.lobby.lobbies
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.LocalAutofillHighlightColor
-import androidx.compose.material3.Button
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewModelScope
-import com.pdm.pokerdice.domain.Lobby
 import com.pdm.pokerdice.domain.User
-import kotlinx.coroutines.launch
+import com.pdm.pokerdice.domain.lobby.Lobby
 
 const val CREATE_LOBBY = "create_button"
 sealed class LobbiesNavigation {
-    class SelectLobby(val lobby: Lobby) : LobbiesNavigation()
+    class SelectLobby(val lobby: Lobby, val user: User) : LobbiesNavigation()
     object CreateLobby : LobbiesNavigation()
 }
 @Composable
@@ -40,15 +18,47 @@ fun LobbiesScreen(
     onNavigate: (LobbiesNavigation) -> Unit = {},
     viewModel: LobbiesViewModel
 ) {
-    val currentJoinState by viewModel.joinLobbyState.collectAsState(JoinLobbyState.Idle)
-    val lobbies by viewModel.lobbies.collectAsState()
+    val state by viewModel.state.collectAsState()
 
+    when (state) {
+        is LobbiesScreenState.Loading -> {
+            LobbiesScreenView(
+                lobbies = null,
+            )
+        }
+        is LobbiesScreenState.ViewLobbies -> {
+            val lobbies = (state as LobbiesScreenState.ViewLobbies).lobbies
+            LobbiesScreenView(
+                lobbies = lobbies,
+                onJoinLobby = { lobbyId ->
+                    viewModel.joinLobby(lobbyId)
+                }
+            )
+        }
+        is LobbiesScreenState.JoinLobby -> {
+            val lobby = (state as LobbiesScreenState.JoinLobby).lobby
+            val user = (state as LobbiesScreenState.JoinLobby).user
+            onNavigate(LobbiesNavigation.SelectLobby(lobby, user))
+        }
+        is LobbiesScreenState.Error -> {
+            val errorState = (state as LobbiesScreenState.Error).message
+            LobbiesScreenView(
+                lobbies = null,
+                error = errorState
+            )
+        }
+    }
+    /*
     LaunchedEffect(currentJoinState) {
         if (currentJoinState is JoinLobbyState.Success) {
             val lobbyToJoin = (currentJoinState as JoinLobbyState.Success).lobby
-            onNavigate(LobbiesNavigation.SelectLobby(lobbyToJoin))
+            val user = (currentJoinState as JoinLobbyState.Success).user
+            onNavigate(LobbiesNavigation.SelectLobby(lobbyToJoin,user))
         }
     }
+
+     */
+    /*
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -104,12 +114,7 @@ fun LobbiesScreen(
         Button(
             onClick = {
                 viewModel.viewModelScope.launch {
-                    val user = viewModel.getLoggedUser()
-                    if (user != null) {
-                        onNavigate(LobbiesNavigation.CreateLobby)
-                    } else {
-                        // Handle the case where the user is not logged in
-                    }
+                    onNavigate(LobbiesNavigation.CreateLobby)
                 }
             },
             modifier = Modifier
@@ -122,6 +127,8 @@ fun LobbiesScreen(
             Text(text = "Create Lobby")
         }
     }
+
+     */
 }
 
 /*

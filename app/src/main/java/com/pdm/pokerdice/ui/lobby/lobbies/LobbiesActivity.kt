@@ -24,11 +24,14 @@
 
             setContent {
                 PokerDiceTheme {
-                    Scaffold (modifier = Modifier.fillMaxSize()) { innerPadding ->
+                    Scaffold(
+                        modifier = Modifier.fillMaxSize(),
+                    ) { paddingValues ->
                         LobbiesScreen(
-                            Modifier.padding(innerPadding),
-                            onNavigate = { handleNavigation(it) },
-                            viewModel)
+                            modifier = Modifier.padding(paddingValues),
+                            viewModel = viewModel,
+                            onNavigate = { handleNavigation(it) }
+                        )
                     }
                 }
             }
@@ -37,7 +40,6 @@
         private val viewModel: LobbiesViewModel by viewModels {
             LobbiesViewModel.Companion.getFactory(
                 service = (application as DependenciesContainer).lobbyService,
-                repo = (application as DependenciesContainer).authInfoRepo
             )
         }
 
@@ -50,6 +52,7 @@
                is LobbiesNavigation.SelectLobby ->
                    Intent(this, LobbyActivity::class.java).apply {
                          putExtra("lobby", it.lobby)
+                        putExtra("user", it.user)
                    }
            }
             startActivity(intent)

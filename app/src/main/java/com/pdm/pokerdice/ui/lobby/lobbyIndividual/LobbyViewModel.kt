@@ -30,14 +30,9 @@
             }
         }
 
-        suspend fun getLoggedUser(): User? {
-            val authInfo = repo.getAuthInfo()
-            return if (authInfo != null) {
-                service.getUserByToken(authInfo.authToken)
-            } else null
-        }
         private val _leaveLobbyState = MutableStateFlow<LeaveLobbyState>(LeaveLobbyState.Idle)
         val leaveLobbyState = _leaveLobbyState.asStateFlow()
+
 
         fun leaveLobby(user: User, lobbyId: Int) {
             viewModelScope.launch {
