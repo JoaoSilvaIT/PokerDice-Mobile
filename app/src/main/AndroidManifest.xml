@@ -13,7 +13,7 @@
         android:theme="@style/Theme.PokerDice"
         android:name=".PokerDice">
         <activity
-            android:name=".ui.authentication.signUp.SignUpActivity"
+            android:name=".home.HomeActivity"
             android:exported="true"
             android:theme="@style/Theme.PokerDice">
             <intent-filter>
@@ -21,6 +21,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".ui.authentication.signUp.SignUpActivity"
+            android:exported="false" />
         <activity android:name=".ui.title.TitleActivity"
             android:exported="false" />
         <activity android:name=".ui.about.AboutActivity"

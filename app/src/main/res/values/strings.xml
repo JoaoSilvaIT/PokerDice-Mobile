@@ -1,4 +1,9 @@
 <resources>
     <string name="app_name">Poker Dice</string>
     <string name="login_title" translatable="false">Login Demo</string>
+    <string name="Go_back">Go back</string>
+    <string name="login">Login</string>
+    <string name="sign_Up">SignUp</string>
+    <string name="welcome">Welcome To PokerDice</string>
+    <string name="creators">Made By:</string>
 </resources>

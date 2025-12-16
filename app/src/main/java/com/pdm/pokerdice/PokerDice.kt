@@ -4,6 +4,8 @@ import android.app.Application
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
+import com.pdm.pokerdice.home.HomeService
+import com.pdm.pokerdice.home.HomeServiceImpl
 import com.pdm.pokerdice.login_signup.AuthInfoRepo
 import com.pdm.pokerdice.login_signup.FakeLoginService
 import com.pdm.pokerdice.login_signup.FakeSignUpService
@@ -18,6 +20,7 @@ import com.pdm.pokerdice.service.FakeLobbyService
 import com.pdm.pokerdice.service.LobbyService
 
 interface DependenciesContainer {
+    val homeService : HomeService
     val lobbyService: LobbyService
 
     val loginService : LoginService
@@ -30,6 +33,7 @@ class PokerDice : DependenciesContainer, Application() {
 
     private val ds: DataStore<Preferences> by preferencesDataStore(name = "auth_info")
 
+    override val homeService: HomeService by lazy { HomeServiceImpl() }
     override val authInfoRepo: AuthInfoRepo by lazy { AuthInfoPreferencesRepo(ds) }
 
     override val signUpService: SignUpService by lazy { FakeSignUpService(manager) }

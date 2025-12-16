@@ -1,70 +1,96 @@
-package com.pdm.pokerdice.ui.theme
+package com.example.chimp.ui.common
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.outlined.Info
-import androidx.compose.material.icons.outlined.Settings
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import com.pdm.pokerdice.R
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.unit.dp
+import com.pdm.pokerdice.ui.theme.PokerDiceTheme
 
-
-
-const val BACK_BUTTON_TAG = "back_button"
-const val INFO_BUTTON_TAG = "info_button"
-const val CONFIG_BUTTON_TAG = "config_button"
-const val TITLE_TEXT_TAG = "title_text"
-
-/**
- * Composable function used to describe the top bar.
- *
- * @param title the title to be displayed in the top bar.
- * @param onBackIntent the handler function of the "back navigation" event. If null, the top bar
- * will not include a back button.
- * @param onInfoIntent the handler function of the "navigate to info" event. If null, the top bar
- * will not include an info button.
- * @param onConfigurationIntent the handler function of the "navigate to configuration" event.
- * If null, the top bar will not include a configuration button.
- */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TopBar(
-    title: String = "",
-    onBackIntent: (() -> Unit)? = null,
-    onInfoIntent: (() -> Unit)? = null,
-    onConfigurationIntent: (() -> Unit)? = null,
+fun GenericTopAppBar(
+    modifier: Modifier = Modifier,
+    title: String= "",
+    onTitleClick: (() -> Unit)? = null,
+    onBackAction : (() -> Unit)? = null,
+    actions: @Composable RowScope.() -> Unit = {},
+    scrollBehavior: TopAppBarScrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
 ) {
     TopAppBar(
-        title = { Text(text = title, modifier = Modifier.testTag(tag = TITLE_TEXT_TAG)) },
+        title = {
+            Text(
+                text = title,
+                color = MaterialTheme.colorScheme.onPrimary,
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .wrapContentHeight(Alignment.CenterVertically)
+                    .then(if (onTitleClick != null) Modifier
+                        .clickable { onTitleClick() }.padding(end= 200.dp) else Modifier)
+            )
+        },
         navigationIcon = {
-            onBackIntent?.let {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Default.ArrowBack,
-                    contentDescription = "Back",
-                    modifier = Modifier.clickable(onClick = it).testTag(tag = BACK_BUTTON_TAG)
-                )
+            if (onBackAction != null ) {
+                IconButton(onClick = onBackAction) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = stringResource(R.string.Go_back),
+                        tint = MaterialTheme.colorScheme.onPrimary
+                    )
+                }
             }
         },
-        actions = {
-            onInfoIntent?.let {
-                Icon(
-                    imageVector = Icons.Outlined.Info,
-                    contentDescription = "About",
-                    modifier = Modifier.clickable(onClick = it).testTag(tag = INFO_BUTTON_TAG)
-                )
-            }
-            onConfigurationIntent?.let {
-                Icon(
-                    imageVector = Icons.Outlined.Settings,
-                    contentDescription = "Configuration",
-                    modifier = Modifier.clickable(onClick = it).testTag(tag = CONFIG_BUTTON_TAG)
+        actions = { actions() },
+
+        colors = TopAppBarDefaults.topAppBarColors(
+            containerColor = MaterialTheme.colorScheme.primary
+        ),
+
+
+        scrollBehavior = scrollBehavior,
+        modifier = modifier.statusBarsPadding()
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Preview(showBackground = true, showSystemUi = true)
+@Composable
+fun PreviewGenericTopAppBar() {
+    PokerDiceTheme {
+        Surface {
+            Column {
+                GenericTopAppBar(
+                    title = "Home",
+                    onBackAction = { },
+                    actions = {
+                        TextButton(onClick = { }) {
+                            Text(
+                                text = stringResource(R.string.login),
+                                color = MaterialTheme.colorScheme.onPrimary
+                            )
+                        }
+                        TextButton(onClick = { }) {
+                            Text(
+                                text = stringResource(R.string.sign_Up),
+                                color = MaterialTheme.colorScheme.onPrimary
+                            )
+                        }
+                    }
                 )
             }
         }
-    )
+    }
 }
+
