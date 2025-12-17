@@ -15,11 +15,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -36,21 +34,21 @@ fun SignUpForm(
     validateCredentials: (name: String, email: String, password: String) -> Boolean,
     modifier: Modifier = Modifier
 ) {
-    var email by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
-    var userName by rememberSaveable { mutableStateOf("")}
+    val email = remember { mutableStateOf("") }
+    val password = remember { mutableStateOf("") }
+    val userName = rememberSaveable { mutableStateOf("") }
 
     SignUpFormStateLess(
         loading,
         error,
-        userName,
-        email,
-        password,
-        isDataValid = validateCredentials(userName, email, password),
-        onEmailChange = {email = it},
-        onPasswordChange = {password = it},
-        onUserNameChange = {userName = it},
-        onSignUp = {userName, email, password -> onSignUp(NewUserCredentials(userName, email, password))},
+        userName.value,
+        email.value,
+        password.value,
+        isDataValid = validateCredentials(userName.value, email.value, password.value),
+        onEmailChange = { email.value = it },
+        onPasswordChange = { password.value = it },
+        onUserNameChange = { userName.value = it },
+        onSignUp = { name, em, pass -> onSignUp(NewUserCredentials(name, em, pass)) },
         modifier = modifier
     )
 }

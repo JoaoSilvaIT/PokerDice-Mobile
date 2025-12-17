@@ -8,9 +8,12 @@ import android.util.Patterns
  * @param password The user's password.
  */
 data class UserCredentials(val email: String, val password: String) {
+    /*
     init {
         require(value = isValidNewCredentialsData("", email, password)) { "Invalid user credentials: $this"}
     }
+
+     */
 }
 
 /**

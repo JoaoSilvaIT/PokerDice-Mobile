@@ -39,5 +39,6 @@ class HomeActivity : ComponentActivity() {
             }
         }
         startActivity(intent)
+        finish() // Finish home activity so user doesn't go back to it
     }
 }

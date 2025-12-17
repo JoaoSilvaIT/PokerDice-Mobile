@@ -34,17 +34,25 @@ suspend fun performLogin(
     service : UserAuthService,
     authInfoRepo: AuthInfoRepo
 ): Either<AuthTokenError, AuthInfo> {
-    when (val result = service.createToken(credentials.email, credentials.password)) {
-        is Either.Failure -> return failure(result.value)
-        is Either.Success -> {
-            when (val user = service.getUserByToken(result.value.tokenValue)) {
-                is Either.Failure -> return failure(user.value)
-                is Either.Success -> {
-                    val authInfo = AuthInfo(user.value.id, result.value.tokenValue)
-                    authInfoRepo.saveAuthInfo(authInfo)
-                    return success(authInfo)
+    return try {
+        when (val result = service.createToken(credentials.email, credentials.password)) {
+            is Either.Failure -> {
+                failure(result.value)
+            }
+            is Either.Success -> {
+                when (val user = service.getUserByToken(result.value.tokenValue)) {
+                    is Either.Failure -> {
+                        failure(user.value)
+                    }
+                    is Either.Success -> {
+                        val authInfo = AuthInfo(user.value.id, result.value.tokenValue)
+                        authInfoRepo.saveAuthInfo(authInfo)
+                        success(authInfo)
+                    }
                 }
             }
         }
+    } catch (e: Exception) {
+        failure(AuthTokenError.UserNotFoundOrInvalidCredentials)
     }
 }

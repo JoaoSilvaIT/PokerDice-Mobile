@@ -32,22 +32,28 @@ typealias SignUpUseCase = suspend (
 suspend fun performSignUp(
     credentials: NewUserCredentials,
     service : UserAuthService,
-
     authInfoRepo: AuthInfoRepo
 ): Either<AuthTokenError, AuthInfo> {
-    val user = service.createUser(
-        credentials.userName,
-        credentials.email,
-        credentials.password)
-    return when(user) {
-        is Either.Failure -> return failure(AuthTokenError.UserNotFoundOrInvalidCredentials)
-        is Either.Success -> {
-            val loginCreds = UserCredentials(credentials.email, credentials.password)
-            performLogin(
-                loginCreds,
-                service,
-                authInfoRepo
-            )
+    return try {
+        val user = service.createUser(
+            credentials.userName,
+            credentials.email,
+            credentials.password)
+        when(user) {
+            is Either.Failure -> {
+                failure(AuthTokenError.UserNotFoundOrInvalidCredentials)
+            }
+            is Either.Success -> {
+                val loginCreeds = UserCredentials(credentials.email, credentials.password)
+                val loginResult = performLogin(
+                    loginCreeds,
+                    service,
+                    authInfoRepo
+                )
+                loginResult
+            }
         }
+    } catch (e: Exception) {
+        failure(AuthTokenError.UserNotFoundOrInvalidCredentials)
     }
 }
