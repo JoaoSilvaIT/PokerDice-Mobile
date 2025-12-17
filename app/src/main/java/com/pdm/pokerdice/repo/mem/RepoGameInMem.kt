@@ -1,7 +1,7 @@
 package com.pdm.pokerdice.repo.mem
 
 import com.pdm.pokerdice.domain.lobby.Lobby
-import com.pdm.pokerdice.domain.User
+import com.pdm.pokerdice.domain.user.User
 import com.pdm.pokerdice.domain.game.Dice
 import com.pdm.pokerdice.domain.game.Game
 import com.pdm.pokerdice.domain.game.Hand

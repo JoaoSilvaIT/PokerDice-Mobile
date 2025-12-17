@@ -32,8 +32,7 @@ const val HOMEPAGE_MADE_BY_TEXT = "made by text on Home page"
 @Composable
 fun HomeView(
     creators: List<String>,
-    loginFunction: () -> Unit,
-    signUpFunction: () -> Unit
+    onNavigate : (HomeNavigation) -> Unit = {},
 ) {
     Scaffold(
         modifier = Modifier
@@ -44,7 +43,7 @@ fun HomeView(
                 title = stringResource(R.string.app_name),
                 actions = {
                     TextButton(
-                        onClick = { loginFunction() },
+                        onClick = { onNavigate(HomeNavigation.LoginScreen()) },
                         modifier = Modifier.testTag(HOMEPAGE_LOGIN_BUTTON)
                     ) {
                         Text(
@@ -53,7 +52,7 @@ fun HomeView(
                         )
                     }
                     TextButton(
-                        onClick = { signUpFunction() },
+                        onClick = { onNavigate(HomeNavigation.SignUpScreen()) },
                         modifier = Modifier.testTag(HOMEPAGE_SIGNUP_BUTTON)
                     ) {
                         Text(
@@ -117,8 +116,7 @@ fun HomeViewPreview() {
                 "Pedro Monteiro",
                 "Bernardo Jaco",
             ),
-            loginFunction = { },
-            signUpFunction = { }
+            onNavigate = {}
         )
     }
 }

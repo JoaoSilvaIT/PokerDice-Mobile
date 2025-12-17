@@ -1,6 +1,10 @@
 package com.pdm.pokerdice.repo.mem
 
-import com.pdm.pokerdice.domain.User
+import com.pdm.pokerdice.domain.user.Token
+import com.pdm.pokerdice.domain.user.TokenValidationInfo
+import com.pdm.pokerdice.domain.user.User
+import com.pdm.pokerdice.domain.user.UserExternalInfo
+import com.pdm.pokerdice.domain.user.UserStatistics
 import com.pdm.pokerdice.repo.RepositoryUser
 import java.time.Instant
 
@@ -25,28 +29,6 @@ class RepoUserInMem : RepositoryUser {
         return newUser
     }
 
-    override fun findTokenByUser(user: User) : String? {
-        val index = users.indexOf(user)
-        return if (index != -1) {
-            tokens[index]
-        } else {
-            null
-        }
-    }
-
-    override fun findUserByToken(token: String): User? {
-        val index = tokens.indexOf(token)
-        return if (index != -1) {
-            users[index]
-        } else {
-            null
-        }
-    }
-
-    override fun addToken(token: String): String {
-        tokens.add(token)
-        return token
-    }
 
     override fun addAll(entities: List<User>) {
         users.addAll(entities)
@@ -56,8 +38,36 @@ class RepoUserInMem : RepositoryUser {
         TODO("Not yet implemented")
     }
 
+    override fun getUserById(id: Int): UserExternalInfo? {
+        TODO("Not yet implemented")
+    }
+
+    override fun getUserStats(userId: Int): UserStatistics {
+        TODO("Not yet implemented")
+    }
+
+    override fun getTokenByTokenValidationInfo(tokenValidationInfo: TokenValidationInfo): Pair<User, Token>? {
+        TODO("Not yet implemented")
+    }
+
+    override fun createToken(token: Token, maxTokens: Int) {
+        TODO("Not yet implemented")
+    }
+
+    override fun updateTokenLastUsed(token: Token, now: Instant) {
+        TODO("Not yet implemented")
+    }
+
+    override fun removeTokenByValidationInfo(tokenValidationInfo: TokenValidationInfo): Int {
+        TODO("Not yet implemented")
+    }
+
+    override fun addBalance(userId: Int, amount: Int) {
+        TODO("Not yet implemented")
+    }
+
     override fun findById(id: Int): User? {
-        return users.find { it.uid == id }
+        return users.find { it.id == id }
     }
 
     override fun findAll(): List<User> {

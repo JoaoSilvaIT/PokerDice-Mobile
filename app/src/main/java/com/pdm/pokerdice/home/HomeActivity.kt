@@ -1,12 +1,14 @@
 package com.pdm.pokerdice.home
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import com.pdm.pokerdice.DependenciesContainer
-import com.pdm.pokerdice.NavigationIntent
+import com.pdm.pokerdice.login.LoginActivity
+import com.pdm.pokerdice.signUp.SignUpActivity
 import kotlin.getValue
 
 class HomeActivity : ComponentActivity() {
@@ -16,7 +18,7 @@ class HomeActivity : ComponentActivity() {
         setContent {
             HomeScreen(
                 viewModel = homeScreenViewModel,
-                navigator = NavigationIntent(this)
+                onNavigate = { handleNavigation(it) }
             )
         }
     }
@@ -28,14 +30,14 @@ class HomeActivity : ComponentActivity() {
     }
 
     private fun handleNavigation(it : HomeNavigation) {
-        when (it) {
+        val intent = when (it) {
             is HomeNavigation.LoginScreen -> {
-                // Navigate to Login Screen
+                Intent(this, LoginActivity::class.java)
             }
             is HomeNavigation.SignUpScreen -> {
-                // Navigate to Sign Up Screen
+                Intent(this, SignUpActivity::class.java)
             }
         }
+        startActivity(intent)
     }
-
 }

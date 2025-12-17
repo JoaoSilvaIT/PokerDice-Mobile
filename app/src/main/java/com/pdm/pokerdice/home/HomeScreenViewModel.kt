@@ -11,6 +11,11 @@ class HomeScreenViewModel(
     private val service : HomeService
 ) : ViewModel() {
 
+    val currentState: HomeScreenState
+        get() {
+            val creators = service.getCreators()
+            return HomeScreenState.Success(creators)
+        }
     companion object {
         /**
          * Returns a factory to create a [HomeScreenViewModel] with the provided parameters.

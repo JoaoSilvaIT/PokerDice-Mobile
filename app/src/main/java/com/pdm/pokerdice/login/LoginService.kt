@@ -1,11 +1,10 @@
 package com.pdm.pokerdice.login
 
-import com.pdm.pokerdice.domain.User
-import com.pdm.pokerdice.login_signup.UserCredentials
-import com.pdm.pokerdice.repo.tm.Manager
-import kotlinx.coroutines.delay
-import kotlin.random.Random
+import com.pdm.pokerdice.domain.user.User
+import com.pdm.pokerdice.domain.user.UserCredentials
+import com.pdm.pokerdice.repo.tm.Transaction
 
+/*
 /**
  * Interface representing the login service.
  */
@@ -29,7 +28,7 @@ class InvalidCredentialsException : Exception("Invalid user credentials provided
  * A fake implementation of the LoginService for testing purposes.
  */
 class FakeLoginService(
-    private val manager: Manager
+    private val manager: Transaction
 ) : LoginService {
     override suspend fun login(credentials: UserCredentials): Pair<User, String> {
         val user = manager.repoUser.findByEmail(credentials.email) ?: throw Exception("Invalid Credentials")
@@ -37,3 +36,6 @@ class FakeLoginService(
         return Pair(user, token)
     }
 }
+
+
+ */

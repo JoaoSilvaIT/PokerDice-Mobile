@@ -1,10 +1,8 @@
 package com.pdm.pokerdice.repo.mem
 
 import com.pdm.pokerdice.domain.lobby.Lobby
-import com.pdm.pokerdice.domain.User
+import com.pdm.pokerdice.domain.user.User
 import com.pdm.pokerdice.repo.RepositoryLobby
-import com.pdm.pokerdice.repo.RepositoryUser
-import kotlin.text.set
 
 class RepoLobbyInMem : RepositoryLobby {
     val lobbies = mutableListOf(

@@ -1,6 +1,5 @@
 package com.pdm.pokerdice.domain.game
 
-import com.pdm.pokerdice.domain.User
 import com.pdm.pokerdice.domain.game.utilis.State
 
 data class Game (

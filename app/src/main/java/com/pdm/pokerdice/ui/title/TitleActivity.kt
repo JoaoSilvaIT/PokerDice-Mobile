@@ -9,12 +9,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
-import com.pdm.pokerdice.login_signup.AuthInfoRepo
 import com.pdm.pokerdice.ui.about.AboutActivity
-import com.pdm.pokerdice.ui.authentication.login.LoginActivity
 import com.pdm.pokerdice.ui.profile.ProfileActivity
-import com.pdm.pokerdice.ui.authentication.signUp.SignUpActivity
-import com.pdm.pokerdice.ui.lobby.lobbies.LobbiesActivity
+import com.pdm.pokerdice.lobby.lobbies.LobbiesActivity
 import com.pdm.pokerdice.ui.theme.PokerDiceTheme
 
 class TitleActivity : ComponentActivity() {

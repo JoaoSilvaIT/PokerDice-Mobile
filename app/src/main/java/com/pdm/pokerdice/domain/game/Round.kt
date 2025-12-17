@@ -1,7 +1,5 @@
 package com.pdm.pokerdice.domain.game
 
-import com.pdm.pokerdice.domain.User
-
 const val MIN_ANTE = 10
 
 data class Round(

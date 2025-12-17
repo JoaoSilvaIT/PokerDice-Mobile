@@ -21,7 +21,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".ui.authentication.signUp.SignUpActivity"
+        <activity android:name=".login.LoginActivity"
+            android:exported="false" />
+        <activity android:name=".signUp.SignUpActivity"
             android:exported="false" />
         <activity android:name=".ui.title.TitleActivity"
             android:exported="false" />
@@ -29,11 +31,11 @@
             android:exported="false" />
         <activity android:name=".ui.profile.ProfileActivity"
             android:exported="false" />
-        <activity android:name=".ui.lobby.lobbies.LobbiesActivity"
+        <activity android:name=".lobby.lobbies.LobbiesActivity"
             android:exported="false" />
-        <activity android:name=".ui.lobby.lobbyCreation.LobbyCreationActivity"
+        <activity android:name=".lobby.lobbyCreation.LobbyCreationActivity"
             android:exported="false"/>
-        <activity android:name=".ui.lobby.lobbyIndividual.LobbyActivity"
+        <activity android:name=".lobby.lobbyIndividual.LobbyActivity"
             android:exported="false"/>
     </application>
 

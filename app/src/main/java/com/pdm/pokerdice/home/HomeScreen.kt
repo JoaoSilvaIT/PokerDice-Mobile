@@ -4,16 +4,13 @@ import androidx.compose.runtime.Composable
 import com.pdm.pokerdice.ui.theme.PokerDiceTheme
 
 @Composable
-fun HomeScreen(viewModel: HomeScreenViewModel, navigator: HomeNavigation) {
-    PokerDiceTheme {
-        when (val currentState = viewModel.state) {
-            is HomeScreenState.Success -> {
-                HomeView(
-                    creators = currentState.creators,
-                    loginFunction = { navigator.goToLogin() },
-                    signUpFunction = { navigator.goToSignup() }
-                )
-            }
+fun HomeScreen(viewModel: HomeScreenViewModel, onNavigate: (HomeNavigation) -> Unit = {}) {
+    when (val currentState = viewModel.currentState) {
+        is HomeScreenState.Success -> {
+            HomeView(
+                creators = currentState.creators,
+                onNavigate
+            )
         }
     }
 }
