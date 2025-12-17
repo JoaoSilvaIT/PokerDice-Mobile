@@ -47,4 +47,6 @@ interface RepositoryGame : Repository<Game> {
         roundNumber: Int,
         players: List<User>,
     ): Map<User, Hand>
+
+    fun findActiveGamesByLobbyId(lobbyId: Int): List<Game>
 }
