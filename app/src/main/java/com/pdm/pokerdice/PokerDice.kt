@@ -4,9 +4,9 @@ import android.app.Application
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
-import com.pdm.pokerdice.home.HomeService
-import com.pdm.pokerdice.home.HomeServiceImpl
-import com.pdm.pokerdice.domain.AuthInfoRepo
+import com.pdm.pokerdice.service.HomeService
+import com.pdm.pokerdice.service.HomeServiceImpl
+import com.pdm.pokerdice.domain.user.AuthInfoRepo
 import com.pdm.pokerdice.domain.user.Sha256TokenEncoder
 import com.pdm.pokerdice.domain.user.UsersDomainConfig
 import com.pdm.pokerdice.game.GameService

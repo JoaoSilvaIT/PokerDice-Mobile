@@ -3,8 +3,8 @@ package com.pdm.pokerdice.lobby.lobbyIndividual
     import androidx.lifecycle.ViewModel
     import androidx.lifecycle.ViewModelProvider
     import androidx.lifecycle.viewModelScope
-    import com.pdm.pokerdice.domain.user.User
-    import com.pdm.pokerdice.domain.AuthInfoRepo
+    import com.pdm.pokerdice.domain.user.AuthInfoRepo
+    import com.pdm.pokerdice.domain.user.UserExternalInfo
     import com.pdm.pokerdice.domain.utilis.Either
     import com.pdm.pokerdice.service.LobbyService
     import kotlinx.coroutines.flow.MutableStateFlow
@@ -35,7 +35,7 @@ package com.pdm.pokerdice.lobby.lobbyIndividual
         val leaveLobbyState = _leaveLobbyState.asStateFlow()
 
 
-        fun leaveLobby(user: User, lobbyId: Int) {
+        fun leaveLobby(user: UserExternalInfo, lobbyId: Int) {
             viewModelScope.launch {
                 when(service.leaveLobby(user,lobbyId)) {
                     is Either.Success -> {

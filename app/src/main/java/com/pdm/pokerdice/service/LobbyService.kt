@@ -1,8 +1,8 @@
 package com.pdm.pokerdice.service
 
 import com.pdm.pokerdice.domain.lobby.Lobby
-import com.pdm.pokerdice.domain.user.User
-import com.pdm.pokerdice.domain.AuthInfoRepo
+import com.pdm.pokerdice.domain.user.AuthInfoRepo
+import com.pdm.pokerdice.domain.user.UserExternalInfo
 import com.pdm.pokerdice.domain.utilis.Either
 import com.pdm.pokerdice.domain.utilis.failure
 import com.pdm.pokerdice.domain.utilis.success
@@ -18,12 +18,12 @@ interface LobbyService {
 
     fun refreshLobbies()
 
-    fun createLobby(name: String, description: String, minPlayers: Int, maxPlayers: Int, host: User) : Either<LobbyError, Lobby>
+    fun createLobby(name: String, description: String, minPlayers: Int, maxPlayers: Int, host: UserExternalInfo) : Either<LobbyError, Lobby>
 
-    fun joinLobby(usr: User, lobbyId: Int) : Either<LobbyError, Lobby>
+    fun joinLobby(usr: UserExternalInfo, lobbyId: Int) : Either<LobbyError, Lobby>
 
-    fun leaveLobby(usr: User, lobbyId: Int) : Either<LobbyError, Boolean>
-    suspend fun getLoggedUser(): User?
+    fun leaveLobby(usr: UserExternalInfo, lobbyId: Int) : Either<LobbyError, Boolean>
+    suspend fun getLoggedUser(): UserExternalInfo?
 }
 
 class FakeLobbyService(val trxManager : TransactionManager , val repo : AuthInfoRepo) : LobbyService {
@@ -38,7 +38,7 @@ class FakeLobbyService(val trxManager : TransactionManager , val repo : AuthInfo
         description: String,
         minPlayers: Int,
         maxPlayers: Int,
-        host: User
+        host: UserExternalInfo
     ): Either<LobbyError, Lobby> {
         if(name.isBlank()) return failure(LobbyError.BlankName)
         if (minPlayers < 2) return failure(LobbyError.MinPlayersTooLow)
@@ -55,10 +55,7 @@ class FakeLobbyService(val trxManager : TransactionManager , val repo : AuthInfo
         }
     }
 
-    override fun joinLobby(
-        usr: User,
-        lobbyId: Int
-    ) : Either<LobbyError, Lobby> {
+    override fun joinLobby(usr: UserExternalInfo, lobbyId: Int): Either<LobbyError, Lobby> {
         return trxManager.run {
             val lobby = repoLobby.findById(lobbyId) ?: return@run failure(LobbyError.LobbyNotFound)
 
@@ -73,9 +70,7 @@ class FakeLobbyService(val trxManager : TransactionManager , val repo : AuthInfo
     }
 
 
-    override fun leaveLobby(
-        usr: User, lobbyId: Int
-    ) : Either<LobbyError, Boolean> {
+    override fun leaveLobby(usr: UserExternalInfo, lobbyId: Int): Either<LobbyError, Boolean> {
         return trxManager.run {
             val lobby = repoLobby.findById(lobbyId) ?: return@run failure(LobbyError.LobbyNotFound)
 
@@ -94,14 +89,11 @@ class FakeLobbyService(val trxManager : TransactionManager , val repo : AuthInfo
         }
     }
 
-    override suspend fun getLoggedUser(): User? {
-        TODO()
-        /*
-        val authInfo = repo.getAuthInfo()
-        return if (authInfo != null) {
-            manager.repoUser.findUserByToken(authInfo.authToken)
-        } else null
+    override suspend fun getLoggedUser(): UserExternalInfo? {
+        val authInfo = repo.getAuthInfo() ?: return null
 
-         */
+        return trxManager.run {
+            repoUser.getUserById(authInfo.userId)
+        }
     }
 }

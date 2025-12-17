@@ -10,9 +10,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
 import com.pdm.pokerdice.DependenciesContainer
-import com.pdm.pokerdice.domain.AuthInfoRepo
+import com.pdm.pokerdice.domain.user.AuthInfoRepo
 import com.pdm.pokerdice.ui.theme.PokerDiceTheme
-import com.pdm.pokerdice.ui.title.TitleActivity
+import com.pdm.pokerdice.lobby.lobbies.LobbiesActivity
 
 class SignUpActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -53,7 +53,7 @@ class SignUpActivity : ComponentActivity() {
 
     private val viewModel : SignUpViewModel by viewModels {
         SignUpViewModel.getFactory(
-            (application as DependenciesContainer).signUpService,
+            (application as DependenciesContainer).authService,
             (application as DependenciesContainer).authInfoRepo
         )
     }
@@ -61,7 +61,9 @@ class SignUpActivity : ComponentActivity() {
     private fun handleNavigation(it: SignUpNavigation) {
         val intent = when (it) {
             is SignUpNavigation.LobbiesScreen ->
-                Intent(this, TitleActivity::class.java)
+                Intent(this, LobbiesActivity::class.java).apply {
+                    putExtra("userInfo", it.userInfo)
+                }
         }
         startActivity(intent)
     }

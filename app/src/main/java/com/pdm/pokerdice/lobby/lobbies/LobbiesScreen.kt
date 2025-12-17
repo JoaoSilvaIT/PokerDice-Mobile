@@ -6,10 +6,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import com.pdm.pokerdice.domain.user.User
 import com.pdm.pokerdice.domain.lobby.Lobby
+import com.pdm.pokerdice.domain.user.UserExternalInfo
 
 const val CREATE_LOBBY = "create_button"
 sealed class LobbiesNavigation {
-    class SelectLobby(val lobby: Lobby, val user: User) : LobbiesNavigation()
+    class SelectLobby(val lobby: Lobby, val user: UserExternalInfo) : LobbiesNavigation()
     object CreateLobby : LobbiesNavigation()
 }
 @Composable

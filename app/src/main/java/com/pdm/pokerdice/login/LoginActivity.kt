@@ -33,7 +33,7 @@ class LoginActivity : ComponentActivity() {
 
     private val viewModel: LoginViewModel by viewModels {
         LoginViewModel.getFactory(
-            (application as DependenciesContainer).loginService,
+            (application as DependenciesContainer).authService,
             (application as DependenciesContainer).authInfoRepo
         )
     }

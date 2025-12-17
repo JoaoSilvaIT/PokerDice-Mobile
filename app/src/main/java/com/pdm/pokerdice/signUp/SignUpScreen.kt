@@ -10,11 +10,12 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.pdm.pokerdice.domain.user.UserInfo
 import com.pdm.pokerdice.domain.user.isValidNewCredentialsData
 
 
 sealed class SignUpNavigation {
-    class LobbiesScreen(val token : String) : SignUpNavigation()
+    class LobbiesScreen(val userInfo : UserInfo) : SignUpNavigation()
 }
 
 @Composable
@@ -29,8 +30,8 @@ fun SignUpScreen(
         val observedState = viewModel.currentState
         LaunchedEffect(observedState) {
             if (observedState is SignUpState.SignUpSuccess) {
-                val token = observedState.token
-                onNavigate(SignUpNavigation.LobbiesScreen(token))
+                val userInfo = observedState.userInfo
+                onNavigate(SignUpNavigation.LobbiesScreen(userInfo))
             }
         }
         Box(

@@ -2,6 +2,7 @@ package com.pdm.pokerdice.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import com.pdm.pokerdice.service.HomeService
 
 interface HomeScreenState {
     data class Success(val creators : List<String>) : HomeScreenState

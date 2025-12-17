@@ -11,13 +11,14 @@ interface RepositoryUser : Repository<User> {
     fun createUser(
         name: String,
         email: String,
+        password: String
     ): User
 
     fun findByEmail(email: String): User?
 
     fun getUserById(id: Int): UserExternalInfo?
 
-    fun getUserStats(userId: Int): UserStatistics
+    fun getUserStats(userId: Int): UserStatistics?
 
     fun getTokenByTokenValidationInfo(tokenValidationInfo: TokenValidationInfo): Pair<User, Token>?
 

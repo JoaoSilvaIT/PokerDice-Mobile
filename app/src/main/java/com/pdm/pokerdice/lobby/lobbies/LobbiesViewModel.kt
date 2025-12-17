@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.pdm.pokerdice.domain.lobby.Lobby
-import com.pdm.pokerdice.domain.user.User
+import com.pdm.pokerdice.domain.user.UserExternalInfo
 import com.pdm.pokerdice.domain.utilis.Either
 import com.pdm.pokerdice.service.LobbyService
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,7 +16,7 @@ import kotlinx.coroutines.launch
 sealed interface LobbiesScreenState {
     data object Loading : LobbiesScreenState
     data class ViewLobbies(val lobbies : List<Lobby>) : LobbiesScreenState
-    data class JoinLobby(val lobby: Lobby, val user : User) : LobbiesScreenState
+    data class JoinLobby(val lobby: Lobby, val user: UserExternalInfo) : LobbiesScreenState
     data class Error(val message: String, val lastState: LobbiesScreenState? = null) : LobbiesScreenState
 }
 class LobbiesViewModel (private val service: LobbyService) : ViewModel() {

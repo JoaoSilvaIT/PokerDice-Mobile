@@ -1,4 +1,4 @@
-package com.pdm.pokerdice.domain
+package com.pdm.pokerdice.domain.user
 
 import kotlinx.coroutines.flow.Flow
 

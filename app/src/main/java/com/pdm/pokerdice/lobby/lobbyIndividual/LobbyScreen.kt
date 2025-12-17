@@ -20,6 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.pdm.pokerdice.domain.lobby.Lobby
 import com.pdm.pokerdice.domain.user.User
+import com.pdm.pokerdice.domain.user.UserExternalInfo
 
 sealed class LobbyNavigation {
     object CreateGame : LobbyNavigation()
@@ -32,7 +33,7 @@ fun LobbyScreen(
     modifier: Modifier = Modifier,
     onNavigate: (LobbyNavigation) -> Unit = {},
     lobby: Lobby,
-    user: User,
+    user: UserExternalInfo,
     viewModel: LobbyViewModel
 ) {
     val currentLeaveState by viewModel.leaveLobbyState.collectAsState(LeaveLobbyState.Idle)

@@ -8,22 +8,24 @@ import com.pdm.pokerdice.domain.user.UserStatistics
 import com.pdm.pokerdice.repo.RepositoryUser
 import java.time.Instant
 
+const val DEFAULT_BALANCE = 100
 class RepoUserInMem : RepositoryUser {
-
-    val users = mutableListOf(
-        User(1, "admin", "admin@gmail.com")
-    )
-
-    val tokens = mutableListOf(
-        "fake_auth_token_1234567"
-    )
+    val users = mutableListOf<User>()
+    val tokens = mutableListOf<Token>()
     var uid = 2
 
     override fun createUser(
         name: String,
         email: String,
+        password: String
     ): User {
-        val newUser = User(uid, name, email)
+        val newUser = User(uid, name, email, password, DEFAULT_BALANCE,
+            UserStatistics(
+                gamesPlayed = 0,
+                wins = 0,
+                losses = 0,
+                winRate = 0.0
+            ))
         uid++
         users.add(newUser)
         return newUser
@@ -35,56 +37,78 @@ class RepoUserInMem : RepositoryUser {
     }
 
     override fun findByEmail(email: String): User? {
-        TODO("Not yet implemented")
+        return users.find { it.email == email }
     }
 
     override fun getUserById(id: Int): UserExternalInfo? {
-        TODO("Not yet implemented")
+        return users.find { it.id == id }?.let {
+            UserExternalInfo(
+                id = it.id,
+                name = it.name,
+                balance = it.balance
+            )
+        }
     }
 
-    override fun getUserStats(userId: Int): UserStatistics {
-        TODO("Not yet implemented")
+    override fun getUserStats(userId: Int): UserStatistics? {
+        return users.find { it.id == userId }?.statistics
+
     }
 
-    override fun getTokenByTokenValidationInfo(tokenValidationInfo: TokenValidationInfo): Pair<User, Token>? {
-        TODO("Not yet implemented")
-    }
+    override fun getTokenByTokenValidationInfo(tokenValidationInfo: TokenValidationInfo): Pair<User, Token>? =
+        tokens.firstOrNull { it.tokenValidationInfo == tokenValidationInfo }?.let {
+            val user = findById(it.userId)
+            requireNotNull(user)
+            user to it
+        }
+
 
     override fun createToken(token: Token, maxTokens: Int) {
-        TODO("Not yet implemented")
+        val nrOfTokens = tokens.count { it.userId == token.userId }
+
+        // Remove the oldest token if we have achieved the maximum number of tokens
+        if (nrOfTokens >= maxTokens) {
+            tokens
+                .filter { it.userId == token.userId }
+                .minByOrNull { it.lastUsedAt }!!
+                .also { tk -> tokens.removeIf { it.tokenValidationInfo == tk.tokenValidationInfo } }
+        }
+        tokens.add(token)
     }
 
     override fun updateTokenLastUsed(token: Token, now: Instant) {
-        TODO("Not yet implemented")
+        tokens.removeIf { it.tokenValidationInfo == token.tokenValidationInfo }
+        tokens.add(token.copy(lastUsedAt = now))
     }
 
     override fun removeTokenByValidationInfo(tokenValidationInfo: TokenValidationInfo): Int {
-        TODO("Not yet implemented")
+        val initialSize = tokens.size
+        tokens.removeIf { it.tokenValidationInfo == tokenValidationInfo }
+        return initialSize - tokens.size
     }
 
     override fun addBalance(userId: Int, amount: Int) {
-        TODO("Not yet implemented")
+        TODO()
     }
 
     override fun findById(id: Int): User? {
         return users.find { it.id == id }
     }
 
-    override fun findAll(): List<User> {
-        TODO("Not yet implemented")
-    }
+    override fun findAll(): List<User> =
+        users.toList()
 
     override fun save(entity: User) {
-        TODO("Not yet implemented")
+        users.removeIf { it.id == entity.id }
+        users.add(entity)
     }
 
     override fun deleteById(id: Int) {
-        TODO("Not yet implemented")
+        users.removeIf { it.id == id }
     }
 
     override fun clear() {
-        TODO("Not yet implemented")
+        users.clear()
+        tokens.clear()
     }
-
-
 }

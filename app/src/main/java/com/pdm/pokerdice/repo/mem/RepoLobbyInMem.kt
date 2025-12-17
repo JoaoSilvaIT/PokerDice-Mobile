@@ -1,38 +1,51 @@
 package com.pdm.pokerdice.repo.mem
 
 import com.pdm.pokerdice.domain.lobby.Lobby
-import com.pdm.pokerdice.domain.user.User
+import com.pdm.pokerdice.domain.user.UserExternalInfo
 import com.pdm.pokerdice.repo.RepositoryLobby
 
 class RepoLobbyInMem : RepositoryLobby {
     val lobbies = mutableListOf(
-        Lobby(1,
+        Lobby(
+            1,
             "LobbyTest",
             "This is a test lobby",
-            listOf(User(2, "jj", "")),
             2,
-            User(2, "jj", ""),
-            1
-            )
+            4,
+            setOf(
+                UserExternalInfo(1, "admin", 100),
+            ),
+            UserExternalInfo(1, "admin", 100)
+        )
     )
     var lid = 2
 
     override fun createLobby(
         name: String,
         description: String,
-        expectedPlayers: Int,
-        rounds : Int,
-        host: User
+        minPlayers: Int,
+        maxPlayers: Int,
+        host: UserExternalInfo
     ): Lobby {
-        val newLobby = Lobby(lid, name, description, listOf(host),expectedPlayers, host, rounds)
+        val newLobby = Lobby(
+            lid,
+            name,
+            description,
+            minPlayers,
+            maxPlayers,
+            setOf(
+                host
+            ),
+            host
+        )
         lid++
         lobbies.add(newLobby)
         return newLobby
     }
 
-    override fun leaveLobby(user: User, lobby: Lobby) : Boolean {
-        val newLobby = lobby.copy(users = (lobby.users - user))
-        val index = lobbies.indexOfFirst { it.lid == lobby.lid }
+    override fun leaveLobby(user: UserExternalInfo, lobby: Lobby) : Boolean {
+        val newLobby = lobby.copy(players =  (lobby.players - user))
+        val index = lobbies.indexOfFirst { it.id == lobby.id }
         if (index != -1) {
             lobbies[index] = newLobby
         }
@@ -44,12 +57,12 @@ class RepoLobbyInMem : RepositoryLobby {
     }
 
     override fun findByName(name: String): Lobby? {
-        TODO("Not yet implemented")
+        return lobbies.find { it.name == name }
     }
 
-    override fun joinLobby(user: User, lobby: Lobby): Lobby {
-        val newLobby = lobby.copy(users = (lobby.users + user))
-        val index = lobbies.indexOfFirst { it.lid == lobby.lid }
+    override fun joinLobby(user: UserExternalInfo, lobby: Lobby): Lobby {
+        val newLobby = lobby.copy(players = (lobby.players + user))
+        val index = lobbies.indexOfFirst { it.id == lobby.id }
         if (index != -1) {
             lobbies[index] = newLobby
         }
@@ -57,7 +70,7 @@ class RepoLobbyInMem : RepositoryLobby {
     }
 
 
-    override fun deleteLobbyByHost(host: User) {
+    override fun deleteLobbyByHost(host: UserExternalInfo) {
         TODO("Not yet implemented")
     }
 
@@ -66,7 +79,7 @@ class RepoLobbyInMem : RepositoryLobby {
     }
 
     override fun findById(id: Int): Lobby? {
-        return lobbies.find { it.lid == id }
+        return lobbies.find { it.id == id }
     }
 
     override fun findAll(): List<Lobby> {

@@ -1,6 +1,6 @@
 package com.pdm.pokerdice.game
 
-import com.pdm.pokerdice.domain.AuthInfoRepo
+import com.pdm.pokerdice.domain.user.AuthInfoRepo
 import com.pdm.pokerdice.domain.game.Game
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow

@@ -5,7 +5,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.pdm.pokerdice.domain.lobby.Lobby
 import com.pdm.pokerdice.domain.lobby.LobbyInfo
-import com.pdm.pokerdice.domain.AuthInfoRepo
+import com.pdm.pokerdice.domain.user.AuthInfoRepo
 import com.pdm.pokerdice.domain.utilis.Either
 import com.pdm.pokerdice.service.LobbyService
 import kotlinx.coroutines.flow.MutableStateFlow

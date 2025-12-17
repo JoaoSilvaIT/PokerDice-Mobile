@@ -38,10 +38,9 @@ class UserAuthService(
             if (repoUser.findByEmail(emailTrimmed) != null) {
                 return@run failure(AuthTokenError.EmailAlreadyInUse)
             }
-            val newUser = repoUser.createUser(name.trim(), emailTrimmed)
+            val newUser = repoUser.createUser(name.trim(), emailTrimmed, password)
             success(newUser)
         }
-
     }
 
     fun createToken(
@@ -75,11 +74,10 @@ class UserAuthService(
         }
     }
 
-    fun getUserByToken(token: String): User? {
+    fun getUserByToken(token: String): Either<AuthTokenError, User> {
         if (!canBeToken(token)) {
-            return null
+            return failure(AuthTokenError.InvalidTokenFormat)
         }
-
         return trxManager.run {
             val tokenValidationInfo = tokenEncoder.createValidationInformation(token)
             val userAndToken = repoUser.getTokenByTokenValidationInfo(tokenValidationInfo)
@@ -87,8 +85,9 @@ class UserAuthService(
             if (userAndToken != null && isTokenTimeValid(clock, userAndToken.second)) {
                 repoUser.updateTokenLastUsed(userAndToken.second, clock.instant())
                 userAndToken.first
+                return@run success(userAndToken.first)
             } else {
-                null
+                return@run failure(AuthTokenError.TokenNotCreated)
             }
         }
     }

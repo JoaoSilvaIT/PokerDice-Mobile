@@ -7,10 +7,12 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.pdm.pokerdice.domain.AuthInfoRepo
+import com.pdm.pokerdice.domain.user.AuthInfoRepo
 import com.pdm.pokerdice.login.utilis.LoginUseCase
 import com.pdm.pokerdice.domain.user.UserCredentials
+import com.pdm.pokerdice.domain.utilis.Either
 import com.pdm.pokerdice.login.utilis.performLogin
+import com.pdm.pokerdice.service.UserAuthService
 import kotlinx.coroutines.launch
 
 interface LoginState {
@@ -26,18 +28,18 @@ interface LoginState {
 
 class LoginViewModel(
     private val loginUseCase: LoginUseCase,
-    private val service : LoginService,
+    private val service : UserAuthService,
     private val authRepo : AuthInfoRepo
 ) : ViewModel() {
 
     companion object {
         /**
-         * Returns a factory to create a [LoginViewModel] with the provided [LoginService].
+         * Returns a factory to create a [LoginViewModel] with the provided [UserAuthService].
          * @param service The service to be used to login.
          * @param repo The repository to manage authentication information.
          * Design challenge: Should we also pass here the use case function? Why? Why not?
          */
-        fun getFactory(service: LoginService, repo: AuthInfoRepo) = object : ViewModelProvider.Factory {
+        fun getFactory(service: UserAuthService, repo: AuthInfoRepo) = object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel> create(modelClass: Class<T>): T =
                 if (modelClass.isAssignableFrom(LoginViewModel::class.java)) {
@@ -57,11 +59,14 @@ class LoginViewModel(
 
     fun login(credentials : UserCredentials) {
         viewModelScope.launch {
-            currentState = try {
-                val token = loginUseCase(credentials, service, authRepo).authToken
-                LoginState.LoginSuccess(token)
-            } catch (_: InvalidCredentialsException) {
-                LoginState.LoginError("Invalid credentials provided")
+            currentState = LoginState.LoginInProgress(credentials)
+            currentState = when (val result = loginUseCase(credentials, service, authRepo)) {
+                is Either.Failure -> {
+                    LoginState.LoginError("Login failed: ${result.value}")
+                }
+                is Either.Success -> {
+                    LoginState.LoginSuccess(result.value.authToken)
+                }
             }
         }
     }

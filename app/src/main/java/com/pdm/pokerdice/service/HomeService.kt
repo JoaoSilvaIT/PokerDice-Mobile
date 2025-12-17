@@ -1,4 +1,4 @@
-package com.pdm.pokerdice.home
+package com.pdm.pokerdice.service
 
 interface HomeService {
     fun getCreators(): List<String>

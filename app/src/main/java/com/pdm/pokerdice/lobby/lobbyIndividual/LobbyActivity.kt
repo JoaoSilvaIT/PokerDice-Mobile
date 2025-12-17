@@ -29,7 +29,7 @@ class LobbyActivity : ComponentActivity() {
             UserExternalInfo(0, "Default Host", 0))
 
         val user = intent.getParcelableExtra("user",
-            User::class.java) ?: User(0, "Default User", "")
+            UserExternalInfo::class.java) ?: UserExternalInfo(0, "Default User", 0)
 
         setContent {
             PokerDiceTheme {
