@@ -36,7 +36,7 @@ class LobbiesActivity : ComponentActivity() {
     }
 
     private val viewModel: LobbiesViewModel by viewModels {
-        LobbiesViewModel.Companion.getFactory(
+        LobbiesViewModel.getFactory(
             service = (application as DependenciesContainer).lobbyService,
         )
     }

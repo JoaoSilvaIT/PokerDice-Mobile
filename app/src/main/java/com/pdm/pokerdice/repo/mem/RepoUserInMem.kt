@@ -23,8 +23,22 @@ class RepoUserInMem : RepositoryUser {
                 losses = 0,
                 winRate = 0.0
             )
+        ),
+        User(
+            id = 2,
+            name = "jaco",
+            email = "jaco@gmail.com",
+            password = "1234",
+            DEFAULT_BALANCE,
+            UserStatistics(
+                gamesPlayed = 0,
+                wins = 0,
+                losses = 0,
+                winRate = 0.0
+            )
         )
     )
+
     val tokens = mutableListOf<Token>()
     var uid = 2
 

@@ -23,6 +23,8 @@ class RepoLobbyInMem : RepositoryLobby {
     override fun createLobby(
         name: String,
         description: String,
+
+
         minPlayers: Int,
         maxPlayers: Int,
         host: UserExternalInfo
@@ -71,11 +73,11 @@ class RepoLobbyInMem : RepositoryLobby {
 
 
     override fun deleteLobbyByHost(host: UserExternalInfo) {
-        TODO("Not yet implemented")
+        lobbies.removeIf { it.host == host }
     }
 
     override fun deleteLobbyById(id: Int) {
-        TODO("Not yet implemented")
+        lobbies.removeIf { it.id == id }
     }
 
     override fun findById(id: Int): Lobby? {
@@ -87,15 +89,16 @@ class RepoLobbyInMem : RepositoryLobby {
     }
 
     override fun save(entity: Lobby) {
-        TODO("Not yet implemented")
+        lobbies.removeIf { it.id == entity.id }
+        lobbies.add(entity)
     }
 
     override fun deleteById(id: Int) {
-        TODO("Not yet implemented")
+        lobbies.removeIf { it.id == id }
     }
 
     override fun clear() {
-        TODO("Not yet implemented")
+        lobbies.clear()
     }
 
 }
