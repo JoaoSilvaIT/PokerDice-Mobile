@@ -5,5 +5,4 @@ data class LobbyInfo(
     val description : String,
     val minPlayers : Int,
     val maxPlayers : Int,
-    val rounds : Int
 )

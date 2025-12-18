@@ -14,9 +14,6 @@ import com.pdm.pokerdice.lobby.lobbyIndividual.LobbyActivity
 import com.pdm.pokerdice.ui.theme.PokerDiceTheme
 
 class LobbyCreationActivity : ComponentActivity() {
-
-
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 

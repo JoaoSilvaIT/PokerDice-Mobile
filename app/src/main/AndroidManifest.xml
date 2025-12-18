@@ -27,9 +27,9 @@
             android:exported="false" />
         <activity android:name=".ui.title.TitleActivity"
             android:exported="false" />
-        <activity android:name=".ui.about.AboutActivity"
+        <activity android:name=".about.AboutActivity"
             android:exported="false" />
-        <activity android:name=".ui.profile.ProfileActivity"
+        <activity android:name=".profile.ProfileActivity"
             android:exported="false" />
         <activity android:name=".lobby.lobbies.LobbiesActivity"
             android:exported="false" />

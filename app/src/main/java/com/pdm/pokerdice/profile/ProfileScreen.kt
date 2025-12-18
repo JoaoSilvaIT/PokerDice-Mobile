@@ -1,4 +1,4 @@
-package com.pdm.pokerdice.ui.profile
+package com.pdm.pokerdice.profile
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border

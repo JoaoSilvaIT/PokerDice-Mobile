@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -34,6 +35,7 @@ fun LobbyScreen(
     onNavigate: (LobbyNavigation) -> Unit = {},
     lobby: Lobby,
     user: UserExternalInfo,
+    host: UserExternalInfo,
     viewModel: LobbyViewModel
 ) {
     val currentLeaveState by viewModel.leaveLobbyState.collectAsState(LeaveLobbyState.Idle)
@@ -66,11 +68,11 @@ fun LobbyScreen(
             style = MaterialTheme.typography.titleMedium,
             modifier = Modifier.padding(vertical = 8.dp)
         )
-        /*
+
         LazyColumn(
             modifier = Modifier.weight(1f) // ocupa o resto do espaço
         ) {
-            items(lobby.users) { usr ->
+            items(lobby.players.toList()) { usr ->
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -85,19 +87,32 @@ fun LobbyScreen(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         if (usr.name == user.name) {
+                            if (usr.name == host.name) {
+                                Text(
+                                    text = "${user.name} (Host, You)",
+                                    style = MaterialTheme.typography.bodyLarge,
+                                    color = MaterialTheme.colorScheme.primary
+                                )
+                            } else
                             Text(
                                 text = "${user.name} (You)",
                                 style = MaterialTheme.typography.bodyLarge,
                                 color = MaterialTheme.colorScheme.primary
                             )
                         } else {
+                            if (usr.name == host.name) {
+                                Text(
+                                    text = "${usr.name} (Host)",
+                                    style = MaterialTheme.typography.bodyLarge,
+                                    color = MaterialTheme.colorScheme.secondary
+                                )
+                            } else
                             Text(text = usr.name, style = MaterialTheme.typography.bodyLarge)
                         }
                     }
                 }
             }
         }
-            */
 
         // Start Match button (navigate)
         Button(

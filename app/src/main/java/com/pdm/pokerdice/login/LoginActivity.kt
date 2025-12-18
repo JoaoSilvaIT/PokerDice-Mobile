@@ -13,6 +13,7 @@ import com.pdm.pokerdice.ui.theme.PokerDiceTheme
 import com.pdm.pokerdice.DependenciesContainer
 import com.pdm.pokerdice.ui.authentication.AuthenticationNavigation
 import com.pdm.pokerdice.lobby.lobbies.LobbiesActivity
+import com.pdm.pokerdice.ui.title.TitleActivity
 
 class LoginActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -38,12 +39,10 @@ class LoginActivity : ComponentActivity() {
         )
     }
 
-    private fun handleNavigation(it: AuthenticationNavigation) {
+    private fun handleNavigation(it: LoginNavigation) {
          val intent = when (it) {
-             is AuthenticationNavigation.LobbiesScreen ->
-                 Intent(this, LobbiesActivity::class.java).apply {
-                     putExtra("token", it.token)
-                 }
+             is LoginNavigation.TitleScreen ->
+                 Intent(this, TitleActivity::class.java)
          }
         startActivity(intent)
     }

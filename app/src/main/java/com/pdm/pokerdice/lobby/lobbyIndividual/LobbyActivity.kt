@@ -39,7 +39,8 @@ class LobbyActivity : ComponentActivity() {
                         onNavigate = { handleNavigation(it) },
                         lobby = lobby,
                         user = user,
-                        viewModel
+                        host = lobby.host,
+                        viewModel = viewModel
                     )
                 }
             }

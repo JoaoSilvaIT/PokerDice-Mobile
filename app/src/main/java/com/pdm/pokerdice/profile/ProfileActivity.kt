@@ -1,4 +1,4 @@
-package com.pdm.pokerdice.ui.profile
+package com.pdm.pokerdice.profile
 
 import android.os.Bundle
 import android.widget.Toast

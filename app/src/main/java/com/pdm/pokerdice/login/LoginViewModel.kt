@@ -7,6 +7,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.pdm.pokerdice.domain.user.AuthInfo
 import com.pdm.pokerdice.domain.user.AuthInfoRepo
 import com.pdm.pokerdice.login.utilis.LoginUseCase
 import com.pdm.pokerdice.domain.user.UserCredentials
@@ -16,13 +17,9 @@ import com.pdm.pokerdice.service.UserAuthService
 import kotlinx.coroutines.launch
 
 interface LoginState {
-
     object Idle : LoginState
-
     data class LoginInProgress(val tentativeCredentials: UserCredentials) : LoginState
-
-    data class LoginSuccess(val token : String) : LoginState
-
+    data class LoginSuccess(val authInfo: AuthInfo) : LoginState
     data class LoginError(val errorMessage: String) : LoginState
 }
 
@@ -65,7 +62,7 @@ class LoginViewModel(
                     LoginState.LoginError("Login failed: ${result.value}")
                 }
                 is Either.Success -> {
-                    LoginState.LoginSuccess(result.value.authToken)
+                    LoginState.LoginSuccess(result.value)
                 }
             }
         }

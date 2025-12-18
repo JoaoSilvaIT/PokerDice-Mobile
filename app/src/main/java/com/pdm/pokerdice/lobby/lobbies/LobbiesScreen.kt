@@ -31,7 +31,8 @@ fun LobbiesScreen(
                 lobbies = lobbies,
                 onJoinLobby = { lobbyId ->
                     viewModel.joinLobby(lobbyId)
-                }
+                },
+                onCreateLobby = { onNavigate(LobbiesNavigation.CreateLobby) }
             )
         }
         is LobbiesScreenState.JoinLobby -> {

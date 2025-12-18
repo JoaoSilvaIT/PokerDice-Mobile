@@ -78,6 +78,7 @@ fun LobbiesView(
 fun LobbiesScreenView(
     modifier: Modifier = Modifier,
     onJoinLobby : (lid : Int) -> Unit = {},
+    onCreateLobby: () -> Unit = {},
     lobbies : List<Lobby>?,
     error : String? = null
 ) {
@@ -97,6 +98,14 @@ fun LobbiesScreenView(
                     onJoinLobby = onJoinLobby,
                     modifier = Modifier.weight(1f),
                 )
+            }
+            Button(
+                onClick = onCreateLobby,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
+            ) {
+                Text(text = "Create Lobby")
             }
         }
         if (error != null) {

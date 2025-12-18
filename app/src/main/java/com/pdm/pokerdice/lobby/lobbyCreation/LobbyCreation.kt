@@ -54,10 +54,10 @@ fun LobbyCreationScreen(
     onNavigate: (LobbyCreationNavigation) -> Unit = {},
     viewModel : LobbyCreationViewModel,
 ) {
-    var expectedPlayers by remember { mutableIntStateOf(2) }
+    var minPlayers by remember { mutableIntStateOf(2) }
+    var maxPlayers by remember { mutableIntStateOf(4) }
     var lobbyName by remember { mutableStateOf("") }
     var lobbyDescription by remember { mutableStateOf("") }
-    var rounds by remember { mutableIntStateOf(expectedPlayers) }
     val currentCreationState by viewModel.createLobbyState.collectAsState(LobbyCreationState.Idle)
 
     LaunchedEffect(currentCreationState) {
@@ -110,7 +110,7 @@ fun LobbyCreationScreen(
                     )
                 }
                 Text(
-                    text = "Expected Players",
+                    text = "Min Players",
                     style = MaterialTheme.typography.labelLarge,
                     modifier = Modifier.padding(top = 12.dp, bottom = 4.dp)
                 )
@@ -120,27 +120,27 @@ fun LobbyCreationScreen(
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     IconButton(
-                        enabled = expectedPlayers > PLAYER_MIN,
-                        onClick = { expectedPlayers-- },
+                        enabled = (minPlayers - 1) >= PLAYER_MIN,
+                        onClick = { minPlayers-- },
                         modifier = Modifier.testTag(DECREMENT_LIMIT)
                     ) {
                         Text("<", style = MaterialTheme.typography.titleLarge)
                     }
                     Text(
-                        text = "$expectedPlayers",
+                        text = "$minPlayers",
                         style = MaterialTheme.typography.titleLarge,
                         modifier = Modifier.padding(horizontal = 24.dp)
                     )
                     IconButton(
-                        enabled = expectedPlayers < PLAYER_MAX,
-                        onClick = { expectedPlayers++ },
+                        enabled = (minPlayers + 1) <= maxPlayers,
+                        onClick = { minPlayers++ },
                         modifier = Modifier.testTag(INCREMENT_LIMIT)
                     ) {
                         Text(">", style = MaterialTheme.typography.titleLarge)
                     }
                 }
                 Text(
-                    text = "Rounds",
+                    text = "Max Players",
                     style = MaterialTheme.typography.labelLarge,
                     modifier = Modifier.padding(top = 12.dp, bottom = 4.dp)
                 )
@@ -150,34 +150,33 @@ fun LobbyCreationScreen(
                     modifier = Modifier.fillMaxWidth()
                 ){
                     IconButton(
-                        enabled = rounds%expectedPlayers == 0 && rounds > 1,
-                        onClick = { rounds-- },
+                        enabled = (maxPlayers - 1) >= minPlayers,
+                        onClick = { maxPlayers-- },
                         modifier = Modifier.testTag(DECREMENT_ROUNDS)
                     ) {
                         Text("<", style = MaterialTheme.typography.titleLarge)
                     }
                     Text(
-                        text = "$rounds",
+                        text = "$maxPlayers",
                         style = MaterialTheme.typography.titleLarge,
                         modifier = Modifier.padding(horizontal = 24.dp)
                     )
                     IconButton(
-                        enabled = rounds%expectedPlayers == 0 && rounds <= MAX_ROUNDS,
-                        onClick = { rounds++ },
+                        enabled = (maxPlayers + 1) <= PLAYER_MAX,
+                        onClick = { maxPlayers++ },
                         modifier = Modifier.testTag(INCREMENT_ROUNDS)
                     ) {
                         Text(">", style = MaterialTheme.typography.titleLarge)
                     }
                 }
             }
-            /*
             Button(
                 onClick = {
                     val lobbyInfo = LobbyInfo(
                         name = lobbyName.normalizedLobbyName(),
                         description = lobbyDescription.trim(),
-                        expectedPlayers = expectedPlayers,
-                        rounds = rounds
+                        minPlayers = minPlayers,
+                        maxPlayers = maxPlayers
                     )
                     viewModel.createLobby(lobbyInfo)
                 },
@@ -186,8 +185,6 @@ fun LobbyCreationScreen(
             ) {
                 Text("Create Lobby", style = MaterialTheme.typography.titleSmall)
             }
-
-             */
         }
     }
 }

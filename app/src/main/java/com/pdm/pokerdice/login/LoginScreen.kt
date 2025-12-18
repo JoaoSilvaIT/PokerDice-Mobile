@@ -14,12 +14,12 @@ import com.pdm.pokerdice.domain.user.isValidCredentialsData
 import com.pdm.pokerdice.ui.authentication.AuthenticationNavigation
 
 sealed class LoginNavigation {
-    class LobbiesScreen(val token : String) : LoginNavigation()
+    object TitleScreen : LoginNavigation()
 }
 
 @Composable
 fun LoginScreen(
-    onNavigate: (AuthenticationNavigation) -> Unit = {},
+    onNavigate: (LoginNavigation) -> Unit = {},
     viewModel: LoginViewModel,
     modifier: Modifier = Modifier
 ) {
@@ -29,8 +29,7 @@ fun LoginScreen(
         val observedState = viewModel.currentState
         LaunchedEffect(observedState) {
             if (observedState is LoginState.LoginSuccess) {
-                val token = observedState.token
-                onNavigate(AuthenticationNavigation.LobbiesScreen(token))
+                onNavigate(LoginNavigation.TitleScreen)
             }
         }
         Box(

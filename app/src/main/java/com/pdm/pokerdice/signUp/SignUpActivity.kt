@@ -12,7 +12,7 @@ import androidx.compose.ui.Modifier
 import com.pdm.pokerdice.DependenciesContainer
 import com.pdm.pokerdice.domain.user.AuthInfoRepo
 import com.pdm.pokerdice.ui.theme.PokerDiceTheme
-import com.pdm.pokerdice.lobby.lobbies.LobbiesActivity
+import com.pdm.pokerdice.ui.title.TitleActivity
 
 class SignUpActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -60,10 +60,7 @@ class SignUpActivity : ComponentActivity() {
 
     private fun handleNavigation(it: SignUpNavigation) {
         val intent = when (it) {
-            is SignUpNavigation.LobbiesScreen ->
-                Intent(this, LobbiesActivity::class.java).apply {
-                    putExtra("userInfo", it.userInfo)
-                }
+            is SignUpNavigation.TitleScreen -> Intent(this, TitleActivity::class.java)
         }
         startActivity(intent)
     }

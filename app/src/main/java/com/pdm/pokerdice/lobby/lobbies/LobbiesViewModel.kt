@@ -17,6 +17,7 @@ sealed interface LobbiesScreenState {
     data object Loading : LobbiesScreenState
     data class ViewLobbies(val lobbies : List<Lobby>) : LobbiesScreenState
     data class JoinLobby(val lobby: Lobby, val user: UserExternalInfo) : LobbiesScreenState
+
     data class Error(val message: String, val lastState: LobbiesScreenState? = null) : LobbiesScreenState
 }
 class LobbiesViewModel (private val service: LobbyService) : ViewModel() {
