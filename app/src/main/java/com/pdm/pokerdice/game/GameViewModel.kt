@@ -5,6 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.pdm.pokerdice.domain.game.Dice
@@ -19,6 +20,8 @@ import com.pdm.pokerdice.domain.game.utilis.State
 import com.pdm.pokerdice.domain.game.utilis.defineHandRank
 import com.pdm.pokerdice.domain.user.User
 import com.pdm.pokerdice.domain.user.UserStatistics
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 /**
  * Represents the various visual states of the Game Screen.
@@ -31,7 +34,11 @@ sealed class GameScreenState {
         val isMyTurn: Boolean,
         val currentRollCount: Int,
         val heldDiceIndexes: Set<Int>,
-        val currentHandRank: HandRank? = null
+        val lockedDiceIndexes: Set<Int> = emptySet(),
+        val currentHandRank: HandRank? = null,
+        val isRolling: Boolean = false,
+        val opponentDice: List<Dice> = emptyList(),
+        val opponentHandRank: HandRank? = null
     ) : GameScreenState()
     data class RoundEnded(val winnerName: String, val winningHand: String) : GameScreenState()
     data class MatchEnded(val winnerName: String, val finalScore: Int) : GameScreenState()
@@ -39,103 +46,102 @@ sealed class GameScreenState {
 
 class GameViewModel : ViewModel() {
 
-    // Using mutableStateOf for Compose observability
     var screenState by mutableStateOf<GameScreenState>(GameScreenState.Loading)
         private set
 
-    // Mock data initialization for Milestone 4
+    private var currentGame: Game? = null
+
     init {
         startFakeGame()
     }
 
     fun submitAnte(amount: Int) {
-        val currentState = screenState
-        if (currentState is GameScreenState.SettingAnte) {
-            val game = currentState.game
-            val currentRound = game.currentRound!!
-            
-            // Deduct ante from players and add to pot
-            // NOTE: M4 Fake Logic - Assuming everyone pays the ante instantly
-            val updatedPlayers = game.players.map { 
-                it.copy(currentBalance = it.currentBalance - amount) 
-            }
-            
-            val totalPot = currentRound.pot + (amount * updatedPlayers.size)
-            
-            val updatedRound = currentRound.copy(
-                ante = amount,
-                pot = totalPot,
-                players = updatedPlayers
-            )
-            
-            val updatedGame = game.copy(
-                currentRound = updatedRound,
-                players = updatedPlayers
-            )
-            
-            // Move to Playing State
-            screenState = GameScreenState.Playing(
-                game = updatedGame,
-                isMyTurn = true, // Still my turn to roll after setting ante
-                currentRollCount = 0,
-                heldDiceIndexes = emptySet(),
-                currentHandRank = null
-            )
+        val game = currentGame ?: return
+        val currentRound = game.currentRound!!
+        
+        val updatedPlayers = game.players.map { 
+            it.copy(currentBalance = it.currentBalance - amount) 
         }
+        
+        val totalPot = currentRound.pot + (amount * updatedPlayers.size)
+        
+        val updatedRound = currentRound.copy(
+            ante = amount,
+            pot = totalPot,
+            players = updatedPlayers
+        )
+        
+        currentGame = game.copy(
+            currentRound = updatedRound,
+            players = updatedPlayers
+        )
+        
+        screenState = GameScreenState.Playing(
+            game = currentGame!!,
+            isMyTurn = true,
+            currentRollCount = 0,
+            heldDiceIndexes = emptySet(),
+            lockedDiceIndexes = emptySet(),
+            currentHandRank = null,
+            isRolling = false,
+            opponentDice = emptyList(),
+            opponentHandRank = null
+        )
     }
 
     fun rollDice() {
         val currentState = screenState
-        if (currentState is GameScreenState.Playing && currentState.isMyTurn && currentState.currentRollCount < 3) {
-            
-            // If it's the first roll, we roll 5 new dice. 
-            // Otherwise, we respect the held indexes.
-            val currentDice = currentState.game.currentRound?.turn?.currentDice ?: emptyList()
+        if (currentState is GameScreenState.Playing && 
+            currentState.isMyTurn && 
+            currentState.currentRollCount < 3 && 
+            !currentState.isRolling
+        ) {
+            viewModelScope.launch {
+                screenState = currentState.copy(isRolling = true)
+                delay(1000)
 
-            val newDiceList = if (currentDice.isEmpty()) {
-                List(5) { Dice(Face.entries.random()) }
-            } else {
-                currentDice.mapIndexed { index, die ->
-                    if (currentState.heldDiceIndexes.contains(index)) die
-                    else Dice(Face.entries.random())
+                val currentDice = currentState.game.currentRound?.turn?.currentDice ?: emptyList()
+                val newDiceList = if (currentDice.isEmpty()) {
+                    List(5) { Dice(Face.values().random()) }
+                } else {
+                    currentDice.mapIndexed { index, die ->
+                        if (currentState.heldDiceIndexes.contains(index)) die
+                        else Dice(Face.values().random())
+                    }
                 }
+
+                val currentRound = currentGame?.currentRound!!
+                val updatedTurn = currentRound.turn.copy(
+                    currentDice = newDiceList,
+                    rollsRemaining = 3 - (currentState.currentRollCount + 1)
+                )
+                
+                val updatedRound = currentRound.copy(turn = updatedTurn)
+                currentGame = currentGame?.copy(currentRound = updatedRound)
+
+                val newLocked = currentState.heldDiceIndexes
+
+                screenState = currentState.copy(
+                    game = currentGame!!,
+                    currentRollCount = currentState.currentRollCount + 1,
+                    isRolling = false,
+                    lockedDiceIndexes = newLocked
+                )
+                updateHandRank()
             }
-
-            // Calculate current hand rank
-            val newHandRank = defineHandRank(Hand(newDiceList)).second
-            
-            val currentGame = currentState.game
-            val currentRound = currentGame.currentRound!!
-            val currentTurn = currentRound.turn
-            
-            val updatedTurn = currentTurn.copy(
-                currentDice = newDiceList,
-                rollsRemaining = 3 - (currentState.currentRollCount + 1)
-            )
-            
-            val updatedRound = currentRound.copy(turn = updatedTurn)
-            val updatedGame = currentGame.copy(currentRound = updatedRound)
-
-            // Update state
-            screenState = currentState.copy(
-                game = updatedGame,
-                currentRollCount = currentState.currentRollCount + 1
-            )
-            // Recalculate rank based on HELD dice (which are technically the ones we kept + new ones? 
-            // User said: "calculate based on selected".
-            // So we take the new dice list, filter by HELD indexes, and calculate rank.
-            updateHandRank()
         }
     }
 
     fun toggleHoldDie(index: Int) {
         val currentState = screenState
-        // Can only hold dice AFTER the first roll
         if (currentState is GameScreenState.Playing && 
             currentState.isMyTurn && 
-            currentState.currentRollCount > 0 && 
-            currentState.currentRollCount < 3
+            currentState.currentRollCount > 0
         ) {
+            if (currentState.lockedDiceIndexes.contains(index)) {
+                return 
+            }
+
             val currentHolds = currentState.heldDiceIndexes.toMutableSet()
             if (currentHolds.contains(index)) {
                 currentHolds.remove(index)
@@ -151,10 +157,14 @@ class GameViewModel : ViewModel() {
         val currentState = screenState
         if (currentState is GameScreenState.Playing) {
             val allDice = currentState.game.currentRound?.turn?.currentDice ?: emptyList()
-            val heldDice = allDice.filterIndexed { index, _ -> currentState.heldDiceIndexes.contains(index) }
             
-            val rank = if (heldDice.isEmpty()) null else calculatePartialRank(heldDice)
-            
+            val diceToEvaluate = if (currentState.currentRollCount >= 3) {
+                allDice
+            } else {
+                allDice.filterIndexed { index, _ -> currentState.heldDiceIndexes.contains(index) }
+            }
+
+            val rank = if (diceToEvaluate.isEmpty()) null else calculatePartialRank(diceToEvaluate)
             screenState = currentState.copy(currentHandRank = rank)
         }
     }
@@ -162,14 +172,17 @@ class GameViewModel : ViewModel() {
     private fun calculatePartialRank(dice: List<Dice>): HandRank {
         val counts = dice.groupingBy { it.face }.eachCount()
         val maxCount = counts.values.maxOrNull() ?: 0
+        val pairCount = counts.values.count { it == 2 }
         val distinctCount = counts.size
+        val hasTriplet = counts.values.contains(3)
+        val hasPair = counts.values.contains(2)
         
         return when {
             maxCount == 5 -> HandRank.FIVE_OF_A_KIND
             maxCount == 4 -> HandRank.FOUR_OF_A_KIND
-            maxCount == 3 && distinctCount == 2 -> HandRank.FULL_HOUSE // e.g. 3 K, 2 Q
+            hasTriplet && hasPair -> HandRank.FULL_HOUSE
             maxCount == 3 -> HandRank.THREE_OF_A_KIND
-            maxCount == 2 && distinctCount == 2 && dice.size >= 4 -> HandRank.TWO_PAIR // e.g. 2 K, 2 Q (size 4) or 2K 2Q 1J (size 5)
+            pairCount == 2 -> HandRank.TWO_PAIR
             maxCount == 2 -> HandRank.ONE_PAIR
             distinctCount == 5 && isStraight(dice) -> HandRank.STRAIGHT
             else -> HandRank.HIGH_DICE
@@ -178,79 +191,120 @@ class GameViewModel : ViewModel() {
 
     private fun isStraight(dice: List<Dice>): Boolean {
         val sortedStrengths = dice.map { it.face.strength }.sorted()
-        // Check for sequence (e.g., 1,2,3,4,5 or 2,3,4,5,6)
-        // Strength: Nine=1 ... Ace=6
-        // Straight requires 5 dice.
         return sortedStrengths == listOf(1, 2, 3, 4, 5) || sortedStrengths == listOf(2, 3, 4, 5, 6)
     }
 
     fun endTurn() {
-         // Logic to pass turn to next player
-         // For M4: Simulate opponent playing and then Round End
-         screenState = GameScreenState.RoundEnded("Opponent", "Full House")
+        val currentState = screenState
+        if (currentState !is GameScreenState.Playing) return
+        
+        val game = currentGame ?: return
+        
+        viewModelScope.launch {
+            try {
+                screenState = currentState.copy(isMyTurn = false)
+                
+                delay(1500) 
+                
+                val opponentHandDice = List(5) { Dice(Face.values().random()) }
+                val opponentRank = calculatePartialRank(opponentHandDice)
+                
+                screenState = currentState.copy(
+                    opponentDice = opponentHandDice,
+                    opponentHandRank = opponentRank,
+                    isMyTurn = false
+                )
+                
+                delay(3000) 
+                
+                val myDice = game.currentRound?.turn?.currentDice ?: emptyList()
+                val myRank = calculatePartialRank(myDice)
+                
+                val myHandValue = myRank.strength
+                val opponentHandValue = opponentRank.strength
+                
+                val winnerName: String
+                val winningHandName: String
+                val pot = game.currentRound?.pot ?: 0
+                
+                var updatedPlayers = game.players
+                
+                if (myHandValue >= opponentHandValue) {
+                    winnerName = "Me"
+                    winningHandName = myRank.name
+                    updatedPlayers = game.players.map { 
+                        if (it.id == 1) it.copy(currentBalance = it.currentBalance + pot) else it
+                    }
+                } else {
+                    winnerName = "Opponent"
+                    winningHandName = opponentRank.name
+                    updatedPlayers = game.players.map { 
+                        if (it.id == 2) it.copy(currentBalance = it.currentBalance + pot) else it
+                    }
+                }
+                
+                currentGame = game.copy(players = updatedPlayers)
+                
+                screenState = GameScreenState.RoundEnded(
+                    winnerName = winnerName, 
+                    winningHand = formatHandName(winningHandName)
+                )
+            } catch (e: Throwable) {
+                e.printStackTrace()
+                screenState = GameScreenState.RoundEnded("Error", "Check Logcat")
+            }
+        }
     }
+    
+    private fun formatHandName(name: String) = name.replace("_", " ").lowercase().replaceFirstChar { it.uppercase() }
 
     fun nextRound() {
-        // Logic to start next round
-        startFakeGame() // Reset to playing for demo
+        val game = currentGame ?: return
+        val nextRoundNumber = (game.currentRound?.number ?: 0) + 1
+        
+        if (nextRoundNumber > game.numberOfRounds) {
+            val winner = game.players.maxByOrNull { it.currentBalance }
+            screenState = GameScreenState.MatchEnded(
+                winnerName = winner?.name ?: "Draw",
+                finalScore = winner?.currentBalance ?: 0
+            )
+        } else {
+            val newRound = game.currentRound!!.copy(
+                number = nextRoundNumber,
+                pot = 0,
+                ante = 0,
+                turn = game.currentRound!!.turn.copy(currentDice = emptyList(), rollsRemaining = 3)
+            )
+            currentGame = game.copy(currentRound = newRound)
+            screenState = GameScreenState.SettingAnte(currentGame!!)
+        }
     }
 
     private fun startFakeGame() {
-        // Fake Data Setup
         val me = PlayerInGame(1, "Me", 100, 0)
         val opponent = PlayerInGame(2, "Opponent", 100, 0)
-        
-        // Correct User instantiation
-        val fakeUser = User(
-            id = 1,
-            name = "Me",
-            email = "",
-            password = "",
-            balance = 100,
-            statistics = UserStatistics(0, 0, 0, 0.0)
-        )
-        
-        // Correct Turn instantiation - STARTING EMPTY
-        val fakeTurn = Turn(
-            player = fakeUser,
-            rollsRemaining = 3,
-            currentDice = emptyList()
-        )
+        val fakeUser = User(1, "Me", "", "", 100, UserStatistics(0, 0, 0, 0.0))
+        val fakeTurn = Turn(player = fakeUser, rollsRemaining = 3, currentDice = emptyList())
 
-        // Correct Round instantiation
         val currentRound = Round(
-            number = 1,
-            firstPlayerIdx = 0,
-            turn = fakeTurn,
-            players = listOf(me, opponent),
-            playerHands = emptyMap(),
-            ante = 0, // Ante not set yet
-            pot = 0,
-            winners = emptyList(),
-            gameId = 1
+            number = 1, firstPlayerIdx = 0, turn = fakeTurn,
+            players = listOf(me, opponent), playerHands = emptyMap(),
+            ante = 0, pot = 0, winners = emptyList(), gameId = 1
         )
 
-        // Correct Game instantiation
-        val fakeGame = Game(
-            id = 1,
-            lobbyId = 101,
-            players = listOf(me, opponent),
+        currentGame = Game(
+            id = 1, lobbyId = 101, players = listOf(me, opponent),
             numberOfRounds = 3,
-            state = State.RUNNING,
-            currentRound = currentRound,
-            startedAt = System.currentTimeMillis(),
-            endedAt = null
+            state = State.RUNNING, currentRound = currentRound,
+            startedAt = System.currentTimeMillis(), endedAt = null
         )
         
-        // Start in SettingAnte mode
-        screenState = GameScreenState.SettingAnte(fakeGame)
+        screenState = GameScreenState.SettingAnte(currentGame!!)
     }
 
     companion object {
         fun getFactory(): ViewModelProvider.Factory = viewModelFactory {
-            initializer {
-                GameViewModel()
-            }
+            initializer { GameViewModel() }
         }
     }
 }
