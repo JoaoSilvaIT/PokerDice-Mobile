@@ -11,7 +11,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.pdm.pokerdice.domain.user.isValidCredentialsData
-import com.pdm.pokerdice.ui.authentication.AuthenticationNavigation
 
 sealed class LoginNavigation {
     object TitleScreen : LoginNavigation()
@@ -20,7 +19,7 @@ sealed class LoginNavigation {
 @Composable
 fun LoginScreen(
     onNavigate: (LoginNavigation) -> Unit = {},
-    viewModel: LoginViewModel,
+    viewModel: LoginScreenViewModel,
     modifier: Modifier = Modifier
 ) {
     Scaffold(
@@ -28,7 +27,7 @@ fun LoginScreen(
     ) { innerPadding ->
         val observedState = viewModel.currentState
         LaunchedEffect(observedState) {
-            if (observedState is LoginState.LoginSuccess) {
+            if (observedState is LoginScreenState.LoginSuccess) {
                 onNavigate(LoginNavigation.TitleScreen)
             }
         }
@@ -41,8 +40,8 @@ fun LoginScreen(
                 .imePadding()
         ) {
             LoginForm(
-                loading = observedState is LoginState.LoginInProgress,
-                error = if (observedState is LoginState.LoginError) observedState.errorMessage else "",
+                loading = observedState is LoginScreenState.LoginInProgress,
+                error = if (observedState is LoginScreenState.LoginError) observedState.errorMessage else "",
                 onLogin = { tentativeCredentials -> viewModel.login(tentativeCredentials) },
                 validateCredentials = ::isValidCredentialsData,
                 modifier = modifier

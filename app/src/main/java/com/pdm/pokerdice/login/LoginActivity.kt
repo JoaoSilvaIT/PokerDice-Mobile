@@ -11,8 +11,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
 import com.pdm.pokerdice.ui.theme.PokerDiceTheme
 import com.pdm.pokerdice.DependenciesContainer
-import com.pdm.pokerdice.ui.authentication.AuthenticationNavigation
-import com.pdm.pokerdice.lobby.lobbies.LobbiesActivity
 import com.pdm.pokerdice.ui.title.TitleActivity
 
 class LoginActivity : ComponentActivity() {
@@ -32,8 +30,8 @@ class LoginActivity : ComponentActivity() {
         }
     }
 
-    private val viewModel: LoginViewModel by viewModels {
-        LoginViewModel.getFactory(
+    private val viewModel: LoginScreenViewModel by viewModels {
+        LoginScreenViewModel.getFactory(
             (application as DependenciesContainer).authService,
             (application as DependenciesContainer).authInfoRepo
         )

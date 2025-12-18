@@ -31,11 +31,9 @@
             android:exported="false" />
         <activity android:name=".profile.ProfileActivity"
             android:exported="false" />
-        <activity android:name=".lobby.lobbies.LobbiesActivity"
+        <activity android:name=".lobbies.LobbiesActivity"
             android:exported="false" />
-        <activity android:name=".lobby.lobbyCreation.LobbyCreationActivity"
-            android:exported="false"/>
-        <activity android:name=".lobby.lobbyIndividual.LobbyActivity"
+        <activity android:name=".lobby.LobbyActivity"
             android:exported="false"/>
         <activity android:name=".game.GameActivity"
             android:exported="false"/>

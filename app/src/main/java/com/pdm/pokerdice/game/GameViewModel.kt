@@ -269,14 +269,26 @@ class GameViewModel : ViewModel() {
                 finalScore = winner?.currentBalance ?: 0
             )
         } else {
+            // Alternate starting player: if current was 0, next is 1, and vice-versa
+            val nextStartingPlayerIdx = 1 - (game.currentRound?.firstPlayerIdx ?: 0)
+            
             val newRound = game.currentRound!!.copy(
                 number = nextRoundNumber,
+                firstPlayerIdx = nextStartingPlayerIdx,
                 pot = 0,
                 ante = 0,
                 turn = game.currentRound!!.turn.copy(currentDice = emptyList(), rollsRemaining = 3)
             )
             currentGame = game.copy(currentRound = newRound)
-            screenState = GameScreenState.SettingAnte(currentGame!!)
+            
+            // If nextStartingPlayer is Me (0), go to SettingAnte. 
+            // If it's Opponent (1), simulate them setting ante and start Playing.
+            if (nextStartingPlayerIdx == 0) {
+                screenState = GameScreenState.SettingAnte(currentGame!!)
+            } else {
+                // Fake Opponent sets ante (e.g., 10) and starts playing
+                submitAnte(10) 
+            }
         }
     }
 

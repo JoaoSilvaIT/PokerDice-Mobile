@@ -18,7 +18,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.chimp.ui.common.GenericTopAppBar
+import com.pdm.pokerdice.ui.theme.GenericTopAppBar
 import com.pdm.pokerdice.R
 import com.pdm.pokerdice.ui.theme.PokerDiceTheme
 

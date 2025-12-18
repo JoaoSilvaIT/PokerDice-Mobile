@@ -50,6 +50,7 @@ class FakeLobbyService(val trxManager : TransactionManager , val repo : AuthInfo
             }
 
             val lobby = repoLobby.createLobby(name, description, minPlayers, maxPlayers, host)
+            refreshLobbies() // Notify UI
             success(lobby)
         }
     }
@@ -63,6 +64,8 @@ class FakeLobbyService(val trxManager : TransactionManager , val repo : AuthInfo
 
             val updatedLobby = repoLobby.joinLobby(usr, lobby)
             repoLobby.save(updatedLobby)
+            
+            refreshLobbies() // Notify UI
 
             success(updatedLobby)
         }
@@ -79,11 +82,13 @@ class FakeLobbyService(val trxManager : TransactionManager , val repo : AuthInfo
 
             if (lobby.players.size == 1) {
                 repoLobby.deleteById(lobby.id)
+                refreshLobbies() // Notify UI
                 return@run success(true)
             }
 
             val updated = lobby.copy(players = lobby.players.filter { it.id != usr.id }.toSet())
             repoLobby.save(updated)
+            refreshLobbies() // Notify UI
             success(false)
         }
     }

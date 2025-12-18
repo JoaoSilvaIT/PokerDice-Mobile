@@ -1,4 +1,4 @@
-package com.example.chimp.ui.common
+package com.pdm.pokerdice.ui.theme
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -17,7 +17,6 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import com.pdm.pokerdice.R
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.unit.dp
-import com.pdm.pokerdice.ui.theme.PokerDiceTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

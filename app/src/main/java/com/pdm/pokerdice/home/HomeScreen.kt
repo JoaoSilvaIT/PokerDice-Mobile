@@ -1,16 +1,18 @@
 package com.pdm.pokerdice.home
 
 import androidx.compose.runtime.Composable
-import com.pdm.pokerdice.ui.theme.PokerDiceTheme
 
 @Composable
-fun HomeScreen(viewModel: HomeScreenViewModel, onNavigate: (HomeNavigation) -> Unit = {}) {
-    when (val currentState = viewModel.currentState) {
-        is HomeScreenState.Success -> {
-            HomeView(
-                creators = currentState.creators,
-                onNavigate
-            )
-        }
-    }
+fun HomeScreen(onNavigate: (HomeNavigation) -> Unit = {}) {
+    // Static data for the landing page
+    val creators = listOf(
+        "Pedro Monteiro (51457)",
+        "João Silva (51682)",
+        "Bernardo Jaco (51690)"
+    )
+
+    HomeView(
+        creators = creators,
+        onNavigate = onNavigate
+    )
 }

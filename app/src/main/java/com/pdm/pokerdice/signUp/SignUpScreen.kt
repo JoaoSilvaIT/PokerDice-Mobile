@@ -20,7 +20,7 @@ sealed class SignUpNavigation {
 @Composable
 fun SignUpScreen(
     onNavigate: (SignUpNavigation) -> Unit = {},
-    viewModel: SignUpViewModel,
+    viewModel: SignUpScreenViewModel,
     modifier: Modifier = Modifier
 ) {
     Scaffold(
@@ -28,7 +28,7 @@ fun SignUpScreen(
     ) { innerPadding ->
         val observedState = viewModel.currentState
         LaunchedEffect(observedState) {
-            if (observedState is SignUpState.SignUpSuccess) {
+            if (observedState is SignUpScreenState.SignUpSuccess) {
                 onNavigate(SignUpNavigation.TitleScreen)
             }
         }
@@ -41,8 +41,8 @@ fun SignUpScreen(
                 .imePadding()
         ) {
             SignUpForm(
-                loading = observedState is SignUpState.SignUpInProgress,
-                error = if (observedState is SignUpState.SignUpError) observedState.errorMessage else "",
+                loading = observedState is SignUpScreenState.SignUpInProgress,
+                error = if (observedState is SignUpScreenState.SignUpError) observedState.errorMessage else "",
                 onSignUp = { tentativeCredentials -> viewModel.signUp(tentativeCredentials) },
                 validateCredentials = ::isValidNewCredentialsData,
                 modifier = modifier

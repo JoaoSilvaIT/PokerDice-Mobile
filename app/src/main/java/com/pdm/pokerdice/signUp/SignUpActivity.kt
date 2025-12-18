@@ -29,8 +29,8 @@ class SignUpActivity : ComponentActivity() {
         }
     }
 
-    private val viewModel : SignUpViewModel by viewModels {
-        SignUpViewModel.getFactory(
+    private val viewModel : SignUpScreenViewModel by viewModels {
+        SignUpScreenViewModel.getFactory(
             (application as DependenciesContainer).authService,
             (application as DependenciesContainer).authInfoRepo
         )
