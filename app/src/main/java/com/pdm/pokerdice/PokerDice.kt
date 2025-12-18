@@ -9,9 +9,10 @@ import com.pdm.pokerdice.service.HomeServiceImpl
 import com.pdm.pokerdice.domain.user.AuthInfoRepo
 import com.pdm.pokerdice.domain.user.Sha256TokenEncoder
 import com.pdm.pokerdice.domain.user.UsersDomainConfig
-import com.pdm.pokerdice.game.GameService
+import com.pdm.pokerdice.service.GameService
 import com.pdm.pokerdice.repo.AuthInfoPreferencesRepo
 import com.pdm.pokerdice.repo.mem.TransactionManagerInMem
+import com.pdm.pokerdice.service.FakeGameService
 import com.pdm.pokerdice.service.FakeLobbyService
 import com.pdm.pokerdice.service.LobbyService
 import com.pdm.pokerdice.service.UserAuthService
@@ -23,9 +24,6 @@ interface DependenciesContainer {
     val lobbyService: LobbyService
 
     val gameService: GameService
-
-    //val loginService : LoginService
-    //val signUpService: SignUpService
     val authInfoRepo : AuthInfoRepo
 
     val authService : UserAuthService
@@ -61,5 +59,5 @@ class PokerDice : DependenciesContainer, Application() {
         )
     }
 
-    override val gameService: GameService by lazy { TODO("Not yet implemented") }
+    override val gameService: GameService by lazy { FakeGameService(manager, authInfoRepo) }
 }

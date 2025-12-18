@@ -17,28 +17,6 @@ import com.pdm.pokerdice.ui.title.TitleActivity
 class SignUpActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        // For future use
-        /*
-        lifecycleScope.launch {
-            val loggedIn =
-                checkLoggedUser((application as com.pdm.pokerdice.PokerDice).authInfoRepo)
-            if (loggedIn) {
-                startActivity(Intent(this@MainActivity, LobbiesActivity::class.java))
-                finish()
-            } else {
-                setContent {
-                    PokerDiceTheme {
-                        Scaffold(modifier = Modifier.Companion.fillMaxSize()) { innerPadding ->
-                            TitleScreen(
-                                modifier = Modifier.Companion.padding(innerPadding),
-                                onNavigate = { navigateTo(it) },
-                            )
-                        }
-                    }
-                }
-            }
-        }
-         */
         setContent {
             PokerDiceTheme {
                 Scaffold(Modifier.fillMaxSize()) { innerPadding ->
@@ -63,11 +41,5 @@ class SignUpActivity : ComponentActivity() {
             is SignUpNavigation.TitleScreen -> Intent(this, TitleActivity::class.java)
         }
         startActivity(intent)
-    }
-
-    // For future use
-    private suspend fun checkLoggedUser(repo : AuthInfoRepo): Boolean {
-        val loggedUser = repo.getAuthInfo()
-        return loggedUser != null
     }
 }

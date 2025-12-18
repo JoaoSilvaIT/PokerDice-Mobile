@@ -1,8 +1,9 @@
-package com.pdm.pokerdice.game
+package com.pdm.pokerdice.service
 
 import com.pdm.pokerdice.domain.user.AuthInfoRepo
 import com.pdm.pokerdice.domain.game.Game
 import com.pdm.pokerdice.domain.game.utilis.State
+import com.pdm.pokerdice.domain.user.UserExternalInfo
 import com.pdm.pokerdice.domain.utilis.Either
 import com.pdm.pokerdice.domain.utilis.failure
 import com.pdm.pokerdice.domain.utilis.success
@@ -12,9 +13,8 @@ import com.pdm.pokerdice.repo.tm.TransactionManager
 import com.pdm.pokerdice.service.errors.GameError
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.toList
 
-interface GameService {
+interface GameService : Service {
     val games : Flow<List<Game>>
 
     fun createGame(startedAt: Long, lobbyId: Int, numberOfRounds: Int, creatorId: Int): Either<GameError, Game>
@@ -86,6 +86,11 @@ class FakeGameService(private val trxManager: TransactionManager, val repo : Aut
             success(endedGame)
         }
 
+    override suspend fun getLoggedUser(): UserExternalInfo? {
+        val authInfo = repo.getAuthInfo() ?: return null
 
-
+        return trxManager.run {
+            repoUser.getUserById(authInfo.userId)
+        }
+    }
 }

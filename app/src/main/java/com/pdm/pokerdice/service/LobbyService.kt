@@ -13,7 +13,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
-interface LobbyService {
+interface LobbyService : Service {
     val lobbies : Flow<List<Lobby>>
 
     fun refreshLobbies()
@@ -23,7 +23,6 @@ interface LobbyService {
     fun joinLobby(usr: UserExternalInfo, lobbyId: Int) : Either<LobbyError, Lobby>
 
     fun leaveLobby(usr: UserExternalInfo, lobbyId: Int) : Either<LobbyError, Boolean>
-    suspend fun getLoggedUser(): UserExternalInfo?
 }
 
 class FakeLobbyService(val trxManager : TransactionManager , val repo : AuthInfoRepo) : LobbyService {
