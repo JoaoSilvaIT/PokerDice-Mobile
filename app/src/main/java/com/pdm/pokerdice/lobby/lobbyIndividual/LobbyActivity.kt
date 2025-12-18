@@ -11,11 +11,12 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
 import com.pdm.pokerdice.DependenciesContainer
 import com.pdm.pokerdice.domain.lobby.Lobby
-import com.pdm.pokerdice.domain.user.User
 import com.pdm.pokerdice.domain.user.UserExternalInfo
-import com.pdm.pokerdice.game.create.CreateGameActivity
+import com.pdm.pokerdice.game.GameActivity
 import com.pdm.pokerdice.ui.theme.PokerDiceTheme
 import com.pdm.pokerdice.ui.title.TitleActivity
+import kotlin.collections.mutableSetOf
+import kotlin.jvm.java
 
 class LobbyActivity : ComponentActivity() {
 
@@ -55,10 +56,9 @@ class LobbyActivity : ComponentActivity() {
     }
 
     private fun handleNavigation(it: LobbyNavigation) {
-        val intent = when (it) {
-            LobbyNavigation.CreateGame -> Intent(this, CreateGameActivity::class.java)
-            LobbyNavigation.TitleScreen -> Intent(this, TitleActivity::class.java)
+        when (it) {
+            LobbyNavigation.CreateGame -> GameActivity.navigate(this)
+            LobbyNavigation.TitleScreen -> startActivity(Intent(this, TitleActivity::class.java))
         }
-        startActivity(intent)
     }
 }
