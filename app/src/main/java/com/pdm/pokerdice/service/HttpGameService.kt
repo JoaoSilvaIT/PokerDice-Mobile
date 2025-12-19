@@ -24,6 +24,7 @@ import io.ktor.client.request.get
 import io.ktor.client.request.header
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
+import io.ktor.http.HttpStatusCode
 
 class HttpGameService(
     private val client: HttpClient,
@@ -65,17 +66,43 @@ class HttpGameService(
         numberOfRounds: Int,
         creatorId: Int
     ): Either<GameError, Game> {
-        // HTTP API creates game implicitly via Lobby or separate endpoint? 
-        // DAW API has POST /api/games with GameCreateInputModel.
-        // For M5, assuming we create via Lobby/Start button which calls API.
-        // We need to implement this in API if needed, but for now placeholder or use existing logic if adapted.
-        return failure(GameError.GameNotFound) 
+        return try {
+            val token = getToken() ?: return failure(GameError.NetworkError("Not logged in"))
+            val response = client.post("api/games") {
+                header("Authorization", "Bearer $token")
+                setBody(mapOf(
+                    "lobbyId" to lobbyId,
+                    "numberOfRounds" to numberOfRounds
+                ))
+            }
+            
+            if (response.status == HttpStatusCode.Created || response.status == HttpStatusCode.OK) {
+                val gameDto = response.body<GameDto>()
+                success(gameDto.toDomain(creatorId))
+            } else {
+                failure(GameError.NetworkError("Failed to create game: ${response.status}"))
+            }
+        } catch (e: Exception) {
+            failure(GameError.NetworkError(e.message ?: "Unknown"))
+        }
     }
 
     override suspend fun startGame(gameId: Int, creatorId: Int): Either<GameError, Game> {
-        // DAW API: POST /api/games/{id}/start
-        // Need to add this to PokerDiceApi if not there.
-        return failure(GameError.GameNotFound)
+        return try {
+            val token = getToken() ?: return failure(GameError.NetworkError("Not logged in"))
+            val response = client.post("api/games/$gameId/start") {
+                header("Authorization", "Bearer $token")
+            }
+            
+            if (response.status == HttpStatusCode.OK) {
+                val gameDto = response.body<GameDto>()
+                success(gameDto.toDomain(creatorId))
+            } else {
+                failure(GameError.NetworkError("Failed to start game: ${response.status}"))
+            }
+        } catch (e: Exception) {
+            failure(GameError.NetworkError(e.message ?: "Unknown"))
+        }
     }
 
     override suspend fun rollDice(gameId: Int): Either<GameError, Unit> {

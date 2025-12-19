@@ -28,6 +28,7 @@ class LobbyActivity : ComponentActivity() {
     private val viewModel: LobbyViewModel by viewModels {
         LobbyViewModel.getFactory(
             service = (application as DependenciesContainer).lobbyService,
+            gameService = (application as DependenciesContainer).gameService,
             repo = (application as DependenciesContainer).authInfoRepo
         )
     }
@@ -53,7 +54,7 @@ class LobbyActivity : ComponentActivity() {
 
     private fun handleNavigation(action: LobbyNavigation) {
         when (action) {
-            LobbyNavigation.StartGame -> GameActivity.navigate(this)
+            is LobbyNavigation.StartGame -> GameActivity.navigate(this, action.gameId)
             LobbyNavigation.Back -> finish() // Or navigate to Lobbies/Title
         }
     }

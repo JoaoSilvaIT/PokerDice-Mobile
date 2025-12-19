@@ -8,12 +8,13 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.pdm.pokerdice.ui.theme.GenericTopAppBar
 
 sealed class LobbyNavigation {
-    object StartGame : LobbyNavigation()
+    data class StartGame(val gameId: Int) : LobbyNavigation()
     object Back : LobbyNavigation()
 }
 
@@ -24,6 +25,12 @@ fun LobbyScreen(
     onNavigate: (LobbyNavigation) -> Unit
 ) {
     val state = viewModel.screenState
+
+    LaunchedEffect(state) {
+        if (state is LobbyScreenState.GameStarted) {
+            onNavigate(LobbyNavigation.StartGame(state.gameId))
+        }
+    }
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -56,12 +63,16 @@ fun LobbyScreen(
                     LobbyWaitingView(
                         lobby = state.lobby,
                         currentUser = state.user,
-                        onStartGame = { onNavigate(LobbyNavigation.StartGame) },
+                        onStartGame = { viewModel.startGame() },
                         onLeaveLobby = { 
                             viewModel.leaveLobby()
                             onNavigate(LobbyNavigation.Back)
                         }
                     )
+                }
+                is LobbyScreenState.GameStarted -> {
+                    // Show loading while navigating
+                    CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
                 }
                 is LobbyScreenState.Error -> {
                     Text(

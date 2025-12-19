@@ -53,6 +53,7 @@ fun GameScreen(
                     state = state,
                     onExitClick = onBackIntent
                 )
+                is GameScreenState.Error -> Text("Error: ${state.message}")
             }
         }
     }

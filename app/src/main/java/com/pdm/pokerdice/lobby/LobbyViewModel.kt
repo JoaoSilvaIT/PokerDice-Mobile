@@ -13,6 +13,7 @@ import com.pdm.pokerdice.domain.lobby.LobbyInfo
 import com.pdm.pokerdice.domain.user.AuthInfoRepo
 import com.pdm.pokerdice.domain.user.UserExternalInfo
 import com.pdm.pokerdice.domain.utilis.Either
+import com.pdm.pokerdice.service.GameService
 import com.pdm.pokerdice.service.LobbyService
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
@@ -24,11 +25,13 @@ sealed class LobbyScreenState {
     object Loading : LobbyScreenState()
     object Configuring : LobbyScreenState() // User is creating a new lobby
     data class Waiting(val lobby: Lobby, val user: UserExternalInfo) : LobbyScreenState() // User is in a lobby
+    data class GameStarted(val gameId: Int) : LobbyScreenState()
     data class Error(val message: String) : LobbyScreenState()
 }
 
 class LobbyViewModel(
     private val service: LobbyService,
+    private val gameService: GameService,
     private val repo: AuthInfoRepo
 ) : ViewModel() {
 
@@ -107,6 +110,30 @@ class LobbyViewModel(
             }
         }
     }
+    
+    fun startGame() {
+        val currentState = screenState as? LobbyScreenState.Waiting ?: return
+        viewModelScope.launch {
+            screenState = LobbyScreenState.Loading
+            val result = gameService.createGame(
+                startedAt = System.currentTimeMillis(),
+                lobbyId = currentState.lobby.id,
+                numberOfRounds = currentState.lobby.settings.numberOfRounds,
+                creatorId = currentState.user.id
+            )
+            
+            when (result) {
+                is Either.Success -> {
+                    screenState = LobbyScreenState.GameStarted(result.value.id)
+                }
+                is Either.Failure -> {
+                    screenState = LobbyScreenState.Error("Failed to start game: ${result.value}")
+                    // Revert to waiting after short delay or let user back out?
+                    // Ideally we should go back to Waiting but with error message
+                }
+            }
+        }
+    }
 
     fun leaveLobby() {
         monitoringJob?.cancel() // Stop monitoring
@@ -132,9 +159,9 @@ class LobbyViewModel(
     }
 
     companion object {
-        fun getFactory(service: LobbyService, repo: AuthInfoRepo): ViewModelProvider.Factory = viewModelFactory {
+        fun getFactory(service: LobbyService, gameService: GameService, repo: AuthInfoRepo): ViewModelProvider.Factory = viewModelFactory {
             initializer {
-                LobbyViewModel(service, repo)
+                LobbyViewModel(service, gameService, repo)
             }
         }
     }
