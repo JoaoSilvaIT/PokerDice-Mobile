@@ -1,5 +1,6 @@
 package com.pdm.pokerdice.lobbies
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -10,7 +11,9 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
 import com.pdm.pokerdice.DependenciesContainer
 import com.pdm.pokerdice.lobby.LobbyActivity
+import com.pdm.pokerdice.lobbyCreation.LobbyCreationActivity
 import com.pdm.pokerdice.ui.theme.PokerDiceTheme
+
 
 class LobbiesActivity : ComponentActivity() {
 
@@ -39,16 +42,17 @@ class LobbiesActivity : ComponentActivity() {
     }
 
     private fun handleNavigation(it: LobbiesNavigation) {
-       when (it) {
-           is LobbiesNavigation.CreateLobby -> {
-               // Navigate to LobbyActivity without args -> Configuring mode
-               LobbyActivity.navigate(this)
-           }
+        val intent = when (it) {
+            is LobbiesNavigation.CreateLobby ->
+                Intent(this, LobbyCreationActivity::class.java).apply {
+                }
 
-           is LobbiesNavigation.SelectLobby -> {
-               // Navigate to LobbyActivity with lobby/user -> Waiting mode
-               LobbyActivity.navigate(this, it.lobby, it.user)
-           }
-       }
+            is LobbiesNavigation.SelectLobby ->
+                Intent(this, LobbyActivity::class.java).apply {
+                    putExtra("lobby", it.lobby)
+                    putExtra("user", it.user)
+                }
+        }
+        startActivity(intent)
     }
 }

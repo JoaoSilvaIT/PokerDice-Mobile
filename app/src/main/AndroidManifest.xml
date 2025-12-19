@@ -36,6 +36,8 @@
             android:exported="false" />
         <activity android:name=".lobbies.LobbiesActivity"
             android:exported="false" />
+        <activity android:name=".lobbyCreation.LobbyCreationActivity"
+            android:exported="false" />
         <activity android:name=".lobby.LobbyActivity"
             android:exported="false"/>
         <activity android:name=".game.GameActivity"

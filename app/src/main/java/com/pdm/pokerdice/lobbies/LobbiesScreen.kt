@@ -1,57 +1,144 @@
 package com.pdm.pokerdice.lobbies
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import com.pdm.pokerdice.domain.lobby.Lobby
 import com.pdm.pokerdice.domain.user.UserExternalInfo
 
-/**
- * Represents the possible navigation destinations of the lobbies screen.
- */
 sealed class LobbiesNavigation {
     class SelectLobby(val lobby: Lobby, val user: UserExternalInfo) : LobbiesNavigation()
     object CreateLobby : LobbiesNavigation()
 }
-
 @Composable
 fun LobbiesScreen(
-    modifier: Modifier = Modifier,
+    modifier: Modifier,
     onNavigate: (LobbiesNavigation) -> Unit = {},
     viewModel: LobbiesViewModel
 ) {
     val state by viewModel.state.collectAsState()
 
-    when (val currentState = state) {
+    when (state) {
         is LobbiesScreenState.Loading -> {
             LobbiesScreenView(
                 lobbies = null,
-                modifier = modifier
             )
         }
         is LobbiesScreenState.ViewLobbies -> {
+            val lobbies = (state as LobbiesScreenState.ViewLobbies).lobbies
             LobbiesScreenView(
-                lobbies = currentState.lobbies,
-                onJoinLobby = { lobbyId -> viewModel.joinLobby(lobbyId) },
-                onCreateLobby = { onNavigate(LobbiesNavigation.CreateLobby) },
-                modifier = modifier
+                lobbies = lobbies,
+                onJoinLobby = { lobbyId ->
+                    viewModel.joinLobby(lobbyId)
+                },
+                onCreateLobby = { onNavigate(LobbiesNavigation.CreateLobby) }
             )
         }
         is LobbiesScreenState.JoinLobby -> {
-            // Use LaunchedEffect to ensure navigation happens only once
-            LaunchedEffect(currentState) {
-                onNavigate(LobbiesNavigation.SelectLobby(currentState.lobby, currentState.user))
-                viewModel.resetToIdle() // Reset state so we don't re-navigate on return
-            }
+            val lobby = (state as LobbiesScreenState.JoinLobby).lobby
+            val user = (state as LobbiesScreenState.JoinLobby).user
+            onNavigate(LobbiesNavigation.SelectLobby(lobby, user))
         }
         is LobbiesScreenState.Error -> {
+            val errorState = (state as LobbiesScreenState.Error).message
             LobbiesScreenView(
                 lobbies = null,
-                error = currentState.message,
-                modifier = modifier
+                error = errorState
             )
         }
     }
+    /*
+    LaunchedEffect(currentJoinState) {
+        if (currentJoinState is JoinLobbyState.Success) {
+            val lobbyToJoin = (currentJoinState as JoinLobbyState.Success).lobby
+            val user = (currentJoinState as JoinLobbyState.Success).user
+            onNavigate(LobbiesNavigation.SelectLobby(lobbyToJoin,user))
+        }
+    }
+
+     */
+    /*
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp)
+    ) {
+        Text(
+            text = "Available Lobbies",
+            style = MaterialTheme.typography.headlineMedium,
+            modifier = Modifier.padding(bottom = 16.dp)
+        )
+
+        LazyColumn(
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxWidth()
+        ) {
+            items(lobbies) { lobby ->
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp),
+                    shape = RoundedCornerShape(12.dp),
+                    elevation = CardDefaults.cardElevation(4.dp)
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(all = 16.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text(
+                            text = lobby.name,
+                            style = MaterialTheme.typography.bodyLarge
+                        )
+                        Button(
+                            onClick = {
+                                viewModel.joinLobby(lobby.lid)
+                            },
+                            modifier = Modifier.testTag("join_button_${lobby.lid}")
+
+                        ) {
+                            Text(
+                                text = "Join Lobby"
+                            )
+
+                        }
+                    }
+                }
+            }
+
+        }
+        Button(
+            onClick = {
+                viewModel.viewModelScope.launch {
+                    onNavigate(LobbiesNavigation.CreateLobby)
+                }
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 16.dp)
+                .height(56.dp)
+                .testTag(CREATE_LOBBY),
+            shape = RoundedCornerShape(12.dp)
+        ) {
+            Text(text = "Create Lobby")
+        }
+    }
+
+     */
 }
+
+/*
+@Preview()
+@Composable
+fun LobbiesScreenPreview() {
+    val repositoryLobby = RepoLobbyInMem()
+    PokerDiceTheme {
+        LobbiesScreen(User(1, "NULL", "null"),repositoryLobby, Modifier)
+    }
+}
+
+ */
