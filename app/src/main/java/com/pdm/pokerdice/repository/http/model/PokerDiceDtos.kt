@@ -168,5 +168,14 @@ data class MeOutputDto(
     val email: String,
     val balance: Int
 ) {
-    fun toDomain() = User(id, name, email, "", balance, UserStatistics(0,0,0,0.0))
+    fun toDomain(stats: UserStatistics) = User(id, name, email, "", balance, stats)
+}
+
+data class UserStatisticsDto(
+    val gamesPlayed: Int,
+    val wins: Int,
+    val losses: Int,
+    val winRate: Double
+) {
+    fun toDomain() = UserStatistics(gamesPlayed, wins, losses, winRate)
 }

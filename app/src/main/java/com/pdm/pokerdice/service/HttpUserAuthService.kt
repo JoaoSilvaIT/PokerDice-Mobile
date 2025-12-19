@@ -16,6 +16,7 @@ import java.time.Instant
 import com.pdm.pokerdice.repository.http.model.LoginOutputDto
 import com.pdm.pokerdice.repository.http.model.MeOutputDto
 import com.pdm.pokerdice.repository.http.model.UserOutputDto
+import com.pdm.pokerdice.repository.http.model.UserStatisticsDto
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
@@ -29,6 +30,23 @@ class HttpUserAuthService(
 ) : UserAuthService {
 
     private suspend fun getToken(): String? = authRepo.getAuthInfo()?.authToken
+
+    override suspend fun getUserInfo(): Either<AuthTokenError, User> {
+        val token = getToken() ?: return failure(AuthTokenError.TokenNotCreated)
+        return try {
+            val me = client.get("/api/me") {
+                header("Authorization", "Bearer $token")
+            }.body<MeOutputDto>()
+            
+            val stats = client.get("/api/users/stats") {
+                header("Authorization", "Bearer $token")
+            }.body<UserStatisticsDto>()
+            
+            success(me.toDomain(stats.toDomain()))
+        } catch (e: Exception) {
+            failure(AuthTokenError.TokenNotCreated)
+        }
+    }
 
     override suspend fun getLoggedUser(): UserExternalInfo? {
         val token = getToken() ?: return null
@@ -110,7 +128,7 @@ class HttpUserAuthService(
             val meDto = client.get("/api/me") {
                 header("Authorization", "Bearer $token")
             }.body<MeOutputDto>()
-            success(meDto.toDomain())
+            success(meDto.toDomain(UserStatistics(0,0,0,0.0)))
         } catch (e: Exception) {
             failure(AuthTokenError.TokenNotCreated)
         }

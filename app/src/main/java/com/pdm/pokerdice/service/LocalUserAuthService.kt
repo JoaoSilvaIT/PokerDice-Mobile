@@ -100,6 +100,11 @@ class LocalUserAuthService(
         }
     }
 
+    override suspend fun getUserInfo(): Either<AuthTokenError, User> {
+        // Local service doesn't really have a centralized 'me' with stats via this flow
+        return failure(AuthTokenError.TokenNotCreated)
+    }
+
     private fun isTokenTimeValid(
         clock: Clock,
         token: Token,

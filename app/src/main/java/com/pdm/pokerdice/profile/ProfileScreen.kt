@@ -2,247 +2,194 @@ package com.pdm.pokerdice.profile
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material3.Button
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.LinearProgressIndicator
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ProgressIndicatorDefaults
-import androidx.compose.material3.Text
+import androidx.compose.material.icons.automirrored.filled.ExitToApp
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.pdm.pokerdice.R
+import com.pdm.pokerdice.domain.user.User
+import com.pdm.pokerdice.ui.theme.GenericTopAppBar
 
 sealed class ProfileNavigation {
-    object EditProfile : ProfileNavigation()
-
-    object GameHistory : ProfileNavigation()
+    data object Back : ProfileNavigation()
+    data object Logout : ProfileNavigation()
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileScreen(
-    mod: Modifier,
-    onNavigate: (ProfileNavigation) -> Unit = {},
+    onNavigate: (ProfileNavigation) -> Unit,
+    viewModel: ProfileViewModel
 ) {
-    LazyColumn(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = mod.fillMaxSize().padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
-    ) {
-        item {
-            Text(
-                "Your Profile",
-                style = MaterialTheme.typography.headlineLarge,
-                color = MaterialTheme.colorScheme.primary,
+    val state by viewModel.state.collectAsState()
+
+    Scaffold(
+        modifier = Modifier.fillMaxSize(),
+        topBar = {
+            GenericTopAppBar(
+                title = "Player Profile",
+                onBackAction = { onNavigate(ProfileNavigation.Back) }
             )
         }
-
-        // User info card
-        item {
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-                shape = MaterialTheme.shapes.medium
-            ) {
-                Column(
-                    modifier = Modifier.padding(16.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(16.dp),
-                ) {
-                    Image(
-                        painter = painterResource(id = R.drawable.dice),
-                        contentDescription = "Profile Picture",
-                        modifier =
-                            Modifier
-                                .size(100.dp)
-                                .clip(CircleShape)
-                                .border(2.dp, MaterialTheme.colorScheme.primary, CircleShape),
-                    )
-
-                    Text(
-                        "Player Name",
-                        style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.Bold,
-                    )
-
-                    Text(
-                        "Level 5 Dice Master",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.secondary,
-                    )
-
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        Text("Experience", style = MaterialTheme.typography.bodyMedium)
-                        Text("75/100", style = MaterialTheme.typography.bodyMedium)
-                    }
-
-                    LinearProgressIndicator(
-                        progress = { 0.75f },
-                        modifier = Modifier.fillMaxWidth(),
-                        color = MaterialTheme.colorScheme.primary,
-                        trackColor = ProgressIndicatorDefaults.linearTrackColor,
-                        strokeCap = ProgressIndicatorDefaults.LinearStrokeCap,
+    ) { innerPadding ->
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+        ) {
+            when (val currentState = state) {
+                is ProfileScreenState.Loading -> {
+                    CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+                }
+                is ProfileScreenState.Success -> {
+                    ProfileContent(
+                        user = currentState.user,
+                        onLogout = { 
+                            viewModel.logout { onNavigate(ProfileNavigation.Logout) } 
+                        }
                     )
                 }
-            }
-        }
-
-        // Statistics card
-        item {
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-                shape = MaterialTheme.shapes.medium
-            ) {
-                Column(
-                    modifier = Modifier.padding(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp),
-                ) {
-                    Text(
-                        "Game Statistics",
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold,
-                    )
-
-                    Spacer(modifier = Modifier.height(8.dp))
-
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
+                is ProfileScreenState.Error -> {
+                    Column(
+                        modifier = Modifier.align(Alignment.Center),
+                        horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        Text("Games Played", style = MaterialTheme.typography.bodyMedium)
-                        Text("42", style = MaterialTheme.typography.bodyMedium)
+                        Text(text = currentState.message, color = MaterialTheme.colorScheme.error)
+                        Button(onClick = { viewModel.fetchProfile() }) {
+                            Text("Retry")
+                        }
                     }
-
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                    ) {
-                        Text("Wins", style = MaterialTheme.typography.bodyMedium)
-                        Text("28", style = MaterialTheme.typography.bodyMedium)
-                    }
-
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                    ) {
-                        Text("Losses", style = MaterialTheme.typography.bodyMedium)
-                        Text("14", style = MaterialTheme.typography.bodyMedium)
-                    }
-
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                    ) {
-                        Text("Win Rate", style = MaterialTheme.typography.bodyMedium)
-                        Text("66.7%", style = MaterialTheme.typography.bodyMedium)
-                    }
-
-                    Button(
-                        onClick = { onNavigate(ProfileNavigation.GameHistory) },
-                        modifier = Modifier.align(Alignment.End),
-                        shape = MaterialTheme.shapes.small
-                    ) {
-                        Text("Game History", style = MaterialTheme.typography.labelLarge)
-                    }
-                }
-            }
-        }
-
-        // Achievements card
-        item {
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-                shape = MaterialTheme.shapes.medium
-            ) {
-                Column(
-                    modifier = Modifier.padding(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp),
-                ) {
-                    Text(
-                        "Achievements",
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold,
-                    )
-
-                    // These achievements would ideally be loaded from a database
-                    // and tied to user authentication
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        Text("First Victory", style = MaterialTheme.typography.bodyMedium)
-                        Text("✓", style = MaterialTheme.typography.bodyMedium)
-                    }
-
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        Text("Five Game Streak", style = MaterialTheme.typography.bodyMedium)
-                        Text("✓", style = MaterialTheme.typography.bodyMedium)
-                    }
-
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        Text("Royal Flush", style = MaterialTheme.typography.bodyMedium)
-                        Text("✗", style = MaterialTheme.typography.bodyMedium)
-                    }
-                }
-            }
-        }
-
-        // Edit profile button
-        item {
-            Button(
-                onClick = { onNavigate(ProfileNavigation.EditProfile) },
-                modifier = Modifier.fillMaxWidth(),
-                shape = MaterialTheme.shapes.medium
-            ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                ) {
-                    Icon(Icons.Default.Edit, contentDescription = "Edit")
-                    Text("Edit Profile", style = MaterialTheme.typography.titleSmall)
                 }
             }
         }
     }
 }
 
-@Preview
 @Composable
-fun ProfileScreenPreview() {
-    ProfileScreen(Modifier)
+private fun ProfileContent(
+    user: User,
+    onLogout: () -> Unit
+) {
+    LazyColumn(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(24.dp),
+    ) {
+        // User Header
+        item {
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Image(
+                    painter = painterResource(id = R.drawable.dice),
+                    contentDescription = "Profile Picture",
+                    modifier = Modifier
+                        .size(100.dp)
+                        .clip(CircleShape)
+                        .border(2.dp, MaterialTheme.colorScheme.primary, CircleShape),
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+                Text(
+                    text = user.name,
+                    style = MaterialTheme.typography.headlineMedium,
+                    fontWeight = FontWeight.Bold
+                )
+                Text(
+                    text = user.email,
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.secondary
+                )
+            }
+        }
+
+        // Account Info
+        item {
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = MaterialTheme.shapes.medium,
+                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+            ) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Text(
+                        text = "Account Balance",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = "${user.balance} Coins",
+                        style = MaterialTheme.typography.displaySmall,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                }
+            }
+        }
+
+        // Statistics
+        item {
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = MaterialTheme.shapes.medium,
+                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+            ) {
+                Column(
+                    modifier = Modifier.padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    Text(
+                        text = "Game Statistics",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold
+                    )
+                    
+                    val stats = user.statistics
+                    StatRow("Games Played", stats.gamesPlayed.toString())
+                    StatRow("Wins", stats.wins.toString())
+                    StatRow("Losses", stats.losses.toString())
+                    StatRow("Win Rate", "${String.format("%.1f", stats.winRate)}%")
+                }
+            }
+        }
+
+        // Logout
+        item {
+            Button(
+                onClick = onLogout,
+                modifier = Modifier.fillMaxWidth(),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.errorContainer,
+                    contentColor = MaterialTheme.colorScheme.onErrorContainer
+                ),
+                shape = MaterialTheme.shapes.medium
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(Icons.AutoMirrored.Filled.ExitToApp, contentDescription = null)
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text("Logout")
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun StatRow(label: String, value: String) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Text(text = label, style = MaterialTheme.typography.bodyLarge)
+        Text(text = value, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold)
+    }
 }
