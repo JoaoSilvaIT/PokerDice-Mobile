@@ -14,6 +14,7 @@ import com.pdm.pokerdice.domain.user.AuthInfoRepo
 import com.pdm.pokerdice.domain.user.UserExternalInfo
 import com.pdm.pokerdice.domain.utilis.Either
 import com.pdm.pokerdice.service.LobbyService
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 
 /**
@@ -34,6 +35,8 @@ class LobbyViewModel(
     var screenState by mutableStateOf<LobbyScreenState>(LobbyScreenState.Loading)
         private set
 
+    private var monitoringJob: Job? = null
+
     /**
      * Initializes the ViewModel.
      * @param initialLobby If provided, we start in Waiting state. If null, we start in Configuring state.
@@ -49,17 +52,38 @@ class LobbyViewModel(
             }
 
             if (initialLobby != null) {
-                screenState = LobbyScreenState.Waiting(initialLobby, user)
+                enterWaitingState(initialLobby, user)
             } else {
                 screenState = LobbyScreenState.Configuring
             }
         }
     }
 
+    private fun enterWaitingState(lobby: Lobby, user: UserExternalInfo) {
+        screenState = LobbyScreenState.Waiting(lobby, user)
+        startMonitoring(lobby.id, user)
+    }
+
+    private fun startMonitoring(lobbyId: Int, user: UserExternalInfo) {
+        monitoringJob?.cancel()
+        monitoringJob = viewModelScope.launch {
+            service.lobbies.collect { lobbiesList ->
+                val updatedLobby = lobbiesList.find { it.id == lobbyId }
+                if (updatedLobby != null) {
+                    // Update state if we are still in Waiting
+                    if (screenState is LobbyScreenState.Waiting) {
+                        screenState = LobbyScreenState.Waiting(updatedLobby, user)
+                    }
+                } else {
+                    // Lobby might have been deleted? Keep current state or handle error?
+                    // For now, keep current state to avoid jarring UI changes if poll fails once
+                }
+            }
+        }
+    }
+
     fun createLobby(info: LobbyInfo) {
         viewModelScope.launch {
-            val currentState = screenState
-            // Ensure we only create if we are configuring or loading
             // Fetch user again to be safe
             val user = service.getLoggedUser() ?: return@launch
 
@@ -75,29 +99,24 @@ class LobbyViewModel(
 
             when (result) {
                 is Either.Success -> {
-                    screenState = LobbyScreenState.Waiting(result.value, user)
+                    enterWaitingState(result.value, user)
                 }
                 is Either.Failure -> {
                     screenState = LobbyScreenState.Error("Failed to create: ${result.value}")
-                    // Optionally revert to Configuring after a delay or user action
                 }
             }
         }
     }
 
     fun leaveLobby() {
+        monitoringJob?.cancel() // Stop monitoring
         viewModelScope.launch {
             val currentState = screenState
             if (currentState is LobbyScreenState.Waiting) {
-                // Optimistic update or waiting?
-                // For now, call service
                 val result = service.leaveLobby(currentState.user, currentState.lobby.id)
                 when(result) {
                     is Either.Success -> {
-                        // Navigation should handle exit, but state can go to idle/finish
-                        // Actually, Activity should observe this or we have a specialized event?
-                        // For simplicity, we can set state to Configuring or send a navigation event via a separate flow/channel if needed.
-                        // Or just Activity finishes.
+                        // Navigation handled by UI
                     }
                     is Either.Failure -> {
                         screenState = LobbyScreenState.Error("Failed to leave: ${result.value}")
@@ -108,6 +127,7 @@ class LobbyViewModel(
     }
     
     fun backToConfig() {
+        monitoringJob?.cancel()
         screenState = LobbyScreenState.Configuring
     }
 

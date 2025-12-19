@@ -38,10 +38,11 @@ suspend fun performSignUp(
         val user = service.createUser(
             credentials.userName,
             credentials.email,
-            credentials.password)
+            credentials.password,
+            credentials.inviteCode)
         when(user) {
             is Either.Failure -> {
-                failure(AuthTokenError.UserNotFoundOrInvalidCredentials)
+                failure(user.value)
             }
             is Either.Success -> {
                 val loginCreeds = UserCredentials(credentials.email, credentials.password)

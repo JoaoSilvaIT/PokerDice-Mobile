@@ -31,12 +31,13 @@ fun SignUpForm(
     loading: Boolean,
     error: String?,
     onSignUp: (credentials: NewUserCredentials) -> Unit,
-    validateCredentials: (name: String, email: String, password: String) -> Boolean,
+    validateCredentials: (name: String, email: String, password: String, invite: String) -> Boolean,
     modifier: Modifier = Modifier
 ) {
     val email = remember { mutableStateOf("") }
     val password = remember { mutableStateOf("") }
     val userName = rememberSaveable { mutableStateOf("") }
+    val inviteCode = rememberSaveable { mutableStateOf("") }
 
     SignUpFormStateLess(
         loading,
@@ -44,11 +45,13 @@ fun SignUpForm(
         userName.value,
         email.value,
         password.value,
-        isDataValid = validateCredentials(userName.value, email.value, password.value),
+        inviteCode.value,
+        isDataValid = validateCredentials(userName.value, email.value, password.value, inviteCode.value),
         onEmailChange = { email.value = it },
         onPasswordChange = { password.value = it },
         onUserNameChange = { userName.value = it },
-        onSignUp = { name, em, pass -> onSignUp(NewUserCredentials(name, em, pass)) },
+        onInviteCodeChange = { inviteCode.value = it },
+        onSignUp = { name, em, pass, invite -> onSignUp(NewUserCredentials(name, em, pass, invite)) },
         modifier = modifier
     )
 }
@@ -60,11 +63,13 @@ fun SignUpFormStateLess(
     userName: String,
     email: String,
     password: String,
+    inviteCode: String,
     isDataValid: Boolean,
     onUserNameChange: (String) -> Unit,
     onEmailChange: (String) -> Unit,
     onPasswordChange: (String) -> Unit,
-    onSignUp: (name: String, email: String, password: String) -> Unit,
+    onInviteCodeChange: (String) -> Unit,
+    onSignUp: (name: String, email: String, password: String, invite: String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -94,8 +99,17 @@ fun SignUpFormStateLess(
             label = { Text("Password") },
             singleLine = true,
             visualTransformation = PasswordVisualTransformation(),
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Done),
-            keyboardActions = KeyboardActions(onDone = { if (isDataValid && !loading) onSignUp(userName, email, password) }),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Next),
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        OutlinedTextField(
+            value = inviteCode,
+            onValueChange = onInviteCodeChange,
+            label = { Text("Invite Code") },
+            singleLine = true,
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text, imeAction = ImeAction.Done),
+            keyboardActions = KeyboardActions(onDone = { if (isDataValid && !loading) onSignUp(userName, email, password, inviteCode) }),
             modifier = Modifier.fillMaxWidth()
         )
 
@@ -104,7 +118,7 @@ fun SignUpFormStateLess(
         }
 
         Button(
-            onClick = { onSignUp(userName,email, password) },
+            onClick = { onSignUp(userName, email, password, inviteCode) },
             enabled = isDataValid && !loading,
             modifier = Modifier.fillMaxWidth()
         ) {
@@ -112,7 +126,7 @@ fun SignUpFormStateLess(
                 CircularProgressIndicator(Modifier.size(16.dp), strokeWidth = 2.dp)
                 Spacer(Modifier.width(8.dp))
             }
-            Text("Entrar")
+            Text("Sign Up")
         }
     }
 }

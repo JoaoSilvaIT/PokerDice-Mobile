@@ -14,4 +14,6 @@ sealed                      class GameError {
     data object GameNotFound : GameError()
 
     data object GameAlreadyEnded : GameError()
+    
+    data class NetworkError(val message: String) : GameError()
 }

@@ -9,6 +9,7 @@ import com.pdm.pokerdice.domain.user.AuthInfo
 import com.pdm.pokerdice.domain.user.AuthInfoRepo
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 
 /**
  * Implementation of AuthInfoRepo that uses DataStore to store authentication information.
@@ -21,7 +22,9 @@ class AuthInfoPreferencesRepo (private val store: DataStore<Preferences>) : Auth
     private val authTokenKey: Preferences.Key<String> = stringPreferencesKey(name = "auth_token")
 
     override val authInfo: Flow<AuthInfo?>
-        get() = TODO("Not yet implemented")
+        get() = store.data.map { preferences ->
+            preferences.toAuthInfo()
+        }
 
     override suspend fun clearAuthInfo() {
         store.edit { it.clear() }

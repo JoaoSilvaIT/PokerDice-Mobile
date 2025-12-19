@@ -22,9 +22,9 @@ data class UserCredentials(val email: String, val password: String) {
  * @param email The user's email address.
  * @param password The user's password.
  */
-data class NewUserCredentials(val userName : String, val email: String, val password: String) {
+data class NewUserCredentials(val userName : String, val email: String, val password: String, val inviteCode: String) {
     init {
-        require(value = isValidNewCredentialsData(userName,email, password)) { "Invalid new user credentials: $this"}
+        require(value = isValidNewCredentialsData(userName,email, password, inviteCode)) { "Invalid new user credentials: $this"}
     }
 }
 
@@ -47,6 +47,8 @@ fun String.isValidPassword(): Boolean = isNotBlank()
 
 fun String.isValidUserName(): Boolean = isNotBlank()
 
+fun String.isValidInviteCode(): Boolean = isNotBlank()
+
 /**
  * Validates if the user credentials are valid. Validity in the client application is determined
  * by verifying both the email and password using their respective validation functions. In the
@@ -55,7 +57,8 @@ fun String.isValidUserName(): Boolean = isNotBlank()
  * @param password The user's password.
  * @return True if both email and password are valid, false otherwise.
  */
-fun isValidNewCredentialsData(name: String, email: String, password: String): Boolean = email.isValidEmail() && password.isValidPassword() && name.isValidUserName()
+fun isValidNewCredentialsData(name: String, email: String, password: String, invite: String): Boolean = 
+    email.isValidEmail() && password.isValidPassword() && name.isValidUserName() && invite.isValidInviteCode()
 
 fun isValidCredentialsData(email: String, password: String): Boolean = email.isValidEmail() && password.isValidPassword()
 

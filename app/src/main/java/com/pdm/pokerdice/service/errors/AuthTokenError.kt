@@ -14,4 +14,6 @@ sealed class AuthTokenError {
     data object InvalidTokenFormat : AuthTokenError()
 
     data object TokenNotCreated : AuthTokenError()
+
+    data object BlankInviteCode : AuthTokenError()
 }

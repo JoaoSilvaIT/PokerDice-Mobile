@@ -18,11 +18,11 @@ interface LobbyService : Service {
 
     fun refreshLobbies()
 
-    fun createLobby(name: String, description: String, minPlayers: Int, maxPlayers: Int, host: UserExternalInfo) : Either<LobbyError, Lobby>
+    suspend fun createLobby(name: String, description: String, minPlayers: Int, maxPlayers: Int, host: UserExternalInfo) : Either<LobbyError, Lobby>
 
-    fun joinLobby(usr: UserExternalInfo, lobbyId: Int) : Either<LobbyError, Lobby>
+    suspend fun joinLobby(usr: UserExternalInfo, lobbyId: Int) : Either<LobbyError, Lobby>
 
-    fun leaveLobby(usr: UserExternalInfo, lobbyId: Int) : Either<LobbyError, Boolean>
+    suspend fun leaveLobby(usr: UserExternalInfo, lobbyId: Int) : Either<LobbyError, Boolean>
 }
 
 class FakeLobbyService(val trxManager : TransactionManager , val repo : AuthInfoRepo) : LobbyService {
@@ -32,7 +32,7 @@ class FakeLobbyService(val trxManager : TransactionManager , val repo : AuthInfo
         _lobbies.value = trxManager.run { repoLobby.findAll() }
     }
 
-    override fun createLobby(
+    override suspend fun createLobby(
         name: String,
         description: String,
         minPlayers: Int,
@@ -55,7 +55,7 @@ class FakeLobbyService(val trxManager : TransactionManager , val repo : AuthInfo
         }
     }
 
-    override fun joinLobby(usr: UserExternalInfo, lobbyId: Int): Either<LobbyError, Lobby> {
+    override suspend fun joinLobby(usr: UserExternalInfo, lobbyId: Int): Either<LobbyError, Lobby> {
         return trxManager.run {
             val lobby = repoLobby.findById(lobbyId) ?: return@run failure(LobbyError.LobbyNotFound)
 
@@ -72,7 +72,7 @@ class FakeLobbyService(val trxManager : TransactionManager , val repo : AuthInfo
     }
 
 
-    override fun leaveLobby(usr: UserExternalInfo, lobbyId: Int): Either<LobbyError, Boolean> {
+    override suspend fun leaveLobby(usr: UserExternalInfo, lobbyId: Int): Either<LobbyError, Boolean> {
         return trxManager.run {
             val lobby = repoLobby.findById(lobbyId) ?: return@run failure(LobbyError.LobbyNotFound)
 
