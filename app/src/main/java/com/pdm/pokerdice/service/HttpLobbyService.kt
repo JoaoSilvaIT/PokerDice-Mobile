@@ -26,7 +26,6 @@ class HttpLobbyService(
     private val client: HttpClient,
     private val authRepo: AuthInfoRepo
 ) : LobbyService {
-
     private suspend fun getToken(): String? = authRepo.getAuthInfo()?.authToken
 
     // Real-time via Polling for M5 (2 seconds)
