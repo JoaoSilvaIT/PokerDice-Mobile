@@ -8,6 +8,7 @@ import com.pdm.pokerdice.domain.game.Turn
 import com.pdm.pokerdice.domain.game.utilis.Face
 import com.pdm.pokerdice.domain.game.utilis.State
 import com.pdm.pokerdice.domain.lobby.Lobby
+import com.pdm.pokerdice.domain.lobby.LobbySettings
 import com.pdm.pokerdice.domain.user.User
 import com.pdm.pokerdice.domain.user.UserExternalInfo
 import com.pdm.pokerdice.domain.user.UserStatistics
@@ -32,8 +33,11 @@ data class LobbyDto(
             id = id,
             name = name ?: "Unknown Lobby",
             description = description ?: "",
-            minPlayers = minPlayers,
-            maxPlayers = maxPlayers,
+            settings = LobbySettings(
+                numberOfRounds = 5, // Default as not present in DTO
+                minPlayers = minPlayers,
+                maxPlayers = maxPlayers
+            ),
             players = safePlayers.map { it.toDomain() }.toSet(),
             host = host.toDomain()
         )
@@ -60,13 +64,18 @@ data class GameDto(
     fun toDomain(currentUserId: Int): Game {
         val gameState = try { State.valueOf(state ?: "RUNNING") } catch (e: Exception) { State.RUNNING }
         val safePlayers = players?.filterNotNull() ?: emptyList()
+        val domainPlayers = safePlayers.map { it.toDomain() }
+        
+        // Map current round if exists
+        val domainRound = currentRound?.toDomain(domainPlayers)
+
         return Game(
             id = id,
-            lobbyId = lobbyId ?: 0,
-            players = safePlayers.map { it.toDomain() },
+            lobbyId = lobbyId,
+            players = domainPlayers,
             numberOfRounds = numberOfRounds,
             state = gameState,
-            currentRound = currentRound?.toDomain(safePlayers),
+            currentRound = domainRound,
             startedAt = startedAt,
             endedAt = endedAt
         )
@@ -83,11 +92,9 @@ data class GameRoundDto(
     val winners: List<PlayerInGameDto?>?,
     val players: List<PlayerInGameDto?>?
 ) {
-    fun toDomain(gamePlayers: List<PlayerInGameDto>): Round {
+    fun toDomain(gamePlayers: List<PlayerInGame>): Round {
         // Map dice strings to Dice domain
         val diceList = (currentDice ?: emptyList()).filterNotNull().map { diceStr -> 
-            // Expecting something like "ACE", "KING" or "1", "6"?
-            // Assuming string representation of Face enum
             try {
                 Dice(Face.valueOf(diceStr.uppercase()))
             } catch (e: Exception) {
@@ -95,27 +102,29 @@ data class GameRoundDto(
             }
         }
 
-        val safePlayers = players?.filterNotNull() ?: gamePlayers
-        
-        // Find current player
-        val turnPlayer = safePlayers.find { it.id == turnUserId }?.toDomainUser() 
-            ?: User(turnUserId, "Unknown", "", "", 0, UserStatistics(0,0,0,0.0))
+        // Find current player in game players
+        val turnPlayer = gamePlayers.find { it.id == turnUserId }
+            ?: PlayerInGame(turnUserId, "Unknown", 0, 0)
 
         val turn = Turn(
             player = turnPlayer,
             rollsRemaining = rollsLeft,
-            currentDice = diceList
+            currentDice = diceList,
+            isFolded = false // Default
         )
+
+        val safeWinners = winners?.filterNotNull()?.map { it.toDomain() } ?: emptyList()
 
         return Round(
             number = number,
-            firstPlayerIdx = 0, // Not provided in DTO?
+            firstPlayerIdx = 0, // Not provided in DTO
             turn = turn,
-            players = safePlayers.map { it.toDomain() },
-            playerHands = emptyMap(), // Not in DTO?
+            players = gamePlayers,
+            playerHands = emptyMap(), // Not in DTO
             ante = ante,
             pot = pot,
-            winners = winners?.filterNotNull()?.map { it.toDomain() } ?: emptyList(),
+            winners = safeWinners,
+            foldedPlayers = emptyList(), // Not in DTO
             gameId = 0
         )
     }

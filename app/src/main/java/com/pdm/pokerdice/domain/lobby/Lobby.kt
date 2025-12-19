@@ -9,8 +9,8 @@ data class Lobby (
     val id : Int,
     val name: String,
     val description : String,
-    val minPlayers : Int,
-    val maxPlayers : Int,
+    val host : UserExternalInfo,
+    val settings: LobbySettings,
     val players : Set<UserExternalInfo>,
-    val host : UserExternalInfo
+    val timeout: Long = 10L,
 ) : Parcelable

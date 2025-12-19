@@ -46,7 +46,7 @@ fun LobbyWaitingView(
         )
         
         Text(
-            text = "Players (${lobby.players.size}/${lobby.maxPlayers})",
+            text = "Players (${lobby.players.size}/${lobby.settings.maxPlayers})",
             style = MaterialTheme.typography.titleMedium,
             modifier = Modifier.padding(vertical = 8.dp)
         )

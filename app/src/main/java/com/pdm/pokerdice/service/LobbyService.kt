@@ -59,7 +59,7 @@ class FakeLobbyService(val trxManager : TransactionManager , val repo : AuthInfo
         return trxManager.run {
             val lobby = repoLobby.findById(lobbyId) ?: return@run failure(LobbyError.LobbyNotFound)
 
-            if (lobby.players.size >= lobby.maxPlayers) return@run failure(LobbyError.LobbyFull)
+            if (lobby.players.size >= lobby.settings.maxPlayers) return@run failure(LobbyError.LobbyFull)
             if (lobby.players.any { it.id == usr.id }) return@run failure(LobbyError.UserAlreadyInLobby)
 
             val updatedLobby = repoLobby.joinLobby(usr, lobby)

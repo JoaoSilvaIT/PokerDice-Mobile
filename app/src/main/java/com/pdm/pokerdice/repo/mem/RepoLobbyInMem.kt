@@ -1,21 +1,22 @@
 package com.pdm.pokerdice.repo.mem
 
 import com.pdm.pokerdice.domain.lobby.Lobby
+import com.pdm.pokerdice.domain.lobby.LobbySettings
 import com.pdm.pokerdice.domain.user.UserExternalInfo
 import com.pdm.pokerdice.repo.RepositoryLobby
 
 class RepoLobbyInMem : RepositoryLobby {
     val lobbies = mutableListOf(
         Lobby(
-            1,
-            "LobbyTest",
-            "This is a test lobby",
-            2,
-            4,
-            setOf(
+            id = 1,
+            name = "LobbyTest",
+            description = "This is a test lobby",
+            settings = LobbySettings(numberOfRounds = 5, minPlayers = 2, maxPlayers = 4),
+            host = UserExternalInfo(1, "admin", 100),
+            players = setOf(
                 UserExternalInfo(1, "admin", 100),
             ),
-            UserExternalInfo(1, "admin", 100)
+            timeout = 10L
         )
     )
     var lid = 2
@@ -30,15 +31,13 @@ class RepoLobbyInMem : RepositoryLobby {
         host: UserExternalInfo
     ): Lobby {
         val newLobby = Lobby(
-            lid,
-            name,
-            description,
-            minPlayers,
-            maxPlayers,
-            setOf(
-                host
-            ),
-            host
+            id = lid,
+            name = name,
+            description = description,
+            settings = LobbySettings(numberOfRounds = 5, minPlayers = minPlayers, maxPlayers = maxPlayers),
+            host = host,
+            players = setOf(host),
+            timeout = 10L
         )
         lid++
         lobbies.add(newLobby)

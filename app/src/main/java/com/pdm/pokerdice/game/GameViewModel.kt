@@ -295,13 +295,13 @@ class GameViewModel : ViewModel() {
     private fun startFakeGame() {
         val me = PlayerInGame(1, "Me", 100, 0)
         val opponent = PlayerInGame(2, "Opponent", 100, 0)
-        val fakeUser = User(1, "Me", "", "", 100, UserStatistics(0, 0, 0, 0.0))
-        val fakeTurn = Turn(player = fakeUser, rollsRemaining = 3, currentDice = emptyList())
+        // val fakeUser = User(1, "Me", "", "", 100, UserStatistics(0, 0, 0, 0.0)) // Unused
+        val fakeTurn = Turn(player = me, rollsRemaining = 3, currentDice = emptyList())
 
         val currentRound = Round(
             number = 1, firstPlayerIdx = 0, turn = fakeTurn,
             players = listOf(me, opponent), playerHands = emptyMap(),
-            ante = 0, pot = 0, winners = emptyList(), gameId = 1
+            ante = 0, pot = 0, winners = emptyList(), foldedPlayers = emptyList(), gameId = 1
         )
 
         currentGame = Game(
