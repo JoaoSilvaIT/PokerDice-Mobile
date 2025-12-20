@@ -112,6 +112,7 @@ class GameViewModel(
 
     fun startGame(game: Game) {
         viewModelScope.launch {
+            isTransactionInProgress = true
             screenState = GameScreenState.Loading
             val result = service.startGame(
                 gameId = game.id,
@@ -120,13 +121,15 @@ class GameViewModel(
 
             when (result) {
                 is Either.Success -> {
-                    // State update will come via monitoring
+                    currentGame = result.value
+                    nextRound()
                     updateScreenState(result.value)
                 }
                 is Either.Failure -> {
                     screenState = GameScreenState.Error("Failed to start game: ${result.value}")
                 }
             }
+            isTransactionInProgress = false
         }
     }
 
