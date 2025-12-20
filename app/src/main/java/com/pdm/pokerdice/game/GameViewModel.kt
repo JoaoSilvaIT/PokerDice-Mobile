@@ -110,6 +110,27 @@ class GameViewModel(
         lastObservedRoundNumber = currentRoundNum
     }
 
+    fun startGame(game: Game) {
+        viewModelScope.launch {
+            screenState = GameScreenState.Loading
+            val result = service.startGame(
+                gameId = game.id,
+                creatorId = myUserId
+            )
+
+            when (result) {
+                is Either.Success -> {
+                    // State update will come via monitoring
+                    updateScreenState(result.value)
+                }
+                is Either.Failure -> {
+                    screenState = GameScreenState.Error("Failed to start game: ${result.value}")
+                }
+            }
+        }
+    }
+
+
     private fun updateScreenState(game: Game) {
         if (game.state == State.FINISHED) {
              val winner = game.players.maxByOrNull { it.moneyWon }

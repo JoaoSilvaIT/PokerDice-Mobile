@@ -20,14 +20,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.pdm.pokerdice.domain.game.Game
 import com.pdm.pokerdice.domain.lobby.Lobby
 import com.pdm.pokerdice.domain.user.User
 import com.pdm.pokerdice.domain.user.UserExternalInfo
 
 sealed class LobbyNavigation {
-    //object CreateGame : LobbyNavigation()
-
-    //object CreateGame: LobbyNavigation()
+    class CreateGame(val game: Game): LobbyNavigation()
     object TitleScreen : LobbyNavigation()
 }
 
@@ -42,10 +41,14 @@ fun LobbyScreen(
     viewModel: LobbyViewModel
 ) {
     val currentLeaveState by viewModel.leaveLobbyState.collectAsState(LeaveLobbyState.Idle)
+    val currentCreateGameState by viewModel.createGameState.collectAsState(CreateGameState.Idle)
 
     LaunchedEffect(currentLeaveState) {
         if (currentLeaveState is LeaveLobbyState.Success) {
             onNavigate(LobbyNavigation.TitleScreen)
+        }
+        if (currentCreateGameState is CreateGameState.Success) {
+            onNavigate(LobbyNavigation.CreateGame((currentCreateGameState as CreateGameState.Success).game))
         }
     }
 
@@ -118,18 +121,15 @@ fun LobbyScreen(
         }
 
         if (user.id == host.id) {
-            /*
             Button(
-                onClick = { onNavigate(LobbyNavigation.CreateGame) },
+                onClick = { viewModel.createGame(lobby, 2) },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(top = 16.dp),
                 shape = MaterialTheme.shapes.medium
             ) {
-                Text("Start Match", style = MaterialTheme.typography.titleSmall)
+                Text("Start Game 🎮", style = MaterialTheme.typography.titleSmall)
             }
-
-             */
         }
 
         Button(

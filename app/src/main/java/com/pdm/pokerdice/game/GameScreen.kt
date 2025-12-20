@@ -15,11 +15,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.pdm.pokerdice.domain.game.Game
 import com.pdm.pokerdice.ui.theme.GenericTopAppBar
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun GameScreen(
+    game: Game,
     viewModel: GameViewModel,
     onBackIntent: () -> Unit
 ) {
@@ -41,7 +43,11 @@ fun GameScreen(
             contentAlignment = Alignment.Center
         ) {
             when (state) {
-                is GameScreenState.Loading -> Text("Loading Game...")
+                is GameScreenState.Loading -> WaitingView(
+                    game = game,
+                    isHost = true,
+                    onStart = { viewModel.startGame(game) }
+                )
                 is GameScreenState.SettingAnte -> SetAnteView(
                     isMyTurn = state.isMyTurn,
                     onConfirm = { viewModel.submitAnte(it) }

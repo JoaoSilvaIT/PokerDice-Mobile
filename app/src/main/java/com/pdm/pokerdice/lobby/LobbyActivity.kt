@@ -13,6 +13,7 @@ import com.pdm.pokerdice.DependenciesContainer
 import com.pdm.pokerdice.domain.lobby.Lobby
 import com.pdm.pokerdice.domain.lobby.LobbySettings
 import com.pdm.pokerdice.domain.user.UserExternalInfo
+import com.pdm.pokerdice.game.GameActivity
 import com.pdm.pokerdice.ui.theme.PokerDiceTheme
 import com.pdm.pokerdice.ui.title.TitleActivity
 
@@ -54,6 +55,7 @@ class LobbyActivity : ComponentActivity() {
     private val viewModel: LobbyViewModel by viewModels {
         LobbyViewModel.getFactory(
             service = (application as DependenciesContainer).lobbyService,
+            gameService = (application as DependenciesContainer).gameService,
             repo = (application as DependenciesContainer).authInfoRepo
         )
     }
@@ -61,6 +63,9 @@ class LobbyActivity : ComponentActivity() {
     private fun handleNavigation(it: LobbyNavigation) {
         val intent = when (it) {
             LobbyNavigation.TitleScreen -> Intent(this, TitleActivity::class.java)
+            is LobbyNavigation.CreateGame -> Intent(this, GameActivity::class.java).apply {
+                putExtra("game", it.game)
+            }
         }
         startActivity(intent)
     }
