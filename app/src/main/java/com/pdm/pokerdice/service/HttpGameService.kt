@@ -17,6 +17,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import com.pdm.pokerdice.repository.http.model.DiceUpdateInputDto
 import com.pdm.pokerdice.repository.http.model.GameDto
+import com.pdm.pokerdice.repository.http.model.RolledDiceOutputDto
 import com.pdm.pokerdice.repository.http.model.SetAnteInputDto
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
@@ -105,13 +106,18 @@ class HttpGameService(
         }
     }
 
-    override suspend fun rollDice(gameId: Int): Either<GameError, Unit> {
+    override suspend fun rollDice(gameId: Int): Either<GameError, List<String>> {
         return try {
             val token = getToken() ?: return failure(GameError.NetworkError("Not logged in"))
-            client.post("api/games/$gameId/rounds/roll-dices") {
+            val response = client.post("api/games/$gameId/rounds/roll-dices") {
                 header("Authorization", "Bearer $token")
             }
-            success(Unit)
+            if (response.status == HttpStatusCode.OK) {
+                val dto = response.body<RolledDiceOutputDto>()
+                success(dto.dice)
+            } else {
+                failure(GameError.NetworkError("Failed to roll dice: ${response.status}"))
+            }
         } catch (e: Exception) {
             failure(GameError.NetworkError(e.message ?: "Unknown"))
         }
@@ -120,11 +126,42 @@ class HttpGameService(
     override suspend fun setAnte(gameId: Int, ante: Int): Either<GameError, Unit> {
         return try {
             val token = getToken() ?: return failure(GameError.NetworkError("Not logged in"))
-            client.post("api/games/$gameId/rounds/ante") {
+            val response = client.post("api/games/$gameId/rounds/ante") {
                 header("Authorization", "Bearer $token")
                 setBody(SetAnteInputDto(ante))
             }
-            success(Unit)
+            if (response.status == HttpStatusCode.OK || response.status == HttpStatusCode.Created) {
+                success(Unit)
+            } else {
+                failure(GameError.NetworkError("Failed to set ante: ${response.status}"))
+            }
+        } catch (e: Exception) {
+            failure(GameError.NetworkError(e.message ?: "Unknown"))
+        }
+    }
+
+    override suspend fun payAnte(gameId: Int): Either<GameError, Unit> {
+        return try {
+            val token = getToken() ?: return failure(GameError.NetworkError("Not logged in"))
+            val response = client.post("api/games/$gameId/rounds/pay-ante") {
+                header("Authorization", "Bearer $token")
+            }
+            if (response.status == HttpStatusCode.OK) success(Unit)
+            else failure(GameError.NetworkError("Failed to pay ante: ${response.status}"))
+        } catch (e: Exception) {
+            failure(GameError.NetworkError(e.message ?: "Unknown"))
+        }
+    }
+
+    override suspend fun startNewRound(gameId: Int, ante: Int?): Either<GameError, Unit> {
+        return try {
+            val token = getToken() ?: return failure(GameError.NetworkError("Not logged in"))
+            val response = client.post("api/games/$gameId/rounds/start") {
+                header("Authorization", "Bearer $token")
+                setBody(SetAnteInputDto(ante))
+            }
+            if (response.status == HttpStatusCode.Created || response.status == HttpStatusCode.OK) success(Unit)
+            else failure(GameError.NetworkError("Failed to start round: ${response.status}"))
         } catch (e: Exception) {
             failure(GameError.NetworkError(e.message ?: "Unknown"))
         }
@@ -133,11 +170,12 @@ class HttpGameService(
     override suspend fun nextTurn(gameId: Int, nextRoundAnte: Int?): Either<GameError, Unit> {
         return try {
             val token = getToken() ?: return failure(GameError.NetworkError("Not logged in"))
-            client.post("api/games/$gameId/rounds/next-turn") {
+            val response = client.post("api/games/$gameId/rounds/next-turn") {
                 header("Authorization", "Bearer $token")
                 setBody(SetAnteInputDto(nextRoundAnte))
             }
-            success(Unit)
+            if (response.status == HttpStatusCode.OK) success(Unit)
+            else failure(GameError.NetworkError("Failed to next turn: ${response.status}"))
         } catch (e: Exception) {
             failure(GameError.NetworkError(e.message ?: "Unknown"))
         }
@@ -146,11 +184,16 @@ class HttpGameService(
     override suspend fun updateTurn(gameId: Int, diceChars: List<String>): Either<GameError, Unit> {
         return try {
             val token = getToken() ?: return failure(GameError.NetworkError("Not logged in"))
-            client.post("api/games/$gameId/rounds/update-turn") {
-                header("Authorization", "Bearer $token")
-                setBody(DiceUpdateInputDto(diceChars))
+            // Backend expects single chars. Map "TEN" to "T".
+            val normalizedChars = diceChars.map { 
+                if (it.equals("TEN", ignoreCase = true)) "T" else it.take(1).uppercase()
             }
-            success(Unit)
+            val response = client.post("api/games/$gameId/rounds/update-turn") {
+                header("Authorization", "Bearer $token")
+                setBody(DiceUpdateInputDto(normalizedChars))
+            }
+            if (response.status == HttpStatusCode.OK) success(Unit)
+            else failure(GameError.NetworkError("Failed to update turn: ${response.status}"))
         } catch (e: Exception) {
             failure(GameError.NetworkError(e.message ?: "Unknown"))
         }

@@ -32,7 +32,6 @@ import androidx.compose.ui.unit.sp
 import com.pdm.pokerdice.domain.game.Dice
 import com.pdm.pokerdice.domain.game.utilis.Face
 import com.pdm.pokerdice.domain.game.utilis.HandRank
-import com.pdm.pokerdice.game.GameScreenState
 import kotlinx.coroutines.delay
 
 @Composable
@@ -44,16 +43,18 @@ fun formatHandRank(rank: HandRank): String {
 fun PlayingView(
     state: GameScreenState.Playing,
     onRollClick: () -> Unit,
+    onHoldClick: () -> Unit,
     onDieClick: (Int) -> Unit,
     onEndTurnClick: () -> Unit
 ) {
-    // Determine Me vs Opponent (Fake data logic: Me=1)
-    val myId = 1
+    // Determine Me vs Opponent
+    val myId = state.myUserId
     val me = state.game.players.find { it.id == myId }
     val opponent = state.game.players.find { it.id != myId }
     
     val myBalance = me?.currentBalance ?: 0
     val opponentBalance = opponent?.currentBalance ?: 0
+    val opponentName = opponent?.name ?: "Opponent"
 
     Column(
         modifier = Modifier
@@ -64,12 +65,13 @@ fun PlayingView(
     ) {
         // Top: Opponent Info
         OpponentSection(
+            name = opponentName,
             balance = opponentBalance,
             dice = state.opponentDice,
-            handRank = state.opponentHandRank // Added to show opponent's strength
+            handRank = state.opponentHandRank
         )
 
-        // Middle Info: Round & Pot & Dice Area
+        // Middle Info
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(16.dp)
@@ -86,49 +88,222 @@ fun PlayingView(
                 Text("Rolls Left: ${3 - state.currentRollCount}")
             }
 
-            // Dice Row
-            val currentDice = state.game.currentRound?.turn?.currentDice ?: emptyList()
+            // Dice Row Logic
+            val lockedDice = state.game.currentRound?.turn?.currentDice ?: emptyList()
+            val rolledDice = state.rolledDice
             
-            // Logic to show dice
-            if (state.currentRollCount > 0 || state.isRolling) {
-                val displayDice = if (currentDice.isEmpty()) List(5) { Dice(Face.ACE) } else currentDice
+            // If we have no dice (start of game), show placeholders if it's our turn to roll?
+            // Or just empty slots.
+            val displayDice = if (lockedDice.isEmpty() && rolledDice.isEmpty() && state.currentRollCount == 0) {
+                 List(5) { Dice(Face.ACE) } // Initial state
+            } else {
+                 lockedDice + rolledDice
+            }
+            
+            // Check if valid to show dice
+            if (state.currentRollCount > 0 || state.isRolling || lockedDice.isNotEmpty()) {
+                if (state.isMyTurn && !state.isRolling) {
+                    Text(
+                        text = "Tap white dice to select",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.secondary,
+                        modifier = Modifier.padding(bottom = 4.dp)
+                    )
+                }
 
                 DiceRow(
                     dice = displayDice,
+                    lockedCount = lockedDice.size,
                     heldIndexes = state.heldDiceIndexes,
-                    lockedIndexes = state.lockedDiceIndexes,
-                    isMyTurn = state.isMyTurn && !state.isRolling,
+                    isMyTurn = state.isMyTurn,
                     isRolling = state.isRolling,
                     onDieClick = onDieClick
                 )
                 
-                // Show player's current rank
-                if (state.currentRollCount > 0 && !state.isRolling) {
-                    state.currentHandRank?.let { rank ->
-                        Text(
-                            text = "Current Hand: ${formatHandRank(rank)}",
-                            style = MaterialTheme.typography.titleMedium,
-                            color = MaterialTheme.colorScheme.primary,
-                            fontWeight = FontWeight.Bold,
-                            modifier = Modifier.padding(top = 8.dp)
-                        )
-                    }
+            // ... (Dice Row Logic) ...
+                // Rank
+                state.currentHandRank?.let { rank ->
+                    Text(
+                        text = "Current Hand: ${formatHandRank(rank)}",
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.primary,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(top = 8.dp)
+                    )
                 }
             } else {
-                // Initial state: show empty slots
-                EmptyDiceRow()
+                 EmptyDiceRow()
             }
         }
 
         // Bottom: Controls
+        val lockedCount = state.game.currentRound?.turn?.currentDice?.size ?: 0
+        val heldCount = state.heldDiceIndexes.size
+        // Valid if Total Committed (Locked + Held) is 5.
+        // Or if we have finished rolling (rollsCount == 0)? No, user said "not possible to finish turn if not have 5 dice held".
+        // This implies strict 5 dice rule.
+        val canEndTurn = (lockedCount + heldCount) == 5
+
         GameControls(
             isMyTurn = state.isMyTurn,
             isRolling = state.isRolling,
             rollsCount = state.currentRollCount,
-            isAllHeld = state.heldDiceIndexes.size == 5,
+            hasHeldDice = state.heldDiceIndexes.isNotEmpty(),
+            canEndTurn = canEndTurn,
             onRollClick = onRollClick,
+            onHoldClick = onHoldClick,
             onEndTurnClick = onEndTurnClick
         )
+    }
+}
+
+@Composable
+fun DiceRow(
+    dice: List<Dice>,
+    lockedCount: Int,
+    heldIndexes: Set<Int>, // Indexes relative to the ROLLED portion
+    isMyTurn: Boolean,
+    isRolling: Boolean,
+    onDieClick: (Int) -> Unit
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceEvenly
+    ) {
+        dice.forEachIndexed { index, die ->
+            val isLocked = index < lockedCount
+            val rolledIndex = index - lockedCount
+            
+            // It is held if it's NOT locked AND the adjusted index is in held set
+            val isHeld = !isLocked && heldIndexes.contains(rolledIndex)
+            
+            // It spins if we are rolling AND it's not held AND not locked
+            // (Locked dice don't spin. Held dice don't spin.)
+            val isSpinning = isRolling && !isLocked && !isHeld
+            
+            DieView(
+                face = die.face,
+                isHeld = isHeld,
+                isLocked = isLocked,
+                isRolling = isSpinning, 
+                isClickable = isMyTurn && !isLocked, 
+                onClick = { 
+                    if (!isLocked) {
+                        onDieClick(rolledIndex)
+                    }
+                }
+            )
+        }
+    }
+}
+
+@Composable
+fun DieView(
+    face: Face,
+    isHeld: Boolean,
+    isLocked: Boolean,
+    isRolling: Boolean,
+    isClickable: Boolean,
+    onClick: () -> Unit
+) {
+    // Animation Logic
+    var animatedFace by remember { mutableStateOf(face) }
+
+    LaunchedEffect(isRolling) {
+        if (isRolling) {
+            while (true) {
+                animatedFace = Face.values().random()
+                delay(75) 
+            }
+        }
+    }
+
+    val faceDisplay = if (isRolling) animatedFace else face
+    
+    val bgColor = when {
+        isLocked -> Color.DarkGray
+        isHeld -> Color.Gray
+        else -> Color.White
+    }
+
+    Box(
+        modifier = Modifier
+            .size(60.dp)
+            .background(
+                color = bgColor,
+                shape = RoundedCornerShape(8.dp)
+            )
+            .border(
+                width = 2.dp,
+                color = Color.Black,
+                shape = RoundedCornerShape(8.dp)
+            )
+            .clickable(enabled = isClickable, onClick = onClick),
+        contentAlignment = Alignment.Center
+    ) {
+        val text = when (faceDisplay) {
+            Face.ACE -> "A"
+            Face.KING -> "K"
+            Face.QUEEN -> "Q"
+            Face.JACK -> "J"
+            Face.TEN -> "10"
+            Face.NINE -> "9"
+        }
+        Text(
+            text = text,
+            fontSize = 24.sp,
+            fontWeight = FontWeight.Bold,
+            color = if (isLocked || isHeld) Color.White else Color.Black
+        )
+    }
+}
+
+@Composable
+fun GameControls(
+    isMyTurn: Boolean,
+    isRolling: Boolean,
+    rollsCount: Int,
+    hasHeldDice: Boolean,
+    canEndTurn: Boolean,
+    onRollClick: () -> Unit,
+    onHoldClick: () -> Unit,
+    onEndTurnClick: () -> Unit
+) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        if (isMyTurn) {
+            Row(
+                modifier = Modifier.fillMaxWidth(0.9f),
+                horizontalArrangement = Arrangement.SpaceEvenly
+            ) {
+                Button(
+                    onClick = onHoldClick,
+                    enabled = hasHeldDice && !isRolling,
+                    modifier = Modifier.weight(1f).padding(end = 4.dp)
+                ) {
+                    Text("Hold Selected")
+                }
+                
+                Button(
+                    onClick = onRollClick,
+                    enabled = rollsCount < 3 && !isRolling,
+                    modifier = Modifier.weight(1f).padding(start = 4.dp)
+                ) {
+                    Text(if (isRolling) "Rolling..." else "Roll")
+                }
+            }
+            
+            Spacer(modifier = Modifier.height(8.dp))
+            
+            Button(
+                onClick = onEndTurnClick,
+                enabled = canEndTurn && !isRolling,
+                modifier = Modifier.fillMaxWidth(0.9f)
+            ) {
+                Text("End Turn / Show Hand")
+            }
+        } else {
+            Text("Waiting for opponent...")
+        }
     }
 }
 
@@ -150,7 +325,7 @@ fun EmptyDiceRow() {
 }
 
 @Composable
-fun OpponentSection(balance: Int, dice: List<Dice> = emptyList(), handRank: HandRank? = null) {
+fun OpponentSection(name: String, balance: Int, dice: List<Dice> = emptyList(), handRank: HandRank? = null) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -162,7 +337,7 @@ fun OpponentSection(balance: Int, dice: List<Dice> = emptyList(), handRank: Hand
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Text("Opponent", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold)
+            Text(name, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold)
             Text("Balance: $balance", style = MaterialTheme.typography.bodyMedium)
         }
         
@@ -236,130 +411,6 @@ fun GameHeader(state: GameScreenState.Playing, myBalance: Int) {
         ) {
             Text("Round: ${state.game.currentRound?.number ?: 1}")
             Text("Pot: ${state.game.currentRound?.pot ?: 0}", fontWeight = FontWeight.Bold)
-        }
-    }
-}
-
-@Composable
-fun DiceRow(
-    dice: List<Dice>,
-    heldIndexes: Set<Int>,
-    lockedIndexes: Set<Int>,
-    isMyTurn: Boolean,
-    isRolling: Boolean,
-    onDieClick: (Int) -> Unit
-) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceEvenly
-    ) {
-        dice.forEachIndexed { index, die ->
-            val isHeld = heldIndexes.contains(index)
-            val isLocked = lockedIndexes.contains(index)
-            
-            DieView(
-                face = die.face,
-                isHeld = isHeld,
-                isLocked = isLocked,
-                isRolling = isRolling && !isHeld, 
-                isClickable = isMyTurn && !isLocked, 
-                onClick = { onDieClick(index) }
-            )
-        }
-    }
-}
-
-@Composable
-fun DieView(
-    face: Face,
-    isHeld: Boolean,
-    isLocked: Boolean,
-    isRolling: Boolean,
-    isClickable: Boolean,
-    onClick: () -> Unit
-) {
-    // Animation Logic
-    var animatedFace by remember { mutableStateOf(face) }
-
-    LaunchedEffect(isRolling) {
-        if (isRolling) {
-            while (true) {
-                animatedFace = Face.values().random()
-                delay(75) 
-            }
-        }
-    }
-
-    val faceDisplay = if (isRolling) animatedFace else face
-    
-    val bgColor = when {
-        isLocked -> Color.DarkGray
-        isHeld -> Color.Gray
-        else -> Color.White
-    }
-
-    Box(
-        modifier = Modifier
-            .size(60.dp)
-            .background(
-                color = bgColor,
-                shape = RoundedCornerShape(8.dp)
-            )
-            .border(
-                width = 2.dp,
-                color = Color.Black,
-                shape = RoundedCornerShape(8.dp)
-            )
-            .clickable(enabled = isClickable, onClick = onClick),
-        contentAlignment = Alignment.Center
-    ) {
-        val text = when (faceDisplay) {
-            Face.ACE -> "A"
-            Face.KING -> "K"
-            Face.QUEEN -> "Q"
-            Face.JACK -> "J"
-            Face.TEN -> "10"
-            Face.NINE -> "9"
-        }
-        Text(
-            text = text,
-            fontSize = 24.sp,
-            fontWeight = FontWeight.Bold,
-            color = if (isLocked || isHeld) Color.White else Color.Black
-        )
-    }
-}
-
-@Composable
-fun GameControls(
-    isMyTurn: Boolean,
-    isRolling: Boolean,
-    rollsCount: Int,
-    isAllHeld: Boolean,
-    onRollClick: () -> Unit,
-    onEndTurnClick: () -> Unit
-) {
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        if (isMyTurn) {
-            Button(
-                onClick = onRollClick,
-                enabled = rollsCount < 3 && !isRolling && !isAllHeld,
-                modifier = Modifier.fillMaxWidth(0.8f)
-            ) {
-                Text(if (isRolling) "Rolling..." else if (rollsCount == 0) "Roll Dice" else "Re-Roll Selected")
-            }
-            
-            Spacer(modifier = Modifier.height(8.dp))
-            
-            Button(
-                onClick = onEndTurnClick,
-                enabled = isAllHeld && !isRolling,
-                modifier = Modifier.fillMaxWidth(0.8f)
-            ) {
-                Text("End Turn / Show Hand")
-            }
-        } else {
-            Text("Waiting for opponent...")
         }
     }
 }

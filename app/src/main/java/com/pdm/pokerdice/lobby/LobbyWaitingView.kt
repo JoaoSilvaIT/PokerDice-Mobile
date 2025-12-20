@@ -59,18 +59,32 @@ fun LobbyWaitingView(
             }
         }
 
-        // Only Host can start match (logic can be here or enabled/disabled)
+        // Only Host can start match
         val isHost = currentUser.id == host.id
+        val canStart = lobby.players.size >= 2
         
         if (isHost) {
             Button(
                 onClick = onStartGame,
+                enabled = canStart,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(top = 16.dp),
                 shape = MaterialTheme.shapes.medium
             ) {
-                Text("Start Match")
+                val text = if (canStart) "Start Match" else "Wait for Players"
+                Text(text)
+            }
+            
+            if (!canStart) {
+                Text(
+                    text = "You need at least 2 players to start a match",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.error,
+                    modifier = Modifier
+                        .padding(top = 4.dp)
+                        .align(Alignment.CenterHorizontally)
+                )
             }
         } else {
             Text(

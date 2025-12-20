@@ -25,6 +25,7 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun SetAnteView(
+    isMyTurn: Boolean,
     onConfirm: (Int) -> Unit
 ) {
     var anteAmount by remember { mutableStateOf("10") }
@@ -37,51 +38,64 @@ fun SetAnteView(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Text(
-            text = "Start Round",
-            style = MaterialTheme.typography.headlineLarge,
-            color = MaterialTheme.colorScheme.primary
-        )
-        
-        Text(
-            text = "You are the first player.\nPlease set the Ante (Bet) for this round.",
-            style = MaterialTheme.typography.bodyMedium,
-            modifier = Modifier.padding(vertical = 16.dp)
-        )
+        if (!isMyTurn) {
+            Text(
+                text = "Waiting for Opponent",
+                style = MaterialTheme.typography.headlineLarge,
+                color = MaterialTheme.colorScheme.primary
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(
+                text = "The first player is setting the Ante...",
+                style = MaterialTheme.typography.bodyLarge
+            )
+        } else {
+            Text(
+                text = "Start Round",
+                style = MaterialTheme.typography.headlineLarge,
+                color = MaterialTheme.colorScheme.primary
+            )
+            
+            Text(
+                text = "You are the first player.\nPlease set the Ante (Bet) for this round.",
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier.padding(vertical = 16.dp)
+            )
 
-        OutlinedTextField(
-            value = anteAmount,
-            onValueChange = { 
-                if (it.all { char -> char.isDigit() }) {
-                    anteAmount = it 
-                    error = ""
-                }
-            },
-            label = { Text("Ante Amount") },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-            isError = error.isNotEmpty(),
-            singleLine = true,
-            modifier = Modifier.fillMaxWidth()
-        )
-        
-        if (error.isNotEmpty()) {
-            Text(text = error, color = MaterialTheme.colorScheme.error)
-        }
+            OutlinedTextField(
+                value = anteAmount,
+                onValueChange = { 
+                    if (it.all { char -> char.isDigit() }) {
+                        anteAmount = it 
+                        error = ""
+                    }
+                },
+                label = { Text("Ante Amount") },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                isError = error.isNotEmpty(),
+                singleLine = true,
+                modifier = Modifier.fillMaxWidth()
+            )
+            
+            if (error.isNotEmpty()) {
+                Text(text = error, color = MaterialTheme.colorScheme.error)
+            }
 
-        Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(24.dp))
 
-        Button(
-            onClick = {
-                val amount = anteAmount.toIntOrNull()
-                if (amount != null && amount > 0) {
-                    onConfirm(amount)
-                } else {
-                    error = "Invalid amount"
-                }
-            },
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text("Confirm Ante")
+            Button(
+                onClick = {
+                    val amount = anteAmount.toIntOrNull()
+                    if (amount != null && amount > 0) {
+                        onConfirm(amount)
+                    } else {
+                        error = "Invalid amount"
+                    }
+                },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Confirm Ante")
+            }
         }
     }
 }

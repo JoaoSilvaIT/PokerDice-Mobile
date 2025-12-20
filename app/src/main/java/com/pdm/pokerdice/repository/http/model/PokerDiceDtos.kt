@@ -96,9 +96,20 @@ data class GameRoundDto(
         // Map dice strings to Dice domain
         val diceList = (currentDice ?: emptyList()).filterNotNull().map { diceStr -> 
             try {
+                // Try to parse by Face name first (e.g. "ACE")
                 Dice(Face.valueOf(diceStr.uppercase()))
             } catch (e: Exception) {
-                Dice(Face.ACE) // Fallback
+                // Try single char mapping
+                val face = when(diceStr.uppercase().firstOrNull()) {
+                    'A' -> Face.ACE
+                    'K' -> Face.KING
+                    'Q' -> Face.QUEEN
+                    'J' -> Face.JACK
+                    'T' -> Face.TEN
+                    '9' -> Face.NINE
+                    else -> Face.ACE // Ultimate Fallback
+                }
+                Dice(face)
             }
         }
 
@@ -137,7 +148,7 @@ data class PlayerInGameDto(
     val moneyWon: Int,
     val handRank: String?
 ) {
-    fun toDomain() = PlayerInGame(id, name ?: "Unknown", currentBalance, moneyWon)
+    fun toDomain() = PlayerInGame(id, name ?: "Unknown", currentBalance, moneyWon, handRank)
     
     fun toDomainUser() = User(id, name ?: "Unknown", "", "", currentBalance, UserStatistics(0,0,0,0.0))
 }
@@ -188,3 +199,7 @@ data class UserStatisticsDto(
 ) {
     fun toDomain() = UserStatistics(gamesPlayed, wins, losses, winRate)
 }
+
+data class RolledDiceOutputDto(
+    val dice: List<String>
+)

@@ -16,7 +16,7 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun RoundEndedView(
-    state: GameScreenState.RoundEnded,
+    state: GameScreenState.RoundEndedStub,
     onNextRoundClick: () -> Unit
 ) {
     Column(
@@ -31,28 +31,6 @@ fun RoundEndedView(
             style = MaterialTheme.typography.headlineLarge,
             color = MaterialTheme.colorScheme.primary
         )
-
-        Column(
-            modifier = Modifier
-                .padding(vertical = 32.dp)
-                .fillMaxWidth(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            Text(
-                text = "Winner",
-                style = MaterialTheme.typography.labelLarge
-            )
-            Text(
-                text = state.winnerName,
-                style = MaterialTheme.typography.displayMedium,
-                fontWeight = FontWeight.Bold
-            )
-            Text(
-                text = "Winning Hand: ${state.winningHand}",
-                style = MaterialTheme.typography.bodyLarge
-            )
-        }
 
         Button(
             onClick = onNextRoundClick,

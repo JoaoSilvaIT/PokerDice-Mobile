@@ -24,19 +24,20 @@ import kotlinx.coroutines.launch
  */
 sealed class GameScreenState {
     object Loading : GameScreenState()
-    data class SettingAnte(val game: Game) : GameScreenState()
+    data class SettingAnte(val game: Game, val isMyTurn: Boolean) : GameScreenState()
     data class Playing(
         val game: Game,
+        val myUserId: Int,
         val isMyTurn: Boolean,
         val currentRollCount: Int,
-        val heldDiceIndexes: Set<Int>,
-        val lockedDiceIndexes: Set<Int> = emptySet(),
+        val heldDiceIndexes: Set<Int>, // Indices into rolledDice
+        val rolledDice: List<Dice> = emptyList(), // Ephemeral dice from last roll
         val currentHandRank: HandRank? = null,
         val isRolling: Boolean = false,
         val opponentDice: List<Dice> = emptyList(),
         val opponentHandRank: HandRank? = null
     ) : GameScreenState()
-    data class RoundEnded(val winnerName: String, val winningHand: String) : GameScreenState()
+    object RoundEndedStub : GameScreenState() // Keep for type compatibility if needed
     data class MatchEnded(val winnerName: String, val finalScore: Int) : GameScreenState()
     data class Error(val message: String) : GameScreenState()
 }
@@ -49,9 +50,14 @@ class GameViewModel(
     var screenState by mutableStateOf<GameScreenState>(GameScreenState.Loading)
         private set
 
+    var lastWinnerNotification by mutableStateOf<String?>(null)
+        private set
+
     private var currentGame: Game? = null
     private var myUserId: Int = -1
     private var monitoringJob: Job? = null
+    private var isTransactionInProgress = false
+    private var lastObservedRoundNumber = 0
 
     fun initialize(gameId: Int) {
         viewModelScope.launch {
@@ -71,7 +77,10 @@ class GameViewModel(
         monitoringJob = viewModelScope.launch {
             service.monitorGame(gameId)
             service.currentGame.collect { game ->
-                if (game != null) {
+                if (game != null && !isTransactionInProgress) {
+                    // Detect winner of previous round before updating currentGame
+                    detectRoundWinner(game)
+                    
                     currentGame = game
                     updateScreenState(game)
                 }
@@ -79,54 +88,80 @@ class GameViewModel(
         }
     }
 
+    private fun detectRoundWinner(newGame: Game) {
+        val newRound = newGame.currentRound ?: return
+        val currentRoundNum = newRound.number
+        
+        if (currentRoundNum > lastObservedRoundNumber && lastObservedRoundNumber > 0) {
+            val previousPlayers = currentGame?.players ?: emptyList()
+            val winners = newGame.players.filter { p ->
+                val prev = previousPlayers.find { it.id == p.id }
+                p.moneyWon > (prev?.moneyWon ?: 0)
+            }
+            
+            if (winners.isNotEmpty()) {
+                lastWinnerNotification = "Round $lastObservedRoundNumber Winner: ${winners.joinToString { it.name }}"
+                viewModelScope.launch {
+                    delay(5000)
+                    lastWinnerNotification = null
+                }
+            }
+        }
+        lastObservedRoundNumber = currentRoundNum
+    }
+
     private fun updateScreenState(game: Game) {
         if (game.state == State.FINISHED) {
-             // Calculate match winner
-             val winner = game.players.maxByOrNull { it.currentBalance }
+             val winner = game.players.maxByOrNull { it.moneyWon }
              screenState = GameScreenState.MatchEnded(
                  winnerName = winner?.name ?: "Draw",
-                 finalScore = winner?.currentBalance ?: 0
+                 finalScore = winner?.moneyWon ?: 0
              )
              return
         }
 
-        val round = game.currentRound ?: return
-        
-        // Check if round ended (winners list is not empty)
-        if (round.winners.isNotEmpty()) {
-            val winner = round.winners.first() // Simplified for single winner
-            screenState = GameScreenState.RoundEnded(
-                winnerName = winner.name,
-                winningHand = "Hand Value: ${round.winners.firstOrNull()?.currentBalance}" // TODO: API should return hand name
-            )
+        val round = game.currentRound ?: run {
+            screenState = GameScreenState.Loading
             return
         }
+        
+        // Removed explicit RoundEnded state check as backend auto-advances
 
         // Logic for Ante vs Playing
-        // If ante is 0, we are in SettingAnte state (assuming backend logic: ante 0 means waiting for ante)
-        // OR if API has explicit state. Here we assume if ante == 0, we need to set it.
         if (round.ante == 0) {
-             screenState = GameScreenState.SettingAnte(game)
+             val isMyTurn = round.turn.player.id == myUserId
+             screenState = GameScreenState.SettingAnte(game, isMyTurn)
              return
         }
 
         // Playing State
         val isMyTurn = round.turn.player.id == myUserId
         
-        // Preserve local UI state (held dice) if we are already playing
+        // Reset held dice if it's no longer my turn or a new round/turn started
         val currentPlayingState = screenState as? GameScreenState.Playing
-        val heldDice = if (isMyTurn) currentPlayingState?.heldDiceIndexes ?: emptySet() else emptySet()
+        val lastTurnPlayerId = currentPlayingState?.game?.currentRound?.turn?.player?.id
         
-        // Calculate hand rank locally for display
-        val currentDice = round.turn.currentDice
-        val rank = if (currentDice.isNotEmpty()) calculatePartialRank(currentDice) else null
+        val sameTurn = currentPlayingState != null && 
+                       lastTurnPlayerId == round.turn.player.id &&
+                       currentPlayingState.game.currentRound?.number == round.number
+        
+        val rolledDice = if (sameTurn) currentPlayingState!!.rolledDice else emptyList()
+        val heldDice = if (sameTurn) currentPlayingState!!.heldDiceIndexes else emptySet()
+        
+        val lockedDice = round.turn.currentDice
+        // Calculate Rank: Locked Dice + Held Ephemeral Dice ONLY
+        val activeDice = heldDice.mapNotNull { if (it < rolledDice.size) rolledDice[it] else null }
+        
+        val totalHandForRank = lockedDice + activeDice
+        val rank = if (totalHandForRank.isNotEmpty()) calculatePartialRank(totalHandForRank) else null
 
         screenState = GameScreenState.Playing(
             game = game,
+            myUserId = myUserId,
             isMyTurn = isMyTurn,
-            currentRollCount = 3 - round.turn.rollsRemaining, // API returns rolls left
+            currentRollCount = 3 - round.turn.rollsRemaining,
             heldDiceIndexes = heldDice,
-            lockedDiceIndexes = emptySet(), // Logic for locking could be complex, simplifying for now
+            rolledDice = rolledDice,
             currentHandRank = rank,
             isRolling = false
         )
@@ -135,43 +170,121 @@ class GameViewModel(
     fun submitAnte(amount: Int) {
         val game = currentGame ?: return
         viewModelScope.launch {
-            service.setAnte(game.id, amount)
-            // State update will come via monitoring
+            val result = service.setAnte(game.id, amount)
+            if (result is Either.Success) {
+                service.payAnte(game.id)
+            }
+        }
+    }
+
+    private fun faceToCharString(face: com.pdm.pokerdice.domain.game.utilis.Face): String {
+        return when (face) {
+            com.pdm.pokerdice.domain.game.utilis.Face.ACE -> "A"
+            com.pdm.pokerdice.domain.game.utilis.Face.KING -> "K"
+            com.pdm.pokerdice.domain.game.utilis.Face.QUEEN -> "Q"
+            com.pdm.pokerdice.domain.game.utilis.Face.JACK -> "J"
+            com.pdm.pokerdice.domain.game.utilis.Face.TEN -> "T"
+            com.pdm.pokerdice.domain.game.utilis.Face.NINE -> "9"
+        }
+    }
+
+    private fun parseFace(faceStr: String): com.pdm.pokerdice.domain.game.utilis.Face {
+        return when (faceStr.uppercase()) {
+            "A", "ACE" -> com.pdm.pokerdice.domain.game.utilis.Face.ACE
+            "K", "KING" -> com.pdm.pokerdice.domain.game.utilis.Face.KING
+            "Q", "QUEEN" -> com.pdm.pokerdice.domain.game.utilis.Face.QUEEN
+            "J", "JACK" -> com.pdm.pokerdice.domain.game.utilis.Face.JACK
+            "T", "TEN" -> com.pdm.pokerdice.domain.game.utilis.Face.TEN
+            "9", "NINE" -> com.pdm.pokerdice.domain.game.utilis.Face.NINE
+            else -> com.pdm.pokerdice.domain.game.utilis.Face.ACE // Fallback
+        }
+    }
+
+    fun holdDice() {
+        val game = currentGame ?: return
+        val state = screenState as? GameScreenState.Playing ?: return
+        if (!state.isMyTurn || state.heldDiceIndexes.isEmpty()) return
+
+        viewModelScope.launch {
+            isTransactionInProgress = true
+            
+            // 1. Get Selected Dice
+            val heldIndices = state.heldDiceIndexes
+            val heldDiceList = state.rolledDice.filterIndexed { index, _ -> index in heldIndices }
+            val heldFacesStr = heldDiceList.map { faceToCharString(it.face) }
+            
+            // 2. Send to Backend
+            val result = service.updateTurn(game.id, heldFacesStr)
+            
+            if (result is Either.Success) {
+                // 3. Update Local Game State (Lock the dice)
+                val currentRound = game.currentRound!!
+                val newLocked = currentRound.turn.currentDice + heldDiceList
+                val newTurn = currentRound.turn.copy(currentDice = newLocked)
+                val newRound = currentRound.copy(turn = newTurn)
+                val newGame = game.copy(currentRound = newRound)
+                
+                currentGame = newGame
+                
+                // 4. Update Ephemeral State (Remove locked from rolled, clear selection)
+                val remainingRolled = state.rolledDice.filterIndexed { index, _ -> index !in heldIndices }
+                
+                // 5. Apply State Update
+                // We manually update to ensure instant transition without waiting for poll
+                screenState = state.copy(
+                    game = newGame,
+                    rolledDice = remainingRolled,
+                    heldDiceIndexes = emptySet()
+                )
+            }
+            isTransactionInProgress = false
         }
     }
 
     fun rollDice() {
         val game = currentGame ?: return
+        val state = screenState as? GameScreenState.Playing ?: return
+        if (!state.isMyTurn) return
+
         viewModelScope.launch {
-            // Optimistic UI update could be added here
-            service.rollDice(game.id)
+            isTransactionInProgress = true
+            screenState = state.copy(isRolling = true)
+            
+            // Just Roll. heldDiceIndexes are ignored (must hold explicitly first).
+            val result = service.rollDice(game.id)
+            
+            delay(500)
+            
+            if (result is Either.Success) {
+                 val newDice = result.value.map { faceStr ->
+                     Dice(parseFace(faceStr))
+                 }
+                 
+                 // Manually decrement rolls in local state for instant update
+                 val currentRound = game.currentRound!!
+                 val newTurn = currentRound.turn.copy(rollsRemaining = currentRound.turn.rollsRemaining - 1)
+                 val newRound = currentRound.copy(turn = newTurn)
+                 val newGame = game.copy(currentRound = newRound)
+                 currentGame = newGame
+
+                 val newState = screenState as? GameScreenState.Playing
+                 if (newState != null) {
+                     screenState = newState.copy(
+                         game = newGame,
+                         rolledDice = newDice, 
+                         currentRollCount = 3 - newTurn.rollsRemaining,
+                         isRolling = false
+                     )
+                 }
+            } else {
+                 val newState = screenState as? GameScreenState.Playing
+                 if (newState != null) {
+                     screenState = newState.copy(isRolling = false)
+                 }
+            }
+            isTransactionInProgress = false
         }
     }
-    
-    // Not explicitly used with API logic yet as API handles holding via dice updates?
-    // Actually, updateTurn sends dice chars. We might need a separate "Hold" logic 
-    // or just send the full dice state. 
-    // Looking at HttpGameService: updateTurn(diceChars). 
-    // So we probably hold dice locally, then roll sends the command?
-    // Wait, rollDice() is a simple trigger. 
-    // Typically: Roll -> Backend generates dice -> Returns new state.
-    // If we want to hold dice, we might need to tell backend WHICH dice to keep?
-    // The API `roll-dices` might not take arguments in current Service?
-    // Let's check Service: rollDice(gameId). No args.
-    // So... how do we hold? 
-    // Maybe `updateTurn` is used to SET the dice before rolling? 
-    // Or maybe the API is simple and doesn't support holding specific dice yet?
-    // Assuming for now we just roll.
-    
-    // CORRECTION based on previous files:
-    // `updateTurn` sends `diceChars`.
-    // Maybe we use that to "lock" dice?
-    // For M5, let's assume we just roll for now, or the API needs update. 
-    // Re-reading HttpGameService: `rollDice` is POST .../roll-dices. 
-    // If we want to implement Hold, we probably need to fix API or Service.
-    // For now, I will implement toggleHoldDie purely for UI, 
-    // but the actual roll might re-roll everything if API isn't aware.
-    // However, checking `updateTurn`... maybe we send the dice we keep?
     
     fun toggleHoldDie(index: Int) {
         val currentState = screenState as? GameScreenState.Playing ?: return
@@ -184,28 +297,30 @@ class GameViewModel(
             currentHolds.add(index)
         }
         
-        // We update local state. 
-        // If we need to sync with backend, we might call updateTurn?
         screenState = currentState.copy(heldDiceIndexes = currentHolds)
-        
-        // TODO: If API requires us to send "kept" dice before rolling, do it here or in rollDice.
     }
-    
+
     fun endTurn() {
          val game = currentGame ?: return
+         val state = screenState as? GameScreenState.Playing ?: return
+         
          viewModelScope.launch {
+             // Lock ALL remaining dice
+             val allRolledFaces = state.rolledDice.map { faceToCharString(it.face) }
+             if (allRolledFaces.isNotEmpty()) {
+                 service.updateTurn(game.id, allRolledFaces)
+             }
+             
              service.nextTurn(game.id, null)
+             screenState = state.copy(rolledDice = emptyList(), heldDiceIndexes = emptySet())
          }
     }
+
     
     fun nextRound() {
-        // If Match ended, navigate away?
-        // If Round ended, we probably wait for backend to start next round or we signal "ready"?
-        // Service has `nextTurn`. 
-        // If state is RoundEnded, maybe we call nextTurn to proceed?
         val game = currentGame ?: return
         viewModelScope.launch {
-            service.nextTurn(game.id, 0) // Start next round/turn
+            service.startNewRound(game.id, null)
         }
     }
 
