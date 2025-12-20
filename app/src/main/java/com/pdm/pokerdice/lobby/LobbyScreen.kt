@@ -22,7 +22,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.pdm.pokerdice.domain.game.Game
 import com.pdm.pokerdice.domain.lobby.Lobby
-import com.pdm.pokerdice.domain.user.User
 import com.pdm.pokerdice.domain.user.UserExternalInfo
 
 sealed class LobbyNavigation {
@@ -47,6 +46,9 @@ fun LobbyScreen(
         if (currentLeaveState is LeaveLobbyState.Success) {
             onNavigate(LobbyNavigation.TitleScreen)
         }
+    }
+
+    LaunchedEffect(currentCreateGameState) {
         if (currentCreateGameState is CreateGameState.Success) {
             onNavigate(LobbyNavigation.CreateGame((currentCreateGameState as CreateGameState.Success).game))
         }
