@@ -10,12 +10,12 @@ interface UserAuthService : Service {
         name: String,
         email: String,
         password: String,
-        invite: String
-    ) : Either<AuthTokenError, User>
+        invite: String,
+    ): Either<AuthTokenError, User>
 
     suspend fun createToken(
         email: String,
-        password: String
+        password: String,
     ): Either<AuthTokenError, TokenExternalInfo>
 
     suspend fun getUserByToken(token: String): Either<AuthTokenError, User>

@@ -8,9 +8,9 @@ data class PlayerInGameDto(
     val name: String?,
     val currentBalance: Int,
     val moneyWon: Int,
-    val handRank: String?
+    val handRank: String?,
 ) {
     fun toDomain() = PlayerInGame(id, name ?: "Unknown", currentBalance, moneyWon, handRank)
 
-    fun toDomainUser() = User(id, name ?: "Unknown", "", "", currentBalance, UserStatistics(0,0,0,0.0))
+    fun toDomainUser() = User(id, name ?: "Unknown", "", "", currentBalance, UserStatistics(0, 0, 0, 0.0))
 }

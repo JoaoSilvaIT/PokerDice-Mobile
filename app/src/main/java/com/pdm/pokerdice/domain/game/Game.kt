@@ -6,7 +6,7 @@ import com.pdm.pokerdice.domain.user.User
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
-data class Game (
+data class Game(
     val id: Int,
     val lobbyId: Int?,
     val players: List<PlayerInGame>,

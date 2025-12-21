@@ -10,7 +10,6 @@ import com.pdm.pokerdice.home.HomeActivity
 import com.pdm.pokerdice.ui.theme.PokerDiceTheme
 
 class ProfileActivity : ComponentActivity() {
-
     private val viewModel: ProfileViewModel by viewModels {
         ProfileViewModel.getFactory((application as DependenciesContainer).authService)
     }
@@ -21,7 +20,7 @@ class ProfileActivity : ComponentActivity() {
             PokerDiceTheme {
                 ProfileScreen(
                     viewModel = viewModel,
-                    onNavigate = { handleNavigation(it) }
+                    onNavigate = { handleNavigation(it) },
                 )
             }
         }
@@ -31,9 +30,10 @@ class ProfileActivity : ComponentActivity() {
         when (action) {
             ProfileNavigation.Back -> finish()
             ProfileNavigation.Logout -> {
-                val intent = Intent(this, HomeActivity::class.java).apply {
-                    flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                }
+                val intent =
+                    Intent(this, HomeActivity::class.java).apply {
+                        flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                    }
                 startActivity(intent)
             }
         }

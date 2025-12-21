@@ -10,10 +10,15 @@ data class GameDto(
     val numberOfRounds: Int,
     val state: String?,
     val currentRound: GameRoundDto?,
-    val players: List<PlayerInGameDto?>?
+    val players: List<PlayerInGameDto?>?,
 ) {
     fun toDomain(currentUserId: Int): Game {
-        val gameState = try { State.valueOf(state ?: "RUNNING") } catch (e: Exception) { State.RUNNING }
+        val gameState =
+            try {
+                State.valueOf(state ?: "RUNNING")
+            } catch (e: Exception) {
+                State.RUNNING
+            }
         val safePlayers = players?.filterNotNull() ?: emptyList()
         val domainPlayers = safePlayers.map { it.toDomain() }
 
@@ -28,7 +33,7 @@ data class GameDto(
             state = gameState,
             currentRound = domainRound,
             startedAt = startedAt,
-            endedAt = endedAt
+            endedAt = endedAt,
         )
     }
 }

@@ -1,6 +1,5 @@
 package com.pdm.pokerdice.domain.lobby
 
-
 data class LobbyDto(
     val id: Int,
     val name: String?,
@@ -8,7 +7,7 @@ data class LobbyDto(
     val minPlayers: Int,
     val maxPlayers: Int,
     val players: List<LobbyPlayerDto?>?,
-    val hostId: Int
+    val hostId: Int,
 ) {
     fun toDomain(): Lobby {
         val safePlayers = players?.filterNotNull() ?: emptyList()
@@ -17,13 +16,14 @@ data class LobbyDto(
             id = id,
             name = name ?: "Unknown Lobby",
             description = description ?: "",
-            settings = LobbySettings(
-                numberOfRounds = 5, // Default as not present in DTO
-                minPlayers = minPlayers,
-                maxPlayers = maxPlayers
-            ),
+            settings =
+                LobbySettings(
+                    numberOfRounds = 5, // Default as not present in DTO
+                    minPlayers = minPlayers,
+                    maxPlayers = maxPlayers,
+                ),
             players = safePlayers.map { it.toDomain() }.toSet(),
-            host = host.toDomain()
+            host = host.toDomain(),
         )
     }
 }

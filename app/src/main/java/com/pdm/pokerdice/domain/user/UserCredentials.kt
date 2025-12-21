@@ -7,7 +7,10 @@ import android.util.Patterns
  * @param email The user's email address.
  * @param password The user's password.
  */
-data class UserCredentials(val email: String, val password: String) {
+data class UserCredentials(
+    val email: String,
+    val password: String,
+) {
     /*
     init {
         require(value = isValidNewCredentialsData("", email, password)) { "Invalid user credentials: $this"}
@@ -22,9 +25,14 @@ data class UserCredentials(val email: String, val password: String) {
  * @param email The user's email address.
  * @param password The user's password.
  */
-data class NewUserCredentials(val userName : String, val email: String, val password: String, val inviteCode: String) {
+data class NewUserCredentials(
+    val userName: String,
+    val email: String,
+    val password: String,
+    val inviteCode: String,
+) {
     init {
-        require(value = isValidNewCredentialsData(userName,email, password, inviteCode)) { "Invalid new user credentials: $this"}
+        require(value = isValidNewCredentialsData(userName, email, password, inviteCode)) { "Invalid new user credentials: $this" }
     }
 }
 
@@ -34,8 +42,7 @@ data class NewUserCredentials(val userName : String, val email: String, val pass
  * In the overall solution, the complete validation is performed by the backend service.
  * @return True if the string is a valid email, false otherwise.
  */
-fun String.isValidEmail(): Boolean =
-    isNotBlank() && Patterns.EMAIL_ADDRESS.matcher(this).matches()
+fun String.isValidEmail(): Boolean = isNotBlank() && Patterns.EMAIL_ADDRESS.matcher(this).matches()
 
 /**
  * Validates if the provided string is a valid password. Validity in the client application is
@@ -57,8 +64,14 @@ fun String.isValidInviteCode(): Boolean = isNotBlank()
  * @param password The user's password.
  * @return True if both email and password are valid, false otherwise.
  */
-fun isValidNewCredentialsData(name: String, email: String, password: String, invite: String): Boolean = 
-    email.isValidEmail() && password.isValidPassword() && name.isValidUserName() && invite.isValidInviteCode()
+fun isValidNewCredentialsData(
+    name: String,
+    email: String,
+    password: String,
+    invite: String,
+): Boolean = email.isValidEmail() && password.isValidPassword() && name.isValidUserName() && invite.isValidInviteCode()
 
-fun isValidCredentialsData(email: String, password: String): Boolean = email.isValidEmail() && password.isValidPassword()
-
+fun isValidCredentialsData(
+    email: String,
+    password: String,
+): Boolean = email.isValidEmail() && password.isValidPassword()

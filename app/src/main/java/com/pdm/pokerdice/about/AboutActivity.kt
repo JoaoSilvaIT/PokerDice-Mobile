@@ -15,14 +15,14 @@ import androidx.core.net.toUri
 import com.pdm.pokerdice.ui.theme.PokerDiceTheme
 
 class AboutActivity : ComponentActivity() {
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             PokerDiceTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     AboutScreen(
-                        Modifier.padding(innerPadding), onNavigate = { handleNavigation(it) }
+                        Modifier.padding(innerPadding),
+                        onNavigate = { handleNavigation(it) },
                     )
                 }
             }
@@ -44,17 +44,19 @@ class AboutActivity : ComponentActivity() {
     }
 
     private fun sendGroupEmail() {
-        val intent = Intent(Intent.ACTION_SENDTO).apply {
-            data = "mailto:".toUri()
-            putExtra(
-                Intent.EXTRA_EMAIL, arrayOf(
-                    "a51457@alunos.isel.pt",
-                    "a51682@alunos.isel.pt",
-                    "a51690@alunos.isel.pt"
+        val intent =
+            Intent(Intent.ACTION_SENDTO).apply {
+                data = "mailto:".toUri()
+                putExtra(
+                    Intent.EXTRA_EMAIL,
+                    arrayOf(
+                        "a51457@alunos.isel.pt",
+                        "a51682@alunos.isel.pt",
+                        "a51690@alunos.isel.pt",
+                    ),
                 )
-            )
-            putExtra(Intent.EXTRA_SUBJECT, "Poker Dice Feedback")
-        }
+                putExtra(Intent.EXTRA_SUBJECT, "Poker Dice Feedback")
+            }
         startActivity(intent)
     }
 }

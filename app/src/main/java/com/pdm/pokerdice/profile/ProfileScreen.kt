@@ -23,6 +23,7 @@ import com.pdm.pokerdice.ui.theme.GenericTopAppBar
 
 sealed class ProfileNavigation {
     data object Back : ProfileNavigation()
+
     data object Logout : ProfileNavigation()
 }
 
@@ -30,7 +31,7 @@ sealed class ProfileNavigation {
 @Composable
 fun ProfileScreen(
     onNavigate: (ProfileNavigation) -> Unit,
-    viewModel: ProfileViewModel
+    viewModel: ProfileViewModel,
 ) {
     val state by viewModel.state.collectAsState()
 
@@ -39,14 +40,15 @@ fun ProfileScreen(
         topBar = {
             GenericTopAppBar(
                 title = "Player Profile",
-                onBackAction = { onNavigate(ProfileNavigation.Back) }
+                onBackAction = { onNavigate(ProfileNavigation.Back) },
             )
-        }
+        },
     ) { innerPadding ->
         Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding)
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding),
         ) {
             when (val currentState = state) {
                 is ProfileScreenState.Loading -> {
@@ -55,15 +57,15 @@ fun ProfileScreen(
                 is ProfileScreenState.Success -> {
                     ProfileContent(
                         user = currentState.user,
-                        onLogout = { 
-                            viewModel.logout { onNavigate(ProfileNavigation.Logout) } 
-                        }
+                        onLogout = {
+                            viewModel.logout { onNavigate(ProfileNavigation.Logout) }
+                        },
                     )
                 }
                 is ProfileScreenState.Error -> {
                     Column(
                         modifier = Modifier.align(Alignment.Center),
-                        horizontalAlignment = Alignment.CenterHorizontally
+                        horizontalAlignment = Alignment.CenterHorizontally,
                     ) {
                         Text(text = currentState.message, color = MaterialTheme.colorScheme.error)
                         Button(onClick = { viewModel.fetchProfile() }) {
@@ -79,13 +81,14 @@ fun ProfileScreen(
 @Composable
 private fun ProfileContent(
     user: User,
-    onLogout: () -> Unit
+    onLogout: () -> Unit,
 ) {
     LazyColumn(
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
+        modifier =
+            Modifier
+                .fillMaxSize()
+                .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(24.dp),
     ) {
         // User Header
@@ -94,21 +97,22 @@ private fun ProfileContent(
                 Image(
                     painter = painterResource(id = R.drawable.dice),
                     contentDescription = "Profile Picture",
-                    modifier = Modifier
-                        .size(100.dp)
-                        .clip(CircleShape)
-                        .border(2.dp, MaterialTheme.colorScheme.primary, CircleShape),
+                    modifier =
+                        Modifier
+                            .size(100.dp)
+                            .clip(CircleShape)
+                            .border(2.dp, MaterialTheme.colorScheme.primary, CircleShape),
                 )
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(
                     text = user.name,
                     style = MaterialTheme.typography.headlineMedium,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.Bold,
                 )
                 Text(
                     text = user.email,
                     style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.secondary
+                    color = MaterialTheme.colorScheme.secondary,
                 )
             }
         }
@@ -118,19 +122,19 @@ private fun ProfileContent(
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 shape = MaterialTheme.shapes.medium,
-                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
                     Text(
                         text = "Account Balance",
                         style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.Bold,
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
                         text = "${user.balance} Coins",
                         style = MaterialTheme.typography.displaySmall,
-                        color = MaterialTheme.colorScheme.primary
+                        color = MaterialTheme.colorScheme.primary,
                     )
                 }
             }
@@ -141,18 +145,18 @@ private fun ProfileContent(
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 shape = MaterialTheme.shapes.medium,
-                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
             ) {
                 Column(
                     modifier = Modifier.padding(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                    verticalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
                     Text(
                         text = "Game Statistics",
                         style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.Bold,
                     )
-                    
+
                     val stats = user.statistics
                     StatRow("Games Played", stats.gamesPlayed.toString())
                     StatRow("Wins", stats.wins.toString())
@@ -167,11 +171,12 @@ private fun ProfileContent(
             Button(
                 onClick = onLogout,
                 modifier = Modifier.fillMaxWidth(),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.errorContainer,
-                    contentColor = MaterialTheme.colorScheme.onErrorContainer
-                ),
-                shape = MaterialTheme.shapes.medium
+                colors =
+                    ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.errorContainer,
+                        contentColor = MaterialTheme.colorScheme.onErrorContainer,
+                    ),
+                shape = MaterialTheme.shapes.medium,
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(Icons.AutoMirrored.Filled.ExitToApp, contentDescription = null)
@@ -184,10 +189,13 @@ private fun ProfileContent(
 }
 
 @Composable
-private fun StatRow(label: String, value: String) {
+private fun StatRow(
+    label: String,
+    value: String,
+) {
     Row(
         modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween
+        horizontalArrangement = Arrangement.SpaceBetween,
     ) {
         Text(text = label, style = MaterialTheme.typography.bodyLarge)
         Text(text = value, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold)

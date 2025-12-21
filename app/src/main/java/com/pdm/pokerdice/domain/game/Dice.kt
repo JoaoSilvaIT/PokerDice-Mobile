@@ -6,5 +6,5 @@ import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data class Dice(
-    val face : Face
+    val face: Face,
 ) : Parcelable

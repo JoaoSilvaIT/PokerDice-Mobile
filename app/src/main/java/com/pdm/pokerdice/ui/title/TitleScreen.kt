@@ -24,9 +24,11 @@ enum class TitleScreenActions {
     Profile,
     Lobbies,
 }
+
 const val LOBBIES = "lobbies_button"
 const val PROFILE = "profile_button"
 const val ABOUT = "about_button"
+
 @Composable
 fun TitleScreen(
     modifier: Modifier,
@@ -55,21 +57,21 @@ fun TitleScreen(
             Button(
                 onClick = { onNavigate(TitleScreenActions.Lobbies) },
                 shape = MaterialTheme.shapes.medium,
-                modifier = Modifier.testTag(LOBBIES)
+                modifier = Modifier.testTag(LOBBIES),
             ) {
                 Text("Lobbies Available", style = MaterialTheme.typography.titleSmall)
             }
             Button(
                 onClick = { onNavigate(TitleScreenActions.Profile) },
                 shape = MaterialTheme.shapes.medium,
-                modifier = Modifier.testTag(PROFILE)
+                modifier = Modifier.testTag(PROFILE),
             ) {
                 Text("Profile", style = MaterialTheme.typography.titleSmall)
             }
             Button(
                 onClick = { onNavigate(TitleScreenActions.About) },
                 shape = MaterialTheme.shapes.medium,
-                modifier = Modifier.testTag(ABOUT)
+                modifier = Modifier.testTag(ABOUT),
             ) {
                 Text("About", style = MaterialTheme.typography.titleSmall)
             }

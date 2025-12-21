@@ -30,7 +30,7 @@ sealed class LoginNavigation {
 fun LoginScreen(
     onNavigate: (LoginNavigation) -> Unit = {},
     viewModel: LoginScreenViewModel,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -43,15 +43,16 @@ fun LoginScreen(
         }
         Box(
             contentAlignment = Alignment.Center,
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues = innerPadding)
-                .padding(horizontal = 48.dp)
-                .imePadding()
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues = innerPadding)
+                    .padding(horizontal = 48.dp)
+                    .imePadding(),
         ) {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = modifier
+                modifier = modifier,
             ) {
                 LoginForm(
                     loading = observedState is LoginScreenState.LoginInProgress,
@@ -63,19 +64,20 @@ fun LoginScreen(
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Row(
-                    horizontalArrangement = Arrangement.Center
+                    horizontalArrangement = Arrangement.Center,
                 ) {
                     Text(
                         text = "Don't have an account? ",
-                        style = MaterialTheme.typography.bodyMedium
+                        style = MaterialTheme.typography.bodyMedium,
                     )
                     Text(
                         text = "Sign Up",
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.clickable {
-                            onNavigate(LoginNavigation.SignUpScreen)
-                        }
+                        modifier =
+                            Modifier.clickable {
+                                onNavigate(LoginNavigation.SignUpScreen)
+                            },
                     )
                 }
             }

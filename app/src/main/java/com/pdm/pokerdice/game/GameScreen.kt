@@ -23,7 +23,7 @@ import com.pdm.pokerdice.ui.theme.GenericTopAppBar
 fun GameScreen(
     game: Game,
     viewModel: GameViewModel,
-    onBackIntent: () -> Unit
+    onBackIntent: () -> Unit,
 ) {
     val state = viewModel.screenState
 
@@ -32,55 +32,61 @@ fun GameScreen(
         topBar = {
             GenericTopAppBar(
                 title = "Poker Dice Match",
-                onBackAction = onBackIntent
+                onBackAction = onBackIntent,
             )
-        }
+        },
     ) { innerPadding ->
         Box(
-            modifier = Modifier
-                .padding(innerPadding)
-                .fillMaxSize(),
-            contentAlignment = Alignment.Center
+            modifier =
+                Modifier
+                    .padding(innerPadding)
+                    .fillMaxSize(),
+            contentAlignment = Alignment.Center,
         ) {
             when (state) {
-                is GameScreenState.Loading -> WaitingView(
-                    game = game,
-                    isHost = true,
-                    onStart = { viewModel.startGame(game) }
-                )
-                is GameScreenState.SettingAnte -> SetAnteView(
-                    isMyTurn = state.isMyTurn,
-                    onConfirm = { viewModel.submitAnte(it) }
-                )
-                is GameScreenState.Playing -> PlayingView(
-                    state = state,
-                    onRollClick = { viewModel.rollDice() },
-                    onHoldClick = { viewModel.holdDice() },
-                    onDieClick = { viewModel.toggleHoldDie(it) },
-                    onEndTurnClick = { viewModel.endTurn() }
-                )
+                is GameScreenState.Loading ->
+                    WaitingView(
+                        game = game,
+                        isHost = true,
+                        onStart = { viewModel.startGame(game) },
+                    )
+                is GameScreenState.SettingAnte ->
+                    SetAnteView(
+                        isMyTurn = state.isMyTurn,
+                        onConfirm = { viewModel.submitAnte(it) },
+                    )
+                is GameScreenState.Playing ->
+                    PlayingView(
+                        state = state,
+                        onRollClick = { viewModel.rollDice() },
+                        onHoldClick = { viewModel.holdDice() },
+                        onDieClick = { viewModel.toggleHoldDie(it) },
+                        onEndTurnClick = { viewModel.endTurn() },
+                    )
                 is GameScreenState.RoundEndedStub -> Text("Round Ended")
-                is GameScreenState.MatchEnded -> MatchEndedView(
-                    state = state,
-                    onExitClick = onBackIntent
-                )
+                is GameScreenState.MatchEnded ->
+                    MatchEndedView(
+                        state = state,
+                        onExitClick = onBackIntent,
+                    )
                 is GameScreenState.Error -> Text("Error: ${state.message}")
             }
 
             // Notification Overlay for Round Winner
             viewModel.lastWinnerNotification?.let { message ->
                 Box(
-                    modifier = Modifier
-                        .align(Alignment.BottomCenter)
-                        .padding(bottom = 32.dp)
-                        .background(Color.Black.copy(alpha = 0.8f), RoundedCornerShape(12.dp))
-                        .padding(horizontal = 24.dp, vertical = 12.dp)
+                    modifier =
+                        Modifier
+                            .align(Alignment.BottomCenter)
+                            .padding(bottom = 32.dp)
+                            .background(Color.Black.copy(alpha = 0.8f), RoundedCornerShape(12.dp))
+                            .padding(horizontal = 24.dp, vertical = 12.dp),
                 ) {
                     Text(
                         text = message,
                         color = Color.White,
                         style = MaterialTheme.typography.bodyLarge,
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.Bold,
                     )
                 }
             }

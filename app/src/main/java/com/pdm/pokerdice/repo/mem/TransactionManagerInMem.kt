@@ -1,6 +1,5 @@
 package com.pdm.pokerdice.repo.mem
 
-import com.pdm.pokerdice.repo.RepositoryUser
 import com.pdm.pokerdice.repo.tm.Transaction
 import com.pdm.pokerdice.repo.tm.TransactionManager
 
@@ -14,7 +13,7 @@ class TransactionManagerInMem : TransactionManager {
             TransactionInMem(
                 repoUser = repoUsers,
                 repoLobby = repoLobby,
-                repoGame = repoGame
+                repoGame = repoGame,
             )
         return transaction.block()
     }

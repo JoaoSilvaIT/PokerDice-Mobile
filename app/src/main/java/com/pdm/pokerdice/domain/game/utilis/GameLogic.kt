@@ -35,27 +35,53 @@ fun calculateFullHandValue(handIt: Pair<Hand, HandRank>): Int {
                 diceGroups.keys.first().strength to 0
             }
             HandRank.FOUR_OF_A_KIND -> {
-                val main = diceGroups.entries.first { it.value == 4 }.key.strength
-                val kick = diceGroups.entries.first { it.value == 1 }.key.strength
+                val main =
+                    diceGroups.entries
+                        .first { it.value == 4 }
+                        .key.strength
+                val kick =
+                    diceGroups.entries
+                        .first { it.value == 1 }
+                        .key.strength
                 main to kick
             }
             HandRank.FULL_HOUSE -> {
-                val triplet = diceGroups.entries.first { it.value == 3 }.key.strength
-                val pair = diceGroups.entries.first { it.value == 2 }.key.strength
+                val triplet =
+                    diceGroups.entries
+                        .first { it.value == 3 }
+                        .key.strength
+                val pair =
+                    diceGroups.entries
+                        .first { it.value == 2 }
+                        .key.strength
                 triplet to pair
             }
             HandRank.THREE_OF_A_KIND -> {
-                val main = diceGroups.entries.first { it.value == 3 }.key.strength
+                val main =
+                    diceGroups.entries
+                        .first { it.value == 3 }
+                        .key.strength
                 val kick = diceGroups.entries.filter { it.value == 1 }.maxOf { it.key.strength }
                 main to kick
             }
             HandRank.TWO_PAIR -> {
-                val pairs = diceGroups.entries.filter { it.value == 2 }.map { it.key.strength }.sortedDescending()
-                val kick = diceGroups.entries.firstOrNull { it.value == 1 }?.key?.strength ?: 0
+                val pairs =
+                    diceGroups.entries
+                        .filter { it.value == 2 }
+                        .map { it.key.strength }
+                        .sortedDescending()
+                val kick =
+                    diceGroups.entries
+                        .firstOrNull { it.value == 1 }
+                        ?.key
+                        ?.strength ?: 0
                 pairs[0] * 10 + pairs[1] to kick
             }
             HandRank.ONE_PAIR -> {
-                val main = diceGroups.entries.first { it.value == 2 }.key.strength
+                val main =
+                    diceGroups.entries
+                        .first { it.value == 2 }
+                        .key.strength
                 val kick = diceGroups.entries.filter { it.value == 1 }.maxOf { it.key.strength }
                 main to kick
             }

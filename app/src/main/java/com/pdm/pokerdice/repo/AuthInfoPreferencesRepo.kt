@@ -15,16 +15,18 @@ import kotlinx.coroutines.flow.map
  * Implementation of AuthInfoRepo that uses DataStore to store authentication information.
  */
 
-class AuthInfoPreferencesRepo (private val store: DataStore<Preferences>) : AuthInfoRepo {
-
+class AuthInfoPreferencesRepo(
+    private val store: DataStore<Preferences>,
+) : AuthInfoRepo {
     private val userId: Preferences.Key<Int> = intPreferencesKey(name = "user_id")
 
     private val authTokenKey: Preferences.Key<String> = stringPreferencesKey(name = "auth_token")
 
     override val authInfo: Flow<AuthInfo?>
-        get() = store.data.map { preferences ->
-            preferences.toAuthInfo()
-        }
+        get() =
+            store.data.map { preferences ->
+                preferences.toAuthInfo()
+            }
 
     override suspend fun clearAuthInfo() {
         store.edit { it.clear() }
@@ -38,7 +40,7 @@ class AuthInfoPreferencesRepo (private val store: DataStore<Preferences>) : Auth
     override suspend fun saveAuthInfo(authInfo: AuthInfo) {
         store.edit { preferences ->
             preferences[userId] = authInfo.userId
-            preferences[authTokenKey] =  authInfo.authToken
+            preferences[authTokenKey] = authInfo.authToken
         }
     }
 

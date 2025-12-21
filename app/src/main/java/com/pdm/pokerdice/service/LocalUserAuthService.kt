@@ -21,9 +21,8 @@ class LocalUserAuthService(
     private val tokenEncoder: TokenEncoder,
     private val config: UsersDomainConfig,
     private val trxManager: TransactionManager,
-    private val clock: Clock
+    private val clock: Clock,
 ) : UserAuthService {
-
     override suspend fun getLoggedUser(): com.pdm.pokerdice.domain.user.UserExternalInfo? {
         // TODO: Implement local logged user retrieval if needed, or inject AuthInfoRepo
         return null
@@ -33,8 +32,8 @@ class LocalUserAuthService(
         name: String,
         email: String,
         password: String,
-        invite: String
-    ) : Either<AuthTokenError, User> {
+        invite: String,
+    ): Either<AuthTokenError, User> {
         if (name.isBlank()) return failure(AuthTokenError.BlankName)
         if (email.isBlank()) return failure(AuthTokenError.BlankEmail)
         if (password.isBlank()) return failure(AuthTokenError.BlankPassword)
@@ -53,7 +52,7 @@ class LocalUserAuthService(
 
     override suspend fun createToken(
         email: String,
-        password: String
+        password: String,
     ): Either<AuthTokenError, TokenExternalInfo> {
         if (email.isBlank()) return failure(AuthTokenError.BlankEmail)
         if (password.isBlank()) return failure(AuthTokenError.BlankPassword)
@@ -111,9 +110,10 @@ class LocalUserAuthService(
     ): Boolean {
         val now = clock.instant()
         return token.createdAt <= now &&
-                Duration.between(token.createdAt, now) <= config.tokenTtl &&
-                Duration.between(token.lastUsedAt, now) <= config.tokenRollingTtl
+            Duration.between(token.createdAt, now) <= config.tokenTtl &&
+            Duration.between(token.lastUsedAt, now) <= config.tokenRollingTtl
     }
+
     private fun generateTokenValue(): String =
         ByteArray(config.tokenSizeInBytes).let { byteArray ->
             SecureRandom.getInstanceStrong().nextBytes(byteArray)

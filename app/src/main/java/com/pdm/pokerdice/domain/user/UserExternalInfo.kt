@@ -4,8 +4,8 @@ import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
-data class  UserExternalInfo(
-    val id : Int,
-    val name : String,
-    val balance : Int
+data class UserExternalInfo(
+    val id: Int,
+    val name: String,
+    val balance: Int,
 ) : Parcelable

@@ -24,39 +24,42 @@ import com.pdm.pokerdice.domain.lobby.Lobby
 
 @Composable
 fun LobbiesView(
-    lobbies : List<Lobby>,
-    onJoinLobby : (lid : Int) -> Unit,
-    modifier: Modifier = Modifier
-){
+    lobbies: List<Lobby>,
+    onJoinLobby: (lid: Int) -> Unit,
+    modifier: Modifier = Modifier,
+) {
     Text(
         text = "Available Lobbies",
         style = MaterialTheme.typography.headlineMedium,
-        modifier = Modifier.padding(16.dp)
+        modifier = Modifier.padding(16.dp),
     )
 
     LazyColumn(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp)
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
     ) {
         items(lobbies) { lobby ->
             Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 8.dp),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp),
                 shape = RoundedCornerShape(12.dp),
-                elevation = CardDefaults.cardElevation(4.dp)
+                elevation = CardDefaults.cardElevation(4.dp),
             ) {
                 Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(all = 16.dp),
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(all = 16.dp),
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween
+                    horizontalArrangement = Arrangement.SpaceBetween,
                 ) {
                     Text(
                         text = lobby.name,
-                        style = MaterialTheme.typography.bodyLarge
+                        style = MaterialTheme.typography.bodyLarge,
                     )
                     Button(
                         onClick = {
@@ -64,33 +67,34 @@ fun LobbiesView(
                         },
                     ) {
                         Text(
-                            text = "Join Lobby"
+                            text = "Join Lobby",
                         )
-
                     }
                 }
             }
         }
     }
-
 }
+
 @Composable
 fun LobbiesScreenView(
     modifier: Modifier = Modifier,
-    onJoinLobby : (lid : Int) -> Unit = {},
+    onJoinLobby: (lid: Int) -> Unit = {},
     onCreateLobby: () -> Unit = {},
-    lobbies : List<Lobby>?,
-    error : String? = null
+    lobbies: List<Lobby>?,
+    error: String? = null,
 ) {
     Scaffold(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(bottom = 16.dp)
+        modifier =
+            modifier
+                .fillMaxSize()
+                .padding(bottom = 16.dp),
     ) { paddingValues ->
         Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues),
         ) {
             if (lobbies != null) {
                 LobbiesView(
@@ -101,9 +105,10 @@ fun LobbiesScreenView(
             }
             Button(
                 onClick = onCreateLobby,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp)
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
             ) {
                 Text(text = "Create Lobby")
             }
@@ -114,9 +119,10 @@ fun LobbiesScreenView(
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.error,
                 textAlign = TextAlign.Center,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 16.dp)
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 16.dp),
             )
         }
     }

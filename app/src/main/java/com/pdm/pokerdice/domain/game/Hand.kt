@@ -5,5 +5,5 @@ import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data class Hand(
-    val dices : List<Dice>
+    val dices: List<Dice>,
 ) : Parcelable

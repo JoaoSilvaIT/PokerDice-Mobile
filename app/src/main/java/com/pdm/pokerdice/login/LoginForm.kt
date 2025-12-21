@@ -32,7 +32,7 @@ fun LoginForm(
     error: String?,
     onLogin: (credentials: UserCredentials) -> Unit,
     validateCredentials: (email: String, password: String) -> Boolean,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
@@ -43,10 +43,10 @@ fun LoginForm(
         email,
         password,
         isDataValid = validateCredentials(email, password),
-        onEmailChange = {email = it},
-        onPasswordChange = {password = it},
-        onLogin = {email, password -> onLogin(UserCredentials(email, password))},
-        modifier = modifier
+        onEmailChange = { email = it },
+        onPasswordChange = { password = it },
+        onLogin = { email, password -> onLogin(UserCredentials(email, password)) },
+        modifier = modifier,
     )
 }
 
@@ -60,18 +60,18 @@ fun LoginFormStateLess(
     onEmailChange: (String) -> Unit,
     onPasswordChange: (String) -> Unit,
     onLogin: (email: String, password: String) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Column(
         modifier.fillMaxWidth().padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
+        verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         OutlinedTextField(
             value = email,
             onValueChange = onEmailChange,
             label = { Text("Email") },
             singleLine = true,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
         )
 
         OutlinedTextField(
@@ -81,8 +81,8 @@ fun LoginFormStateLess(
             singleLine = true,
             visualTransformation = PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Done),
-            keyboardActions = KeyboardActions(onDone = { if (isDataValid && !loading) onLogin( email, password) }),
-            modifier = Modifier.fillMaxWidth()
+            keyboardActions = KeyboardActions(onDone = { if (isDataValid && !loading) onLogin(email, password) }),
+            modifier = Modifier.fillMaxWidth(),
         )
 
         if (!error.isNullOrBlank()) {
@@ -92,7 +92,7 @@ fun LoginFormStateLess(
         Button(
             onClick = { onLogin(email, password) },
             enabled = isDataValid && !loading,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
         ) {
             if (loading) {
                 CircularProgressIndicator(Modifier.size(16.dp), strokeWidth = 2.dp)

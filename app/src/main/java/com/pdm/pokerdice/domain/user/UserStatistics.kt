@@ -9,4 +9,4 @@ data class UserStatistics(
     val wins: Int,
     val losses: Int,
     val winRate: Double,
-): Parcelable
+) : Parcelable

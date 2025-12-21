@@ -17,9 +17,9 @@ import com.pdm.pokerdice.service.errors.AuthTokenError
  * @param authInfoRepo The repository to store the authentication information.
  */
 typealias SignUpUseCase = suspend (
-    credentials : NewUserCredentials,
-    service : UserAuthService,
-    authInfoRepo : AuthInfoRepo
+    credentials: NewUserCredentials,
+    service: UserAuthService,
+    authInfoRepo: AuthInfoRepo,
 ) -> Either<AuthTokenError, AuthInfo>
 
 /**
@@ -31,30 +31,32 @@ typealias SignUpUseCase = suspend (
  */
 suspend fun performSignUp(
     credentials: NewUserCredentials,
-    service : UserAuthService,
-    authInfoRepo: AuthInfoRepo
-): Either<AuthTokenError, AuthInfo> {
-    return try {
-        val user = service.createUser(
-            credentials.userName,
-            credentials.email,
-            credentials.password,
-            credentials.inviteCode)
-        when(user) {
+    service: UserAuthService,
+    authInfoRepo: AuthInfoRepo,
+): Either<AuthTokenError, AuthInfo> =
+    try {
+        val user =
+            service.createUser(
+                credentials.userName,
+                credentials.email,
+                credentials.password,
+                credentials.inviteCode,
+            )
+        when (user) {
             is Either.Failure -> {
                 failure(user.value)
             }
             is Either.Success -> {
                 val loginCreeds = UserCredentials(credentials.email, credentials.password)
-                val loginResult = performLogin(
-                    loginCreeds,
-                    service,
-                    authInfoRepo
-                )
+                val loginResult =
+                    performLogin(
+                        loginCreeds,
+                        service,
+                        authInfoRepo,
+                    )
                 loginResult
             }
         }
     } catch (e: Exception) {
         failure(AuthTokenError.UserNotFoundOrInvalidCredentials)
     }
-}

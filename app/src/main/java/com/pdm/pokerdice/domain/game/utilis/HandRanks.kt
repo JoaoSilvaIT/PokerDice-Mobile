@@ -1,6 +1,8 @@
 package com.pdm.pokerdice.domain.game.utilis
 
-enum class HandRank(val strength: Int) {
+enum class HandRank(
+    val strength: Int,
+) {
     FIVE_OF_A_KIND(8),
     FOUR_OF_A_KIND(7),
     FULL_HOUSE(6),

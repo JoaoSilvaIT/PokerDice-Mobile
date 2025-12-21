@@ -4,7 +4,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
@@ -19,24 +18,35 @@ import kotlinx.coroutines.launch
 
 interface SignUpScreenState {
     object Idle : SignUpScreenState
-    data class SignUpInProgress(val tentativeCredentials: NewUserCredentials) : SignUpScreenState
-    data class SignUpSuccess(val userInfo : UserInfo) : SignUpScreenState
-    data class SignUpError(val errorMessage: String) : SignUpScreenState
+
+    data class SignUpInProgress(
+        val tentativeCredentials: NewUserCredentials,
+    ) : SignUpScreenState
+
+    data class SignUpSuccess(
+        val userInfo: UserInfo,
+    ) : SignUpScreenState
+
+    data class SignUpError(
+        val errorMessage: String,
+    ) : SignUpScreenState
 }
 
 class SignUpScreenViewModel(
-    private val signUpUseCase : SignUpUseCase,
-    private val service : UserAuthService,
-    private val authRepo : AuthInfoRepo
+    private val signUpUseCase: SignUpUseCase,
+    private val service: UserAuthService,
+    private val authRepo: AuthInfoRepo,
 ) : ViewModel() {
-
     companion object {
-        fun getFactory(service: UserAuthService, repo: AuthInfoRepo) = viewModelFactory {
+        fun getFactory(
+            service: UserAuthService,
+            repo: AuthInfoRepo,
+        ) = viewModelFactory {
             initializer {
                 SignUpScreenViewModel(
                     ::performSignUp,
                     service,
-                    repo
+                    repo,
                 )
             }
         }
@@ -45,14 +55,14 @@ class SignUpScreenViewModel(
     var currentState: SignUpScreenState by mutableStateOf(SignUpScreenState.Idle)
         private set
 
-    fun signUp(credentials : NewUserCredentials) {
+    fun signUp(credentials: NewUserCredentials) {
         if (currentState is SignUpScreenState.SignUpInProgress || currentState is SignUpScreenState.SignUpSuccess) {
             return
         }
 
         viewModelScope.launch {
             currentState = SignUpScreenState.SignUpInProgress(credentials)
-            when(val result = signUpUseCase(credentials, service, authRepo)){
+            when (val result = signUpUseCase(credentials, service, authRepo)) {
                 is Either.Success -> {
                     val authInfo = result.value
                     currentState = SignUpScreenState.SignUpSuccess(UserInfo(authInfo.userId, authInfo.authToken))

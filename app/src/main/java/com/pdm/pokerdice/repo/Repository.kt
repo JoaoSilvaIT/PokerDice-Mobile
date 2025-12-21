@@ -5,6 +5,7 @@ package com.pdm.pokerdice.repo
  */
 interface Repository<T> {
     fun addAll(entities: List<T>) // Add multiple entities
+
     fun findById(id: Int): T? // Find an entity by its ID
 
     fun findAll(): List<T> // Retrieve all entities

@@ -14,9 +14,7 @@ import com.pdm.pokerdice.lobby.LobbyActivity
 import com.pdm.pokerdice.lobbyCreation.LobbyCreationActivity
 import com.pdm.pokerdice.ui.theme.PokerDiceTheme
 
-
 class LobbiesActivity : ComponentActivity() {
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -28,7 +26,7 @@ class LobbiesActivity : ComponentActivity() {
                     LobbiesScreen(
                         modifier = Modifier.padding(paddingValues),
                         viewModel = viewModel,
-                        onNavigate = { handleNavigation(it) }
+                        onNavigate = { handleNavigation(it) },
                     )
                 }
             }
@@ -42,17 +40,18 @@ class LobbiesActivity : ComponentActivity() {
     }
 
     private fun handleNavigation(it: LobbiesNavigation) {
-        val intent = when (it) {
-            is LobbiesNavigation.CreateLobby ->
-                Intent(this, LobbyCreationActivity::class.java).apply {
-                }
+        val intent =
+            when (it) {
+                is LobbiesNavigation.CreateLobby ->
+                    Intent(this, LobbyCreationActivity::class.java).apply {
+                    }
 
-            is LobbiesNavigation.SelectLobby ->
-                Intent(this, LobbyActivity::class.java).apply {
-                    putExtra("lobby", it.lobby)
-                    putExtra("user", it.user)
-                }
-        }
+                is LobbiesNavigation.SelectLobby ->
+                    Intent(this, LobbyActivity::class.java).apply {
+                        putExtra("lobby", it.lobby)
+                        putExtra("user", it.user)
+                    }
+            }
         startActivity(intent)
     }
 }

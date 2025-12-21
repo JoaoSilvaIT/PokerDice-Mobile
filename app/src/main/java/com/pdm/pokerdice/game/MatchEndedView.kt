@@ -17,46 +17,48 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun MatchEndedView(
     state: GameScreenState.MatchEnded,
-    onExitClick: () -> Unit
+    onExitClick: () -> Unit,
 ) {
     Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(24.dp),
+        modifier =
+            Modifier
+                .fillMaxSize()
+                .padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+        verticalArrangement = Arrangement.Center,
     ) {
         Text(
             text = "Game Over",
             style = MaterialTheme.typography.headlineLarge,
-            color = MaterialTheme.colorScheme.primary
+            color = MaterialTheme.colorScheme.primary,
         )
 
         Column(
-            modifier = Modifier
-                .padding(vertical = 32.dp)
-                .fillMaxWidth(),
+            modifier =
+                Modifier
+                    .padding(vertical = 32.dp)
+                    .fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             Text(
                 text = "Match Winner",
-                style = MaterialTheme.typography.labelLarge
+                style = MaterialTheme.typography.labelLarge,
             )
             Text(
                 text = state.winnerName,
                 style = MaterialTheme.typography.displayMedium,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Bold,
             )
             Text(
                 text = "Final Score: ${state.finalScore} coins",
-                style = MaterialTheme.typography.headlineSmall
+                style = MaterialTheme.typography.headlineSmall,
             )
         }
 
         Button(
             onClick = onExitClick,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
         ) {
             Text("Return to Lobby")
         }

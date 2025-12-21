@@ -8,14 +8,19 @@ import com.pdm.pokerdice.domain.lobby.Lobby
 import com.pdm.pokerdice.domain.user.UserExternalInfo
 
 sealed class LobbiesNavigation {
-    class SelectLobby(val lobby: Lobby, val user: UserExternalInfo) : LobbiesNavigation()
+    class SelectLobby(
+        val lobby: Lobby,
+        val user: UserExternalInfo,
+    ) : LobbiesNavigation()
+
     object CreateLobby : LobbiesNavigation()
 }
+
 @Composable
 fun LobbiesScreen(
     modifier: Modifier,
     onNavigate: (LobbiesNavigation) -> Unit = {},
-    viewModel: LobbiesViewModel
+    viewModel: LobbiesViewModel,
 ) {
     val state by viewModel.state.collectAsState()
 
@@ -32,7 +37,7 @@ fun LobbiesScreen(
                 onJoinLobby = { lobbyId ->
                     viewModel.joinLobby(lobbyId)
                 },
-                onCreateLobby = { onNavigate(LobbiesNavigation.CreateLobby) }
+                onCreateLobby = { onNavigate(LobbiesNavigation.CreateLobby) },
             )
         }
         is LobbiesScreenState.JoinLobby -> {
@@ -44,7 +49,7 @@ fun LobbiesScreen(
             val errorState = (state as LobbiesScreenState.Error).message
             LobbiesScreenView(
                 lobbies = null,
-                error = errorState
+                error = errorState,
             )
         }
     }

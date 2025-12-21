@@ -11,7 +11,7 @@ interface RepositoryUser : Repository<User> {
     fun createUser(
         name: String,
         email: String,
-        password: String
+        password: String,
     ): User
 
     fun findByEmail(email: String): User?
@@ -38,5 +38,4 @@ interface RepositoryUser : Repository<User> {
         userId: Int,
         amount: Int,
     )
-
 }

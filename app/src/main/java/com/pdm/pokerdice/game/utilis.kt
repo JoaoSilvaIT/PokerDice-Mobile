@@ -4,8 +4,8 @@ import com.pdm.pokerdice.domain.game.Dice
 import com.pdm.pokerdice.domain.game.utilis.Face
 import com.pdm.pokerdice.domain.game.utilis.HandRank
 
-fun faceToCharString(face: Face): String {
-    return when (face) {
+fun faceToCharString(face: Face): String =
+    when (face) {
         Face.ACE -> "A"
         Face.KING -> "K"
         Face.QUEEN -> "Q"
@@ -13,7 +13,6 @@ fun faceToCharString(face: Face): String {
         Face.TEN -> "T"
         Face.NINE -> "9"
     }
-}
 
 fun calculatePartialRank(dice: List<Dice>): HandRank {
     val counts = dice.groupingBy { it.face }.eachCount()
@@ -40,8 +39,8 @@ private fun isStraight(dice: List<Dice>): Boolean {
     return sortedStrengths == listOf(1, 2, 3, 4, 5) || sortedStrengths == listOf(2, 3, 4, 5, 6)
 }
 
-fun parseFace(faceStr: String): Face {
-    return when (faceStr.uppercase()) {
+fun parseFace(faceStr: String): Face =
+    when (faceStr.uppercase()) {
         "A", "ACE" -> Face.ACE
         "K", "KING" -> Face.KING
         "Q", "QUEEN" -> Face.QUEEN
@@ -50,4 +49,3 @@ fun parseFace(faceStr: String): Face {
         "9", "NINE" -> Face.NINE
         else -> Face.ACE
     }
-}

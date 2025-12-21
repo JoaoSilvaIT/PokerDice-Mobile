@@ -1,6 +1,7 @@
 package com.pdm.pokerdice.service
 
 import com.pdm.pokerdice.domain.lobby.Lobby
+import com.pdm.pokerdice.domain.lobby.LobbyEvent
 import com.pdm.pokerdice.domain.user.AuthInfoRepo
 import com.pdm.pokerdice.domain.user.UserExternalInfo
 import com.pdm.pokerdice.domain.utilis.Either
@@ -12,22 +13,41 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.flow
 
 interface LobbyService : Service {
-    val lobbies : Flow<List<Lobby>>
+    val lobbies: Flow<List<Lobby>>
 
     fun refreshLobbies()
 
-    suspend fun createLobby(name: String, description: String, minPlayers: Int, maxPlayers: Int, host: UserExternalInfo) : Either<LobbyError, Lobby>
+    suspend fun createLobby(
+        name: String,
+        description: String,
+        minPlayers: Int,
+        maxPlayers: Int,
+        host: UserExternalInfo,
+    ): Either<LobbyError, Lobby>
 
-    suspend fun joinLobby(usr: UserExternalInfo, lobbyId: Int) : Either<LobbyError, Lobby>
+    suspend fun joinLobby(
+        usr: UserExternalInfo,
+        lobbyId: Int,
+    ): Either<LobbyError, Lobby>
 
-    suspend fun leaveLobby(usr: UserExternalInfo, lobbyId: Int) : Either<LobbyError, Boolean>
+    suspend fun leaveLobby(
+        usr: UserExternalInfo,
+        lobbyId: Int,
+    ): Either<LobbyError, Boolean>
+
+    suspend fun monitorLobbyEvents(lobbyId: Int): Flow<LobbyEvent>
 }
 
-class FakeLobbyService(val trxManager : TransactionManager , val repo : AuthInfoRepo) : LobbyService {
+class FakeLobbyService(
+    val trxManager: TransactionManager,
+    val repo: AuthInfoRepo,
+) : LobbyService {
     private val _lobbies = MutableStateFlow(trxManager.run { repoLobby.findAll() })
-    override val lobbies : StateFlow<List<Lobby>> = _lobbies.asStateFlow()
+    override val lobbies: StateFlow<List<Lobby>> = _lobbies.asStateFlow()
+
     override fun refreshLobbies() {
         _lobbies.value = trxManager.run { repoLobby.findAll() }
     }
@@ -37,9 +57,9 @@ class FakeLobbyService(val trxManager : TransactionManager , val repo : AuthInfo
         description: String,
         minPlayers: Int,
         maxPlayers: Int,
-        host: UserExternalInfo
+        host: UserExternalInfo,
     ): Either<LobbyError, Lobby> {
-        if(name.isBlank()) return failure(LobbyError.BlankName)
+        if (name.isBlank()) return failure(LobbyError.BlankName)
         if (minPlayers < 2) return failure(LobbyError.MinPlayersTooLow)
         if (maxPlayers > 10) return failure(LobbyError.MaxPlayersTooHigh)
         if (minPlayers > maxPlayers) return failure(LobbyError.MinPlayersGreaterThanMax)
@@ -55,7 +75,10 @@ class FakeLobbyService(val trxManager : TransactionManager , val repo : AuthInfo
         }
     }
 
-    override suspend fun joinLobby(usr: UserExternalInfo, lobbyId: Int): Either<LobbyError, Lobby> {
+    override suspend fun joinLobby(
+        usr: UserExternalInfo,
+        lobbyId: Int,
+    ): Either<LobbyError, Lobby> {
         return trxManager.run {
             val lobby = repoLobby.findById(lobbyId) ?: return@run failure(LobbyError.LobbyNotFound)
 
@@ -64,15 +87,17 @@ class FakeLobbyService(val trxManager : TransactionManager , val repo : AuthInfo
 
             val updatedLobby = repoLobby.joinLobby(usr, lobby)
             repoLobby.save(updatedLobby)
-            
+
             refreshLobbies() // Notify UI
 
             success(updatedLobby)
         }
     }
 
-
-    override suspend fun leaveLobby(usr: UserExternalInfo, lobbyId: Int): Either<LobbyError, Boolean> {
+    override suspend fun leaveLobby(
+        usr: UserExternalInfo,
+        lobbyId: Int,
+    ): Either<LobbyError, Boolean> {
         return trxManager.run {
             val lobby = repoLobby.findById(lobbyId) ?: return@run failure(LobbyError.LobbyNotFound)
 
@@ -100,4 +125,10 @@ class FakeLobbyService(val trxManager : TransactionManager , val repo : AuthInfo
             repoUser.getUserById(authInfo.userId)
         }
     }
+
+    override suspend fun monitorLobbyEvents(lobbyId: Int): Flow<LobbyEvent> =
+        flow {
+            // Stub implementation for fake service
+            emit(LobbyEvent.ConnectionLost)
+        }
 }

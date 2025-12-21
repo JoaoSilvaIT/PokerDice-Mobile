@@ -1,6 +1,6 @@
 package com.pdm.pokerdice.service.errors
 
-sealed                      class GameError {
+sealed class GameError {
     data object InvalidNumberOfRounds : GameError()
 
     data object InvalidTime : GameError()
@@ -14,6 +14,8 @@ sealed                      class GameError {
     data object GameNotFound : GameError()
 
     data object GameAlreadyEnded : GameError()
-    
-    data class NetworkError(val message: String) : GameError()
+
+    data class NetworkError(
+        val message: String,
+    ) : GameError()
 }

@@ -1,11 +1,11 @@
 package com.pdm.pokerdice.repo
 
-import com.pdm.pokerdice.domain.lobby.Lobby
-import com.pdm.pokerdice.domain.user.User
 import com.pdm.pokerdice.domain.game.Dice
 import com.pdm.pokerdice.domain.game.Game
 import com.pdm.pokerdice.domain.game.Hand
 import com.pdm.pokerdice.domain.game.Round
+import com.pdm.pokerdice.domain.lobby.Lobby
+import com.pdm.pokerdice.domain.user.User
 
 interface RepositoryGame : Repository<Game> {
     fun createGame(

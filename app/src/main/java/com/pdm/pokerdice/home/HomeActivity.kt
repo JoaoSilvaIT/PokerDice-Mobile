@@ -16,21 +16,22 @@ class HomeActivity : ComponentActivity() {
         setContent {
             PokerDiceTheme {
                 HomeScreen(
-                    onNavigate = { handleNavigation(it) }
+                    onNavigate = { handleNavigation(it) },
                 )
             }
         }
     }
 
-    private fun handleNavigation(it : HomeNavigation) {
-        val intent = when (it) {
-            is HomeNavigation.LoginScreen -> {
-                Intent(this, LoginActivity::class.java)
+    private fun handleNavigation(it: HomeNavigation) {
+        val intent =
+            when (it) {
+                is HomeNavigation.LoginScreen -> {
+                    Intent(this, LoginActivity::class.java)
+                }
+                is HomeNavigation.SignUpScreen -> {
+                    Intent(this, SignUpActivity::class.java)
+                }
             }
-            is HomeNavigation.SignUpScreen -> {
-                Intent(this, SignUpActivity::class.java)
-            }
-        }
         startActivity(intent)
     }
 }

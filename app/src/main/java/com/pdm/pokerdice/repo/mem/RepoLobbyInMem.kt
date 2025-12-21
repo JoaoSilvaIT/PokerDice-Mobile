@@ -6,46 +6,50 @@ import com.pdm.pokerdice.domain.user.UserExternalInfo
 import com.pdm.pokerdice.repo.RepositoryLobby
 
 class RepoLobbyInMem : RepositoryLobby {
-    val lobbies = mutableListOf(
-        Lobby(
-            id = 1,
-            name = "LobbyTest",
-            description = "This is a test lobby",
-            settings = LobbySettings(numberOfRounds = 5, minPlayers = 2, maxPlayers = 4),
-            host = UserExternalInfo(1, "admin", 100),
-            players = setOf(
-                UserExternalInfo(1, "admin", 100),
+    val lobbies =
+        mutableListOf(
+            Lobby(
+                id = 1,
+                name = "LobbyTest",
+                description = "This is a test lobby",
+                settings = LobbySettings(numberOfRounds = 5, minPlayers = 2, maxPlayers = 4),
+                host = UserExternalInfo(1, "admin", 100),
+                players =
+                    setOf(
+                        UserExternalInfo(1, "admin", 100),
+                    ),
+                timeout = 10L,
             ),
-            timeout = 10L
         )
-    )
     var lid = 2
 
     override fun createLobby(
         name: String,
         description: String,
-
-
         minPlayers: Int,
         maxPlayers: Int,
-        host: UserExternalInfo
+        host: UserExternalInfo,
     ): Lobby {
-        val newLobby = Lobby(
-            id = lid,
-            name = name,
-            description = description,
-            settings = LobbySettings(numberOfRounds = 5, minPlayers = minPlayers, maxPlayers = maxPlayers),
-            host = host,
-            players = setOf(host),
-            timeout = 10L
-        )
+        val newLobby =
+            Lobby(
+                id = lid,
+                name = name,
+                description = description,
+                settings = LobbySettings(numberOfRounds = 5, minPlayers = minPlayers, maxPlayers = maxPlayers),
+                host = host,
+                players = setOf(host),
+                timeout = 10L,
+            )
         lid++
         lobbies.add(newLobby)
         return newLobby
     }
 
-    override fun leaveLobby(user: UserExternalInfo, lobby: Lobby) : Boolean {
-        val newLobby = lobby.copy(players =  (lobby.players - user))
+    override fun leaveLobby(
+        user: UserExternalInfo,
+        lobby: Lobby,
+    ): Boolean {
+        val newLobby = lobby.copy(players = (lobby.players - user))
         val index = lobbies.indexOfFirst { it.id == lobby.id }
         if (index != -1) {
             lobbies[index] = newLobby
@@ -57,11 +61,12 @@ class RepoLobbyInMem : RepositoryLobby {
         lobbies.addAll(entities)
     }
 
-    override fun findByName(name: String): Lobby? {
-        return lobbies.find { it.name == name }
-    }
+    override fun findByName(name: String): Lobby? = lobbies.find { it.name == name }
 
-    override fun joinLobby(user: UserExternalInfo, lobby: Lobby): Lobby {
+    override fun joinLobby(
+        user: UserExternalInfo,
+        lobby: Lobby,
+    ): Lobby {
         val newLobby = lobby.copy(players = (lobby.players + user))
         val index = lobbies.indexOfFirst { it.id == lobby.id }
         if (index != -1) {
@@ -69,7 +74,6 @@ class RepoLobbyInMem : RepositoryLobby {
         }
         return newLobby
     }
-
 
     override fun deleteLobbyByHost(host: UserExternalInfo) {
         lobbies.removeIf { it.host == host }
@@ -79,13 +83,9 @@ class RepoLobbyInMem : RepositoryLobby {
         lobbies.removeIf { it.id == id }
     }
 
-    override fun findById(id: Int): Lobby? {
-        return lobbies.find { it.id == id }
-    }
+    override fun findById(id: Int): Lobby? = lobbies.find { it.id == id }
 
-    override fun findAll(): List<Lobby> {
-        return lobbies
-    }
+    override fun findAll(): List<Lobby> = lobbies
 
     override fun save(entity: Lobby) {
         lobbies.removeIf { it.id == entity.id }
@@ -99,5 +99,4 @@ class RepoLobbyInMem : RepositoryLobby {
     override fun clear() {
         lobbies.clear()
     }
-
 }

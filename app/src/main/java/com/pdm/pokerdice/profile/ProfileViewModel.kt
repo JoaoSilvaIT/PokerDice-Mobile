@@ -15,12 +15,19 @@ import kotlinx.coroutines.launch
 
 sealed interface ProfileScreenState {
     data object Loading : ProfileScreenState
-    data class Success(val user: User) : ProfileScreenState
-    data class Error(val message: String) : ProfileScreenState
+
+    data class Success(
+        val user: User,
+    ) : ProfileScreenState
+
+    data class Error(
+        val message: String,
+    ) : ProfileScreenState
 }
 
-class ProfileViewModel(private val service: UserAuthService) : ViewModel() {
-
+class ProfileViewModel(
+    private val service: UserAuthService,
+) : ViewModel() {
     private val _state = MutableStateFlow<ProfileScreenState>(ProfileScreenState.Loading)
     val state: StateFlow<ProfileScreenState> = _state.asStateFlow()
 
@@ -52,10 +59,11 @@ class ProfileViewModel(private val service: UserAuthService) : ViewModel() {
     }
 
     companion object {
-        fun getFactory(service: UserAuthService): ViewModelProvider.Factory = viewModelFactory {
-            initializer {
-                ProfileViewModel(service)
+        fun getFactory(service: UserAuthService): ViewModelProvider.Factory =
+            viewModelFactory {
+                initializer {
+                    ProfileViewModel(service)
+                }
             }
-        }
     }
 }

@@ -18,19 +18,22 @@ import io.ktor.client.HttpClient
 import io.ktor.client.engine.okhttp.OkHttp
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.defaultRequest
+import io.ktor.client.plugins.sse.SSE
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
 import io.ktor.serialization.gson.gson
 
 interface DependenciesContainer {
-    val homeService : HomeService
+    val homeService: HomeService
     val lobbyService: LobbyService
     val gameService: GameService
-    val authInfoRepo : AuthInfoRepo
-    val authService : UserAuthService
+    val authInfoRepo: AuthInfoRepo
+    val authService: UserAuthService
 }
 
-class PokerDice : DependenciesContainer, Application() {
+class PokerDice :
+    Application(),
+    DependenciesContainer {
     private val ds: DataStore<Preferences> by preferencesDataStore(name = "auth_info")
 
     // HTTP Client (Shared) - Use 10.0.2.2 for Emulator
@@ -39,6 +42,7 @@ class PokerDice : DependenciesContainer, Application() {
             install(ContentNegotiation) {
                 gson()
             }
+            install(SSE)
             defaultRequest {
                 url("http://10.0.2.2:8080/")
                 contentType(ContentType.Application.Json)
@@ -50,11 +54,11 @@ class PokerDice : DependenciesContainer, Application() {
     override val authInfoRepo: AuthInfoRepo by lazy { AuthInfoPreferencesRepo(ds) }
 
     // REAL HTTP SERVICES
-    override val lobbyService: LobbyService by lazy { 
-        HttpLobbyService(httpClient, authInfoRepo) 
+    override val lobbyService: LobbyService by lazy {
+        HttpLobbyService(httpClient, authInfoRepo)
     }
 
-    override val gameService: GameService by lazy { 
+    override val gameService: GameService by lazy {
         HttpGameService(httpClient, authInfoRepo)
     }
 

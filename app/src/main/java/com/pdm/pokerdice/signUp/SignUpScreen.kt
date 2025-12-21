@@ -20,7 +20,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.pdm.pokerdice.domain.user.isValidNewCredentialsData
 
-
 sealed class SignUpNavigation {
     object TitleScreen : SignUpNavigation()
 
@@ -31,7 +30,7 @@ sealed class SignUpNavigation {
 fun SignUpScreen(
     onNavigate: (SignUpNavigation) -> Unit = {},
     viewModel: SignUpScreenViewModel,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -44,40 +43,42 @@ fun SignUpScreen(
         }
         Box(
             contentAlignment = Alignment.Center,
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues = innerPadding)
-                .padding(horizontal = 48.dp)
-                .imePadding()
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues = innerPadding)
+                    .padding(horizontal = 48.dp)
+                    .imePadding(),
         ) {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = modifier
+                modifier = modifier,
             ) {
                 SignUpForm(
                     loading = observedState is SignUpScreenState.SignUpInProgress,
                     error = if (observedState is SignUpScreenState.SignUpError) observedState.errorMessage else "",
                     onSignUp = { tentativeCredentials -> viewModel.signUp(tentativeCredentials) },
                     validateCredentials = ::isValidNewCredentialsData,
-                    modifier = modifier
+                    modifier = modifier,
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Row(
-                    horizontalArrangement = Arrangement.Center
+                    horizontalArrangement = Arrangement.Center,
                 ) {
                     Text(
                         text = "Already have an account? ",
-                        style = MaterialTheme.typography.bodyMedium
+                        style = MaterialTheme.typography.bodyMedium,
                     )
                     Text(
                         text = "Login",
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.clickable {
-                            onNavigate(SignUpNavigation.LoginScreen)
-                        }
+                        modifier =
+                            Modifier.clickable {
+                                onNavigate(SignUpNavigation.LoginScreen)
+                            },
                     )
                 }
             }

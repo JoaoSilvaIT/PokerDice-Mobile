@@ -5,9 +5,9 @@ import com.pdm.pokerdice.repo.RepositoryLobby
 import com.pdm.pokerdice.repo.RepositoryUser
 
 interface Transaction {
-    val repoUser : RepositoryUser
-    val repoLobby : RepositoryLobby
-    val repoGame : RepositoryGame
+    val repoUser: RepositoryUser
+    val repoLobby: RepositoryLobby
+    val repoGame: RepositoryGame
 
     fun rollback()
 }

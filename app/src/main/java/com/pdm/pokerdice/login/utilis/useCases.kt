@@ -18,9 +18,8 @@ import com.pdm.pokerdice.service.errors.AuthTokenError
 typealias LoginUseCase = suspend (
     credentials: UserCredentials,
     service: UserAuthService,
-    authInfoRepo: AuthInfoRepo
+    authInfoRepo: AuthInfoRepo,
 ) -> Either<AuthTokenError, AuthInfo>
-
 
 /**
  * Performs the implementation of the login use case.
@@ -31,10 +30,10 @@ typealias LoginUseCase = suspend (
  */
 suspend fun performLogin(
     credentials: UserCredentials,
-    service : UserAuthService,
-    authInfoRepo: AuthInfoRepo
-): Either<AuthTokenError, AuthInfo> {
-    return try {
+    service: UserAuthService,
+    authInfoRepo: AuthInfoRepo,
+): Either<AuthTokenError, AuthInfo> =
+    try {
         when (val result = service.createToken(credentials.email, credentials.password)) {
             is Either.Failure -> {
                 failure(result.value)
@@ -55,4 +54,3 @@ suspend fun performLogin(
     } catch (e: Exception) {
         failure(AuthTokenError.UserNotFoundOrInvalidCredentials)
     }
-}

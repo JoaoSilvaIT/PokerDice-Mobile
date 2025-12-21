@@ -35,7 +35,7 @@ import com.pdm.pokerdice.ui.theme.PokerDiceTheme
 fun WaitingView(
     game: Game,
     isHost: Boolean = false,
-    onStart: () -> Unit
+    onStart: () -> Unit,
 ) {
     // Cores baseadas na imagem
     val backgroundColor = Color(0xFF36596D)
@@ -45,20 +45,22 @@ fun WaitingView(
     val textColor = Color(0xFFE8D5B5)
 
     Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(backgroundColor)
-            .padding(16.dp),
-        contentAlignment = Alignment.Center
+        modifier =
+            Modifier
+                .fillMaxSize()
+                .background(backgroundColor)
+                .padding(16.dp),
+        contentAlignment = Alignment.Center,
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .border(3.dp, borderColor, RoundedCornerShape(16.dp))
-                .background(backgroundColor.copy(alpha = 0.95f), RoundedCornerShape(16.dp))
-                .padding(32.dp),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .border(3.dp, borderColor, RoundedCornerShape(16.dp))
+                    .background(backgroundColor.copy(alpha = 0.95f), RoundedCornerShape(16.dp))
+                    .padding(32.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(24.dp)
+            verticalArrangement = Arrangement.spacedBy(24.dp),
         ) {
             Text(
                 text = "WAITING FOR GAME TO START",
@@ -66,7 +68,7 @@ fun WaitingView(
                 fontWeight = FontWeight.Bold,
                 color = textColor,
                 textAlign = TextAlign.Center,
-                letterSpacing = 2.sp
+                letterSpacing = 2.sp,
             )
 
             Spacer(modifier = Modifier.height(8.dp))
@@ -76,13 +78,13 @@ fun WaitingView(
                 text = "Game #${game.id}",
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold,
-                color = textColor
+                color = textColor,
             )
 
             Text(
                 text = "${game.numberOfRounds} Rounds",
                 fontSize = 20.sp,
-                color = textColor
+                color = textColor,
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -92,15 +94,16 @@ fun WaitingView(
                 text = "Players (${game.players.size})",
                 fontSize = 22.sp,
                 fontWeight = FontWeight.Bold,
-                color = textColor
+                color = textColor,
             )
 
             // Lista de jogadores
             Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 32.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 32.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp),
             ) {
                 game.players.forEachIndexed { index, player ->
                     PlayerCard(
@@ -108,7 +111,7 @@ fun WaitingView(
                         isHost = index == 0,
                         iconColor = playerIconColor,
                         cardColor = cardColor,
-                        textColor = textColor
+                        textColor = textColor,
                     )
                 }
             }
@@ -121,7 +124,7 @@ fun WaitingView(
                     fontSize = 18.sp,
                     fontStyle = FontStyle.Italic,
                     color = textColor.copy(alpha = 0.8f),
-                    textAlign = TextAlign.Center
+                    textAlign = TextAlign.Center,
                 )
             } else {
                 Button(onClick = onStart) {
@@ -138,29 +141,31 @@ fun PlayerCard(
     isHost: Boolean,
     iconColor: Color,
     cardColor: Color,
-    textColor: Color
+    textColor: Color,
 ) {
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(cardColor, RoundedCornerShape(12.dp))
-            .border(2.dp, iconColor.copy(alpha = 0.3f), RoundedCornerShape(12.dp))
-            .padding(16.dp),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .background(cardColor, RoundedCornerShape(12.dp))
+                .border(2.dp, iconColor.copy(alpha = 0.3f), RoundedCornerShape(12.dp))
+                .padding(16.dp),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Start
+        horizontalArrangement = Arrangement.Start,
     ) {
         // Ícone do jogador
         Box(
-            modifier = Modifier
-                .size(50.dp)
-                .background(iconColor, CircleShape),
-            contentAlignment = Alignment.Center
+            modifier =
+                Modifier
+                    .size(50.dp)
+                    .background(iconColor, CircleShape),
+            contentAlignment = Alignment.Center,
         ) {
             Text(
                 text = playerName.firstOrNull()?.uppercase() ?: "U",
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color.Black
+                color = Color.Black,
             )
         }
 
@@ -171,7 +176,7 @@ fun PlayerCard(
             text = if (isHost) "$playerName (Host)" else playerName,
             fontSize = 20.sp,
             fontWeight = FontWeight.Medium,
-            color = textColor
+            color = textColor,
         )
     }
 }
@@ -181,31 +186,33 @@ fun PlayerCard(
 fun WaitingViewPreview() {
     PokerDiceTheme {
         WaitingView(
-            game = Game(
-                id = 1,
-                lobbyId = 1,
-                players = listOf(
-                    PlayerInGame(
-                        id = 1,
-                        name = "User1",
-                        currentBalance = 1000,
-                        moneyWon = 0
-                    ),
-                    PlayerInGame(
-                        id = 2,
-                        name = "User2",
-                        currentBalance = 1000,
-                        moneyWon = 0
-                    )
+            game =
+                Game(
+                    id = 1,
+                    lobbyId = 1,
+                    players =
+                        listOf(
+                            PlayerInGame(
+                                id = 1,
+                                name = "User1",
+                                currentBalance = 1000,
+                                moneyWon = 0,
+                            ),
+                            PlayerInGame(
+                                id = 2,
+                                name = "User2",
+                                currentBalance = 1000,
+                                moneyWon = 0,
+                            ),
+                        ),
+                    numberOfRounds = 2,
+                    state = State.WAITING,
+                    currentRound = null,
+                    startedAt = System.currentTimeMillis(),
+                    endedAt = null,
                 ),
-                numberOfRounds = 2,
-                state = State.WAITING,
-                currentRound = null,
-                startedAt = System.currentTimeMillis(),
-                endedAt = null
-            ),
             isHost = true,
-            {}
+            {},
         )
     }
 }

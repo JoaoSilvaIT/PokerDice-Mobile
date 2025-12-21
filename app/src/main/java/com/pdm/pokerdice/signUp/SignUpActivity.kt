@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
 import com.pdm.pokerdice.DependenciesContainer
-import com.pdm.pokerdice.domain.user.AuthInfoRepo
 import com.pdm.pokerdice.login.LoginActivity
 import com.pdm.pokerdice.ui.theme.PokerDiceTheme
 import com.pdm.pokerdice.ui.title.TitleActivity
@@ -24,24 +23,26 @@ class SignUpActivity : ComponentActivity() {
                     SignUpScreen(
                         onNavigate = { handleNavigation(it) },
                         viewModel,
-                        Modifier.padding(innerPadding))
+                        Modifier.padding(innerPadding),
+                    )
                 }
             }
         }
     }
 
-    private val viewModel : SignUpScreenViewModel by viewModels {
+    private val viewModel: SignUpScreenViewModel by viewModels {
         SignUpScreenViewModel.getFactory(
             (application as DependenciesContainer).authService,
-            (application as DependenciesContainer).authInfoRepo
+            (application as DependenciesContainer).authInfoRepo,
         )
     }
 
     private fun handleNavigation(it: SignUpNavigation) {
-        val intent = when (it) {
-            is SignUpNavigation.TitleScreen -> Intent(this, TitleActivity::class.java)
-            is SignUpNavigation.LoginScreen -> Intent(this, LoginActivity::class.java)
-        }
+        val intent =
+            when (it) {
+                is SignUpNavigation.TitleScreen -> Intent(this, TitleActivity::class.java)
+                is SignUpNavigation.LoginScreen -> Intent(this, LoginActivity::class.java)
+            }
         startActivity(intent)
     }
 }

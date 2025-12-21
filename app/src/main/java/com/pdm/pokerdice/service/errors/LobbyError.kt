@@ -18,6 +18,8 @@ sealed class LobbyError {
     data object UserAlreadyInLobby : LobbyError()
 
     data object UserNotInLobby : LobbyError()
-    
-    data class NetworkError(val message: String) : LobbyError()
+
+    data class NetworkError(
+        val message: String,
+    ) : LobbyError()
 }

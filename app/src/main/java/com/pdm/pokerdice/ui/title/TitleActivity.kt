@@ -10,8 +10,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
 import com.pdm.pokerdice.about.AboutActivity
-import com.pdm.pokerdice.profile.ProfileActivity
 import com.pdm.pokerdice.lobbies.LobbiesActivity
+import com.pdm.pokerdice.profile.ProfileActivity
 import com.pdm.pokerdice.ui.theme.PokerDiceTheme
 
 class TitleActivity : ComponentActivity() {
@@ -29,6 +29,7 @@ class TitleActivity : ComponentActivity() {
             }
         }
     }
+
     private fun navigateTo(action: TitleScreenActions) {
         val intent =
             when (action) {

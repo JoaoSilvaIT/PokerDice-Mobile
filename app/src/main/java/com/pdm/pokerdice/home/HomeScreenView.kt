@@ -18,10 +18,9 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.pdm.pokerdice.ui.theme.GenericTopAppBar
 import com.pdm.pokerdice.R
+import com.pdm.pokerdice.ui.theme.GenericTopAppBar
 import com.pdm.pokerdice.ui.theme.PokerDiceTheme
-
 
 const val HOME_VIEW_TAG = "HomeView"
 const val HOMEPAGE_LOGIN_BUTTON = "Login button on home page"
@@ -32,72 +31,74 @@ const val HOMEPAGE_MADE_BY_TEXT = "made by text on Home page"
 @Composable
 fun HomeView(
     creators: List<String>,
-    onNavigate : (HomeNavigation) -> Unit = {},
+    onNavigate: (HomeNavigation) -> Unit = {},
 ) {
     Scaffold(
-        modifier = Modifier
-            .fillMaxSize()
-            .testTag(HOME_VIEW_TAG),
+        modifier =
+            Modifier
+                .fillMaxSize()
+                .testTag(HOME_VIEW_TAG),
         topBar = {
             GenericTopAppBar(
                 title = stringResource(R.string.app_name),
                 actions = {
                     TextButton(
                         onClick = { onNavigate(HomeNavigation.LoginScreen()) },
-                        modifier = Modifier.testTag(HOMEPAGE_LOGIN_BUTTON)
+                        modifier = Modifier.testTag(HOMEPAGE_LOGIN_BUTTON),
                     ) {
                         Text(
                             text = stringResource(R.string.login),
-                            color = MaterialTheme.colorScheme.onPrimary
+                            color = MaterialTheme.colorScheme.onPrimary,
                         )
                     }
                     TextButton(
                         onClick = { onNavigate(HomeNavigation.SignUpScreen()) },
-                        modifier = Modifier.testTag(HOMEPAGE_SIGNUP_BUTTON)
+                        modifier = Modifier.testTag(HOMEPAGE_SIGNUP_BUTTON),
                     ) {
                         Text(
                             text = stringResource(R.string.sign_Up),
-                            color = MaterialTheme.colorScheme.onPrimary
+                            color = MaterialTheme.colorScheme.onPrimary,
                         )
                     }
-                }
+                },
             )
-        }
+        },
     ) { paddingValues ->
         Column(
-            modifier = Modifier
-                .padding(paddingValues)
-                .fillMaxSize()
-                .background(MaterialTheme.colorScheme.background),
+            modifier =
+                Modifier
+                    .padding(paddingValues)
+                    .fillMaxSize()
+                    .background(MaterialTheme.colorScheme.background),
             verticalArrangement = Arrangement.SpaceBetween,
-            horizontalAlignment = Alignment.CenterHorizontally
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Box(
                 modifier = Modifier.weight(1f),
-                contentAlignment = Alignment.Center
+                contentAlignment = Alignment.Center,
             ) {
                 Text(
                     text = stringResource(R.string.welcome),
                     style = MaterialTheme.typography.titleSmall,
                     color = MaterialTheme.colorScheme.onBackground,
-                    modifier = Modifier.padding(16.dp)
+                    modifier = Modifier.padding(16.dp),
                 )
             }
             Column(
                 modifier = Modifier.padding(16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
+                horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 Text(
                     modifier = Modifier.testTag(HOMEPAGE_MADE_BY_TEXT),
                     text = stringResource(R.string.creators),
                     style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onBackground
+                    color = MaterialTheme.colorScheme.onBackground,
                 )
                 creators.forEach {
                     Text(
                         text = it,
                         style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onBackground
+                        color = MaterialTheme.colorScheme.onBackground,
                     )
                 }
             }
@@ -105,18 +106,18 @@ fun HomeView(
     }
 }
 
-
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun HomeViewPreview() {
     PokerDiceTheme {
         HomeView(
-            creators = listOf(
-                "João Silva",
-                "Pedro Monteiro",
-                "Bernardo Jaco",
-            ),
-            onNavigate = {}
+            creators =
+                listOf(
+                    "João Silva",
+                    "Pedro Monteiro",
+                    "Bernardo Jaco",
+                ),
+            onNavigate = {},
         )
     }
 }

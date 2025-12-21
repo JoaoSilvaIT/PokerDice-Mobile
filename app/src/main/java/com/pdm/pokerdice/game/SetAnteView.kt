@@ -2,7 +2,6 @@ package com.pdm.pokerdice.game
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -26,47 +25,48 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun SetAnteView(
     isMyTurn: Boolean,
-    onConfirm: (Int) -> Unit
+    onConfirm: (Int) -> Unit,
 ) {
     var anteAmount by remember { mutableStateOf("10") }
     var error by remember { mutableStateOf("") }
 
     Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(24.dp),
+        modifier =
+            Modifier
+                .fillMaxSize()
+                .padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+        verticalArrangement = Arrangement.Center,
     ) {
         if (!isMyTurn) {
             Text(
                 text = "Waiting for Opponent",
                 style = MaterialTheme.typography.headlineLarge,
-                color = MaterialTheme.colorScheme.primary
+                color = MaterialTheme.colorScheme.primary,
             )
             Spacer(modifier = Modifier.height(16.dp))
             Text(
                 text = "The first player is setting the Ante...",
-                style = MaterialTheme.typography.bodyLarge
+                style = MaterialTheme.typography.bodyLarge,
             )
         } else {
             Text(
                 text = "Start Round",
                 style = MaterialTheme.typography.headlineLarge,
-                color = MaterialTheme.colorScheme.primary
+                color = MaterialTheme.colorScheme.primary,
             )
-            
+
             Text(
                 text = "You are the first player.\nPlease set the Ante (Bet) for this round.",
                 style = MaterialTheme.typography.bodyMedium,
-                modifier = Modifier.padding(vertical = 16.dp)
+                modifier = Modifier.padding(vertical = 16.dp),
             )
 
             OutlinedTextField(
                 value = anteAmount,
-                onValueChange = { 
+                onValueChange = {
                     if (it.all { char -> char.isDigit() }) {
-                        anteAmount = it 
+                        anteAmount = it
                         error = ""
                     }
                 },
@@ -74,9 +74,9 @@ fun SetAnteView(
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 isError = error.isNotEmpty(),
                 singleLine = true,
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
             )
-            
+
             if (error.isNotEmpty()) {
                 Text(text = error, color = MaterialTheme.colorScheme.error)
             }
@@ -92,7 +92,7 @@ fun SetAnteView(
                         error = "Invalid amount"
                     }
                 },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
             ) {
                 Text("Confirm Ante")
             }

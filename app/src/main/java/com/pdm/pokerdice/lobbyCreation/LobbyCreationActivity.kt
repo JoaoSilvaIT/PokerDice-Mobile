@@ -19,11 +19,11 @@ class LobbyCreationActivity : ComponentActivity() {
 
         setContent {
             PokerDiceTheme {
-                Scaffold (modifier = Modifier.fillMaxSize()) { innerPadding ->
+                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     LobbyCreationScreen(
                         modifier = Modifier.padding(innerPadding),
                         onNavigate = { navigateTo(it) },
-                        viewModel
+                        viewModel,
                     )
                 }
             }
@@ -33,16 +33,19 @@ class LobbyCreationActivity : ComponentActivity() {
     private val viewModel: LobbyCreationViewModel by viewModels {
         LobbyCreationViewModel.Companion.getFactory(
             service = (application as DependenciesContainer).lobbyService,
-            repo = (application as DependenciesContainer).authInfoRepo
+            repo = (application as DependenciesContainer).authInfoRepo,
         )
     }
+
     private fun navigateTo(action: LobbyCreationNavigation) {
-        val intent = when(action){
-            is LobbyCreationNavigation.CreatedLobby -> Intent(this, LobbyActivity::class.java).apply {
-                putExtra("lobby", action.lobby)
-                putExtra("user", action.lobby.host)
+        val intent =
+            when (action) {
+                is LobbyCreationNavigation.CreatedLobby ->
+                    Intent(this, LobbyActivity::class.java).apply {
+                        putExtra("lobby", action.lobby)
+                        putExtra("user", action.lobby.host)
+                    }
             }
-        }
         startActivity(intent)
     }
 }

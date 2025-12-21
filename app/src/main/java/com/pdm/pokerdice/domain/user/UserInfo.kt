@@ -4,7 +4,7 @@ import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
-data class UserInfo (
+data class UserInfo(
     val id: Int,
-    val token: String
-): Parcelable
+    val token: String,
+) : Parcelable

@@ -18,34 +18,39 @@ import com.pdm.pokerdice.ui.theme.PokerDiceTheme
 import com.pdm.pokerdice.ui.title.TitleActivity
 
 class LobbyActivity : ComponentActivity() {
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val lobby = intent.getParcelableExtra("lobby",
-            Lobby::class.java) ?: Lobby(
-            id = 0,
-            name = "Default Name",
-            description = "Default Description",
-            host = UserExternalInfo(0, "Default Host", 0),
-            settings = LobbySettings(numberOfRounds = 5, minPlayers = 2, maxPlayers = 4),
-            players = mutableSetOf(),
-            timeout = 10L
-        )
+        val lobby =
+            intent.getParcelableExtra(
+                "lobby",
+                Lobby::class.java,
+            ) ?: Lobby(
+                id = 0,
+                name = "Default Name",
+                description = "Default Description",
+                host = UserExternalInfo(0, "Default Host", 0),
+                settings = LobbySettings(numberOfRounds = 5, minPlayers = 2, maxPlayers = 4),
+                players = mutableSetOf(),
+                timeout = 10L,
+            )
 
-        val user = intent.getParcelableExtra("user",
-            UserExternalInfo::class.java) ?: UserExternalInfo(0, "Default User", 0)
+        val user =
+            intent.getParcelableExtra(
+                "user",
+                UserExternalInfo::class.java,
+            ) ?: UserExternalInfo(0, "Default User", 0)
 
         setContent {
             PokerDiceTheme {
-                Scaffold (modifier = Modifier.fillMaxSize()) { innerPadding ->
+                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     LobbyScreen(
                         Modifier.padding(innerPadding),
                         onNavigate = ::handleNavigation,
                         lobby = lobby,
                         user = user,
                         host = lobby.host,
-                        viewModel = viewModel
+                        viewModel = viewModel,
                     )
                 }
             }
@@ -56,17 +61,18 @@ class LobbyActivity : ComponentActivity() {
         LobbyViewModel.getFactory(
             service = (application as DependenciesContainer).lobbyService,
             gameService = (application as DependenciesContainer).gameService,
-            repo = (application as DependenciesContainer).authInfoRepo
         )
     }
 
     private fun handleNavigation(it: LobbyNavigation) {
-        val intent = when (it) {
-            LobbyNavigation.TitleScreen -> Intent(this, TitleActivity::class.java)
-            is LobbyNavigation.CreateGame -> Intent(this, GameActivity::class.java).apply {
-                putExtra("game", it.game)
+        val intent =
+            when (it) {
+                LobbyNavigation.TitleScreen -> Intent(this, TitleActivity::class.java)
+                is LobbyNavigation.CreateGame ->
+                    Intent(this, GameActivity::class.java).apply {
+                        putExtra("game", it.game)
+                    }
             }
-        }
         startActivity(intent)
     }
 }

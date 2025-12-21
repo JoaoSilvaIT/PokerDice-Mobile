@@ -25,14 +25,13 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import com.pdm.pokerdice.domain.user.NewUserCredentials
 
-
 @Composable
 fun SignUpForm(
     loading: Boolean,
     error: String?,
     onSignUp: (credentials: NewUserCredentials) -> Unit,
     validateCredentials: (name: String, email: String, password: String, invite: String) -> Boolean,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val email = remember { mutableStateOf("") }
     val password = remember { mutableStateOf("") }
@@ -52,7 +51,7 @@ fun SignUpForm(
         onUserNameChange = { userName.value = it },
         onInviteCodeChange = { inviteCode.value = it },
         onSignUp = { name, em, pass, invite -> onSignUp(NewUserCredentials(name, em, pass, invite)) },
-        modifier = modifier
+        modifier = modifier,
     )
 }
 
@@ -70,11 +69,11 @@ fun SignUpFormStateLess(
     onPasswordChange: (String) -> Unit,
     onInviteCodeChange: (String) -> Unit,
     onSignUp: (name: String, email: String, password: String, invite: String) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Column(
         modifier.fillMaxWidth().padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
+        verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         OutlinedTextField(
             value = userName,
@@ -82,7 +81,7 @@ fun SignUpFormStateLess(
             label = { Text("Username") },
             singleLine = true,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
         )
 
         OutlinedTextField(
@@ -90,7 +89,7 @@ fun SignUpFormStateLess(
             onValueChange = onEmailChange,
             label = { Text("Email") },
             singleLine = true,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
         )
 
         OutlinedTextField(
@@ -100,7 +99,7 @@ fun SignUpFormStateLess(
             singleLine = true,
             visualTransformation = PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Next),
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
         )
 
         OutlinedTextField(
@@ -110,7 +109,7 @@ fun SignUpFormStateLess(
             singleLine = true,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text, imeAction = ImeAction.Done),
             keyboardActions = KeyboardActions(onDone = { if (isDataValid && !loading) onSignUp(userName, email, password, inviteCode) }),
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
         )
 
         if (!error.isNullOrBlank()) {
@@ -120,7 +119,7 @@ fun SignUpFormStateLess(
         Button(
             onClick = { onSignUp(userName, email, password, inviteCode) },
             enabled = isDataValid && !loading,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
         ) {
             if (loading) {
                 CircularProgressIndicator(Modifier.size(16.dp), strokeWidth = 2.dp)

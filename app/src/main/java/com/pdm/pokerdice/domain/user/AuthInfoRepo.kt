@@ -7,7 +7,10 @@ import kotlinx.coroutines.flow.Flow
  * @param userId user's ID.
  * @param authToken The authentication token.
  */
-data class AuthInfo(val userId: Int, val authToken: String)
+data class AuthInfo(
+    val userId: Int,
+    val authToken: String,
+)
 
 /**
  * Repository interface for managing authentication information.
@@ -49,9 +52,7 @@ class FakeAuthInfoRepo : AuthInfoRepo {
         storedAuthInfo = authInfo
     }
 
-    override suspend fun getAuthInfo(): AuthInfo? {
-        return storedAuthInfo
-    }
+    override suspend fun getAuthInfo(): AuthInfo? = storedAuthInfo
 
     override suspend fun clearAuthInfo() {
         storedAuthInfo = null

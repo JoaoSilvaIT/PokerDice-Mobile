@@ -1,4 +1,5 @@
 package com.pdm.pokerdice.domain.utilis
+
 sealed class Either<out F, out S> {
     data class Failure<out F>(
         val value: F,

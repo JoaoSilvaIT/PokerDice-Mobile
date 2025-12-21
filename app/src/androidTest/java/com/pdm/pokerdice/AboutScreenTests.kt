@@ -1,9 +1,5 @@
 package com.pdm.pokerdice
 
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.test.junit4.createComposeRule
-import androidx.compose.ui.test.onNodeWithTag
-import androidx.compose.ui.test.performClick
 import AboutNavigation
 import AboutScreen
 import CONTACT_US
@@ -11,16 +7,19 @@ import CREATOR1
 import CREATOR2
 import CREATOR3
 import GAME_RULES
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.performClick
 import org.junit.Rule
 import org.junit.Test
 
 class AboutScreenTests {
-
     @get:Rule
     val composeTestRule = createComposeRule()
 
     @Test
-    fun ClickOn_GameRulesButton_GeneratesGameRulesEvent(){
+    fun clickOnGameRulesButtonGeneratesGameRulesEvent() {
         var event: AboutNavigation? = null
 
         composeTestRule.setContent {
@@ -32,7 +31,7 @@ class AboutScreenTests {
     }
 
     @Test
-    fun ClickOn_ContactUsButton_GeneratesContactUsEvent(){
+    fun clickOnContactUsButtonGeneratesContactUsEvent() {
         var event: AboutNavigation? = null
 
         composeTestRule.setContent {
@@ -44,7 +43,7 @@ class AboutScreenTests {
     }
 
     @Test
-    fun ClickOn_Creator1Button_GeneratesCreatorEvent(){
+    fun clickOnCreator1ButtonGeneratesCreatorEvent() {
         var event: AboutNavigation? = null
         val expectedUrl = "https://github.com/pedrowlv"
 
@@ -58,7 +57,7 @@ class AboutScreenTests {
     }
 
     @Test
-    fun ClickOn_Creator2Button_GeneratesCreatorEvent(){
+    fun clickOnCreator2ButtonGeneratesCreatorEvent() {
         var event: AboutNavigation? = null
         val expectedUrl = "https://github.com/JoaoSilvaIT"
 
@@ -72,7 +71,7 @@ class AboutScreenTests {
     }
 
     @Test
-    fun ClickOn_Creator3Button_GeneratesCreatorEvent(){
+    fun clickOnCreator3ButtonGeneratesCreatorEvent() {
         var event: AboutNavigation? = null
         val expectedUrl = "https://github.com/jacaoo"
 

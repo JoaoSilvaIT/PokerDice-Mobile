@@ -5,11 +5,10 @@ interface HomeService {
 }
 
 class HomeServiceImpl : HomeService {
-    override fun getCreators(): List<String> {
-        return listOf(
+    override fun getCreators(): List<String> =
+        listOf(
             "Bernardo Jaco",
             "Pedro Monteiro",
-            "João Silva"
+            "João Silva",
         )
-    }
 }
