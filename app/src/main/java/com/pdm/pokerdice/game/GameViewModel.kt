@@ -46,19 +46,15 @@ class GameViewModel(
     private val service: GameService,
     private val authRepo: AuthInfoRepo
 ) : ViewModel() {
-
     var screenState by mutableStateOf<GameScreenState>(GameScreenState.Loading)
         private set
-
     var lastWinnerNotification by mutableStateOf<String?>(null)
         private set
-
     private var currentGame: Game? = null
     private var myUserId: Int = -1
     private var monitoringJob: Job? = null
     private var isTransactionInProgress = false
     private var lastObservedRoundNumber = 0
-
     fun initialize(gameId: Int) {
         viewModelScope.launch {
             val authInfo = authRepo.getAuthInfo()
@@ -71,7 +67,6 @@ class GameViewModel(
             startMonitoring(gameId)
         }
     }
-
     private fun startMonitoring(gameId: Int) {
         monitoringJob?.cancel()
         monitoringJob = viewModelScope.launch {
@@ -87,12 +82,11 @@ class GameViewModel(
             }
         }
     }
-
     private fun detectRoundWinner(newGame: Game) {
         val newRound = newGame.currentRound ?: return
         val currentRoundNum = newRound.number
         
-        if (currentRoundNum > lastObservedRoundNumber && lastObservedRoundNumber > 0) {
+        if (lastObservedRoundNumber in 1..<currentRoundNum) {
             val previousPlayers = currentGame?.players ?: emptyList()
             val winners = newGame.players.filter { p ->
                 val prev = previousPlayers.find { it.id == p.id }
@@ -109,7 +103,6 @@ class GameViewModel(
         }
         lastObservedRoundNumber = currentRoundNum
     }
-
     fun startGame(game: Game) {
         viewModelScope.launch {
             isTransactionInProgress = true
@@ -132,8 +125,6 @@ class GameViewModel(
             isTransactionInProgress = false
         }
     }
-
-
     private fun updateScreenState(game: Game) {
         if (game.state == State.FINISHED) {
              val winner = game.players.maxByOrNull { it.moneyWon }
@@ -190,7 +181,6 @@ class GameViewModel(
             isRolling = false
         )
     }
-
     fun submitAnte(amount: Int) {
         val game = currentGame ?: return
         viewModelScope.launch {
@@ -200,30 +190,6 @@ class GameViewModel(
             }
         }
     }
-
-    private fun faceToCharString(face: com.pdm.pokerdice.domain.game.utilis.Face): String {
-        return when (face) {
-            com.pdm.pokerdice.domain.game.utilis.Face.ACE -> "A"
-            com.pdm.pokerdice.domain.game.utilis.Face.KING -> "K"
-            com.pdm.pokerdice.domain.game.utilis.Face.QUEEN -> "Q"
-            com.pdm.pokerdice.domain.game.utilis.Face.JACK -> "J"
-            com.pdm.pokerdice.domain.game.utilis.Face.TEN -> "T"
-            com.pdm.pokerdice.domain.game.utilis.Face.NINE -> "9"
-        }
-    }
-
-    private fun parseFace(faceStr: String): com.pdm.pokerdice.domain.game.utilis.Face {
-        return when (faceStr.uppercase()) {
-            "A", "ACE" -> com.pdm.pokerdice.domain.game.utilis.Face.ACE
-            "K", "KING" -> com.pdm.pokerdice.domain.game.utilis.Face.KING
-            "Q", "QUEEN" -> com.pdm.pokerdice.domain.game.utilis.Face.QUEEN
-            "J", "JACK" -> com.pdm.pokerdice.domain.game.utilis.Face.JACK
-            "T", "TEN" -> com.pdm.pokerdice.domain.game.utilis.Face.TEN
-            "9", "NINE" -> com.pdm.pokerdice.domain.game.utilis.Face.NINE
-            else -> com.pdm.pokerdice.domain.game.utilis.Face.ACE // Fallback
-        }
-    }
-
     fun holdDice() {
         val game = currentGame ?: return
         val state = screenState as? GameScreenState.Playing ?: return
@@ -264,7 +230,6 @@ class GameViewModel(
             isTransactionInProgress = false
         }
     }
-
     fun rollDice() {
         val game = currentGame ?: return
         val state = screenState as? GameScreenState.Playing ?: return
@@ -309,7 +274,6 @@ class GameViewModel(
             isTransactionInProgress = false
         }
     }
-    
     fun toggleHoldDie(index: Int) {
         val currentState = screenState as? GameScreenState.Playing ?: return
         if (!currentState.isMyTurn) return
@@ -323,7 +287,6 @@ class GameViewModel(
         
         screenState = currentState.copy(heldDiceIndexes = currentHolds)
     }
-
     fun endTurn() {
          val game = currentGame ?: return
          val state = screenState as? GameScreenState.Playing ?: return
@@ -339,40 +302,12 @@ class GameViewModel(
              screenState = state.copy(rolledDice = emptyList(), heldDiceIndexes = emptySet())
          }
     }
-
-    
     fun nextRound() {
         val game = currentGame ?: return
         viewModelScope.launch {
             service.startNewRound(game.id, null)
         }
     }
-
-    private fun calculatePartialRank(dice: List<Dice>): HandRank {
-        val counts = dice.groupingBy { it.face }.eachCount()
-        val maxCount = counts.values.maxOrNull() ?: 0
-        val pairCount = counts.values.count { it == 2 }
-        val distinctCount = counts.size
-        val hasTriplet = counts.values.contains(3)
-        val hasPair = counts.values.contains(2)
-        
-        return when {
-            maxCount == 5 -> HandRank.FIVE_OF_A_KIND
-            maxCount == 4 -> HandRank.FOUR_OF_A_KIND
-            hasTriplet && hasPair -> HandRank.FULL_HOUSE
-            maxCount == 3 -> HandRank.THREE_OF_A_KIND
-            pairCount == 2 -> HandRank.TWO_PAIR
-            maxCount == 2 -> HandRank.ONE_PAIR
-            distinctCount == 5 && isStraight(dice) -> HandRank.STRAIGHT
-            else -> HandRank.HIGH_DICE
-        }
-    }
-
-    private fun isStraight(dice: List<Dice>): Boolean {
-        val sortedStrengths = dice.map { it.face.strength }.sorted()
-        return sortedStrengths == listOf(1, 2, 3, 4, 5) || sortedStrengths == listOf(2, 3, 4, 5, 6)
-    }
-
     companion object {
         fun getFactory(service: GameService, authRepo: AuthInfoRepo): ViewModelProvider.Factory = viewModelFactory {
             initializer { GameViewModel(service, authRepo) }

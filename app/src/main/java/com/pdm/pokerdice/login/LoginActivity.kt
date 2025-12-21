@@ -11,6 +11,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
 import com.pdm.pokerdice.ui.theme.PokerDiceTheme
 import com.pdm.pokerdice.DependenciesContainer
+import com.pdm.pokerdice.signUp.SignUpActivity
 import com.pdm.pokerdice.ui.title.TitleActivity
 
 class LoginActivity : ComponentActivity() {
@@ -41,6 +42,8 @@ class LoginActivity : ComponentActivity() {
          val intent = when (it) {
              is LoginNavigation.TitleScreen ->
                  Intent(this, TitleActivity::class.java)
+                is LoginNavigation.SignUpScreen ->
+                    Intent(this, SignUpActivity::class.java)
          }
         startActivity(intent)
     }

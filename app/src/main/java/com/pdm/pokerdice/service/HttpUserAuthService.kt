@@ -2,21 +2,20 @@ package com.pdm.pokerdice.service
 
 import com.pdm.pokerdice.domain.user.AuthInfo
 import com.pdm.pokerdice.domain.user.AuthInfoRepo
+import com.pdm.pokerdice.domain.user.LoginInputDto
+import com.pdm.pokerdice.domain.user.LoginOutputDto
+import com.pdm.pokerdice.domain.user.MeOutputDto
 import com.pdm.pokerdice.domain.user.TokenExternalInfo
 import com.pdm.pokerdice.domain.user.User
 import com.pdm.pokerdice.domain.user.UserExternalInfo
+import com.pdm.pokerdice.domain.user.UserOutputDto
 import com.pdm.pokerdice.domain.user.UserStatistics
+import com.pdm.pokerdice.domain.user.UserStatisticsDto
 import com.pdm.pokerdice.domain.utilis.Either
 import com.pdm.pokerdice.domain.utilis.failure
 import com.pdm.pokerdice.domain.utilis.success
-import com.pdm.pokerdice.repository.http.model.LoginInputDto
-import com.pdm.pokerdice.repository.http.model.SignUpInputDto
 import com.pdm.pokerdice.service.errors.AuthTokenError
 import java.time.Instant
-import com.pdm.pokerdice.repository.http.model.LoginOutputDto
-import com.pdm.pokerdice.repository.http.model.MeOutputDto
-import com.pdm.pokerdice.repository.http.model.UserOutputDto
-import com.pdm.pokerdice.repository.http.model.UserStatisticsDto
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get

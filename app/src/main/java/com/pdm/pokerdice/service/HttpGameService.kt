@@ -1,6 +1,10 @@
 package com.pdm.pokerdice.service
 
+import com.pdm.pokerdice.domain.game.DiceUpdateInputDto
 import com.pdm.pokerdice.domain.game.Game
+import com.pdm.pokerdice.domain.game.GameDto
+import com.pdm.pokerdice.domain.game.RolledDiceOutputDto
+import com.pdm.pokerdice.domain.game.SetAnteInputDto
 import com.pdm.pokerdice.domain.user.AuthInfoRepo
 import com.pdm.pokerdice.domain.user.UserExternalInfo
 import com.pdm.pokerdice.domain.utilis.Either
@@ -15,10 +19,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import com.pdm.pokerdice.repository.http.model.DiceUpdateInputDto
-import com.pdm.pokerdice.repository.http.model.GameDto
-import com.pdm.pokerdice.repository.http.model.RolledDiceOutputDto
-import com.pdm.pokerdice.repository.http.model.SetAnteInputDto
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
@@ -26,6 +26,8 @@ import io.ktor.client.request.header
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.http.HttpStatusCode
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 
 class HttpGameService(
     private val client: HttpClient,
@@ -37,6 +39,8 @@ class HttpGameService(
 
     private var pollingJob: Job? = null
     private val scope = CoroutineScope(Dispatchers.IO)
+
+    private val mutex = Mutex()
 
     private suspend fun getToken(): String? = authRepo.getAuthInfo()?.authToken
 
@@ -50,8 +54,9 @@ class HttpGameService(
                         val gameDto = client.get("api/games/$gameId") {
                             header("Authorization", "Bearer ${authInfo.authToken}")
                         }.body<GameDto>()
-                        val game = gameDto.toDomain(authInfo.userId)
-                        _currentGame.value = game
+                        mutex.withLock {
+                            _currentGame.value = gameDto.toDomain(authInfo.userId)
+                        }
                     }
                 } catch (e: Exception) {
                     e.printStackTrace()

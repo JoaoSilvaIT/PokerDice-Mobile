@@ -11,6 +11,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
 import com.pdm.pokerdice.DependenciesContainer
 import com.pdm.pokerdice.domain.user.AuthInfoRepo
+import com.pdm.pokerdice.login.LoginActivity
 import com.pdm.pokerdice.ui.theme.PokerDiceTheme
 import com.pdm.pokerdice.ui.title.TitleActivity
 
@@ -39,6 +40,7 @@ class SignUpActivity : ComponentActivity() {
     private fun handleNavigation(it: SignUpNavigation) {
         val intent = when (it) {
             is SignUpNavigation.TitleScreen -> Intent(this, TitleActivity::class.java)
+            is SignUpNavigation.LoginScreen -> Intent(this, LoginActivity::class.java)
         }
         startActivity(intent)
     }

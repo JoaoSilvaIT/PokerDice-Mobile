@@ -1,14 +1,14 @@
 package com.pdm.pokerdice.service
 
+import com.pdm.pokerdice.domain.lobby.LobbiesListDto
 import io.ktor.client.HttpClient
 import com.pdm.pokerdice.domain.lobby.Lobby
+import com.pdm.pokerdice.domain.lobby.LobbyDto
 import com.pdm.pokerdice.domain.user.AuthInfoRepo
 import com.pdm.pokerdice.domain.user.UserExternalInfo
 import com.pdm.pokerdice.domain.utilis.Either
 import com.pdm.pokerdice.domain.utilis.failure
 import com.pdm.pokerdice.domain.utilis.success
-import com.pdm.pokerdice.repository.http.model.LobbyDto
-import com.pdm.pokerdice.repository.http.model.LobbiesListDto
 import com.pdm.pokerdice.service.errors.LobbyError
 import io.ktor.client.call.body
 import io.ktor.client.request.get
@@ -28,7 +28,6 @@ class HttpLobbyService(
 ) : LobbyService {
     private suspend fun getToken(): String? = authRepo.getAuthInfo()?.authToken
 
-    // Real-time via Polling for M5 (2 seconds)
     override val lobbies: Flow<List<Lobby>> = flow {
         while (true) {
             try {
@@ -37,10 +36,10 @@ class HttpLobbyService(
                     val response = client.get("api/lobbies") {
                         header("Authorization", "Bearer $token")
                     }.body<LobbiesListDto>()
-                    
+
                     val list = (response.lobbies ?: emptyList()).filterNotNull().mapNotNull {
                         try {
-                            it.toDomain() 
+                            it.toDomain()
                         } catch (e: Exception) {
                             e.printStackTrace()
                             null
@@ -48,7 +47,7 @@ class HttpLobbyService(
                     }
                     emit(list)
                 } else {
-                    emit(emptyList()) 
+                    emit(emptyList())
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
