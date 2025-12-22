@@ -166,6 +166,42 @@ private fun ProfileContent(
             }
         }
 
+        // Hand Frequencies
+        item {
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = MaterialTheme.shapes.medium,
+                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+            ) {
+                Column(
+                    modifier = Modifier.padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp),
+                ) {
+                    Text(
+                        text = "Hand Frequencies",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
+                    )
+
+                    val frequencies = user.statistics.handFrequencies
+                    if (frequencies.isEmpty()) {
+                        Text(
+                            text = "No hands played yet.",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.secondary
+                        )
+                    } else {
+                        frequencies.entries.sortedByDescending { it.key.strength }.forEach { (rank, count) ->
+                            StatRow(
+                                label = rank.name.replace("_", " ").lowercase().replaceFirstChar { it.uppercase() },
+                                value = count.toString()
+                            )
+                        }
+                    }
+                }
+            }
+        }
+
         // Logout
         item {
             Button(
