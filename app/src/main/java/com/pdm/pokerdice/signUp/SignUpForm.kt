@@ -1,5 +1,6 @@
 package com.pdm.pokerdice.signUp
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -10,20 +11,27 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import com.pdm.pokerdice.domain.user.NewUserCredentials
+import com.pdm.pokerdice.ui.theme.RetroGold
+import com.pdm.pokerdice.ui.theme.RetroNavyDark
+import com.pdm.pokerdice.ui.theme.RetroTeal
+import com.pdm.pokerdice.ui.theme.RetroTextDark
 
 @Composable
 fun SignUpForm(
@@ -72,9 +80,21 @@ fun SignUpFormStateLess(
     modifier: Modifier = Modifier,
 ) {
     Column(
-        modifier.fillMaxWidth().padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp),
+        modifier
+            .fillMaxWidth()
+            .background(Color.White.copy(alpha = 0.95f), shape = MaterialTheme.shapes.medium)
+            .padding(24.dp), // Added container card style
+        verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
+        val textFieldColors = OutlinedTextFieldDefaults.colors(
+            focusedBorderColor = RetroGold,
+            unfocusedBorderColor = Color.Gray,
+            focusedLabelColor = RetroNavyDark,
+            cursorColor = RetroTeal,
+            focusedTextColor = RetroTextDark,
+            unfocusedTextColor = RetroTextDark,
+        )
+
         OutlinedTextField(
             value = userName,
             onValueChange = onUserNameChange,
@@ -82,6 +102,8 @@ fun SignUpFormStateLess(
             singleLine = true,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
             modifier = Modifier.fillMaxWidth(),
+            colors = textFieldColors,
+            shape = MaterialTheme.shapes.small
         )
 
         OutlinedTextField(
@@ -90,6 +112,8 @@ fun SignUpFormStateLess(
             label = { Text("Email") },
             singleLine = true,
             modifier = Modifier.fillMaxWidth(),
+            colors = textFieldColors,
+            shape = MaterialTheme.shapes.small
         )
 
         OutlinedTextField(
@@ -100,6 +124,8 @@ fun SignUpFormStateLess(
             visualTransformation = PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Next),
             modifier = Modifier.fillMaxWidth(),
+            colors = textFieldColors,
+            shape = MaterialTheme.shapes.small
         )
 
         OutlinedTextField(
@@ -110,6 +136,8 @@ fun SignUpFormStateLess(
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text, imeAction = ImeAction.Done),
             keyboardActions = KeyboardActions(onDone = { if (isDataValid && !loading) onSignUp(userName, email, password, inviteCode) }),
             modifier = Modifier.fillMaxWidth(),
+            colors = textFieldColors,
+            shape = MaterialTheme.shapes.small
         )
 
         if (!error.isNullOrBlank()) {
@@ -120,9 +148,15 @@ fun SignUpFormStateLess(
             onClick = { onSignUp(userName, email, password, inviteCode) },
             enabled = isDataValid && !loading,
             modifier = Modifier.fillMaxWidth(),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = RetroTeal,
+                contentColor = Color.White,
+                disabledContainerColor = Color.LightGray
+            ),
+            shape = MaterialTheme.shapes.medium
         ) {
             if (loading) {
-                CircularProgressIndicator(Modifier.size(16.dp), strokeWidth = 2.dp)
+                CircularProgressIndicator(Modifier.size(16.dp), strokeWidth = 2.dp, color = Color.White)
                 Spacer(Modifier.width(8.dp))
             }
             Text("Sign Up")

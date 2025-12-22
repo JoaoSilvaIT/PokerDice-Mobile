@@ -1,6 +1,7 @@
 package com.pdm.pokerdice.profile
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -14,12 +15,21 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.pdm.pokerdice.R
 import com.pdm.pokerdice.domain.user.User
 import com.pdm.pokerdice.ui.theme.GenericTopAppBar
+import com.pdm.pokerdice.ui.theme.RetroBackgroundEnd
+import com.pdm.pokerdice.ui.theme.RetroBackgroundStart
+import com.pdm.pokerdice.ui.theme.RetroGold
+import com.pdm.pokerdice.ui.theme.RetroNavyLight
+import com.pdm.pokerdice.ui.theme.RetroOrange
+import com.pdm.pokerdice.ui.theme.RetroTeal
 
 sealed class ProfileNavigation {
     data object Back : ProfileNavigation()
@@ -48,11 +58,18 @@ fun ProfileScreen(
             modifier =
                 Modifier
                     .fillMaxSize()
-                    .padding(innerPadding),
+                    .padding(innerPadding)
+                    .background(
+                        brush = Brush.linearGradient(
+                            colors = listOf(RetroBackgroundStart, RetroBackgroundEnd),
+                            start = Offset(0f, 0f),
+                            end = Offset(Float.POSITIVE_INFINITY, Float.POSITIVE_INFINITY)
+                        )
+                    ),
         ) {
             when (val currentState = state) {
                 is ProfileScreenState.Loading -> {
-                    CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+                    CircularProgressIndicator(modifier = Modifier.align(Alignment.Center), color = RetroGold)
                 }
                 is ProfileScreenState.Success -> {
                     ProfileContent(
@@ -101,18 +118,19 @@ private fun ProfileContent(
                         Modifier
                             .size(100.dp)
                             .clip(CircleShape)
-                            .border(2.dp, MaterialTheme.colorScheme.primary, CircleShape),
+                            .border(2.dp, RetroGold, CircleShape),
                 )
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(
                     text = user.name,
                     style = MaterialTheme.typography.headlineMedium,
                     fontWeight = FontWeight.Bold,
+                    color = Color.White
                 )
                 Text(
                     text = user.email,
                     style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.secondary,
+                    color = Color.White.copy(alpha = 0.7f),
                 )
             }
         }
@@ -123,18 +141,20 @@ private fun ProfileContent(
                 modifier = Modifier.fillMaxWidth(),
                 shape = MaterialTheme.shapes.medium,
                 elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+                colors = CardDefaults.cardColors(containerColor = RetroNavyLight)
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
                     Text(
                         text = "Account Balance",
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
+                        color = RetroGold
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
                         text = "${user.balance} Coins",
                         style = MaterialTheme.typography.displaySmall,
-                        color = MaterialTheme.colorScheme.primary,
+                        color = RetroTeal,
                     )
                 }
             }
@@ -146,6 +166,7 @@ private fun ProfileContent(
                 modifier = Modifier.fillMaxWidth(),
                 shape = MaterialTheme.shapes.medium,
                 elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+                colors = CardDefaults.cardColors(containerColor = RetroNavyLight)
             ) {
                 Column(
                     modifier = Modifier.padding(16.dp),
@@ -155,6 +176,7 @@ private fun ProfileContent(
                         text = "Game Statistics",
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
+                        color = RetroGold
                     )
 
                     val stats = user.statistics
@@ -172,6 +194,7 @@ private fun ProfileContent(
                 modifier = Modifier.fillMaxWidth(),
                 shape = MaterialTheme.shapes.medium,
                 elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+                colors = CardDefaults.cardColors(containerColor = RetroNavyLight)
             ) {
                 Column(
                     modifier = Modifier.padding(16.dp),
@@ -181,6 +204,7 @@ private fun ProfileContent(
                         text = "Hand Frequencies",
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
+                        color = RetroGold
                     )
 
                     val frequencies = user.statistics.handFrequencies
@@ -188,7 +212,7 @@ private fun ProfileContent(
                         Text(
                             text = "No hands played yet.",
                             style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.secondary
+                            color = Color.White.copy(alpha = 0.7f)
                         )
                     } else {
                         frequencies.entries.sortedByDescending { it.key.strength }.forEach { (rank, count) ->
@@ -209,8 +233,8 @@ private fun ProfileContent(
                 modifier = Modifier.fillMaxWidth(),
                 colors =
                     ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.errorContainer,
-                        contentColor = MaterialTheme.colorScheme.onErrorContainer,
+                        containerColor = RetroOrange,
+                        contentColor = Color.White,
                     ),
                 shape = MaterialTheme.shapes.medium,
             ) {
@@ -233,7 +257,7 @@ private fun StatRow(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
     ) {
-        Text(text = label, style = MaterialTheme.typography.bodyLarge)
-        Text(text = value, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold)
+        Text(text = label, style = MaterialTheme.typography.bodyLarge, color = Color.White)
+        Text(text = value, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold, color = RetroGold)
     }
 }

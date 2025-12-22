@@ -19,12 +19,10 @@ class AboutActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             PokerDiceTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    AboutScreen(
-                        Modifier.padding(innerPadding),
-                        onNavigate = { handleNavigation(it) },
-                    )
-                }
+                AboutScreen(
+                    modifier = Modifier,
+                    onNavigate = { handleNavigation(it) },
+                )
             }
         }
     }

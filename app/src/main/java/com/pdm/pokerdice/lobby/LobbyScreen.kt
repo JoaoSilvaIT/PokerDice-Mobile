@@ -1,6 +1,7 @@
 package com.pdm.pokerdice.lobby
 
 import android.annotation.SuppressLint
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -9,9 +10,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -20,10 +24,21 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.pdm.pokerdice.domain.game.Game
 import com.pdm.pokerdice.domain.lobby.Lobby
 import com.pdm.pokerdice.domain.user.UserExternalInfo
+import com.pdm.pokerdice.ui.theme.AlmostBlack
+import com.pdm.pokerdice.ui.theme.GenericTopAppBar
+import com.pdm.pokerdice.ui.theme.RetroBackgroundEnd
+import com.pdm.pokerdice.ui.theme.RetroBackgroundStart
+import com.pdm.pokerdice.ui.theme.RetroGold
+import com.pdm.pokerdice.ui.theme.RetroNavyLight
+import com.pdm.pokerdice.ui.theme.RetroOrange
+import com.pdm.pokerdice.ui.theme.RetroTeal
 
 sealed class LobbyNavigation {
     class CreateGame(
@@ -33,6 +48,7 @@ sealed class LobbyNavigation {
     object TitleScreen : LobbyNavigation()
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("SuspiciousIndentation")
 @Composable
 fun LobbyScreen(
@@ -98,111 +114,147 @@ fun LobbyScreen(
         }
     }
 
-    Column(
-        modifier =
-            modifier
-                .fillMaxSize()
-                .padding(16.dp),
-    ) {
-        Text(
-            text = currentLobby.name,
-            style = MaterialTheme.typography.headlineLarge,
-            modifier = Modifier.padding(bottom = 4.dp),
-        )
-
-        Text(
-            text = currentLobby.description,
-            style = MaterialTheme.typography.bodyLarge,
-            modifier = Modifier.padding(bottom = 16.dp),
-        )
-        // List of Players
-        Text(
-            text = "Players in Lobby:",
-            style = MaterialTheme.typography.titleMedium,
-            modifier = Modifier.padding(vertical = 8.dp),
-        )
-
-        LazyColumn(
-            modifier = Modifier.weight(1f), // ocupa o resto do espaço
+    Scaffold(
+        modifier = modifier.fillMaxSize(),
+        topBar = {
+            GenericTopAppBar(
+                title = currentLobby.name,
+                // No back arrow requested
+            )
+        }
+    ) { innerPadding ->
+        Column(
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding)
+                    .background(
+                        brush = Brush.linearGradient(
+                            colors = listOf(RetroBackgroundStart, RetroBackgroundEnd),
+                            start = Offset(0f, 0f),
+                            end = Offset(Float.POSITIVE_INFINITY, Float.POSITIVE_INFINITY)
+                        )
+                    )
+                    .padding(16.dp),
         ) {
-            items(currentLobby.players.toList()) { usr ->
-                Card(
-                    modifier =
-                        Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 4.dp),
-                    shape = MaterialTheme.shapes.medium,
-                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-                ) {
-                    Row(
+            Text(
+                text = "Lobby: ${currentLobby.name}",
+                style = MaterialTheme.typography.headlineMedium,
+                color = RetroGold,
+                modifier = Modifier.padding(bottom = 4.dp),
+            )
+
+            Text(
+                text = currentLobby.description,
+                style = MaterialTheme.typography.bodyLarge,
+                color = Color.White.copy(alpha = 0.8f),
+                modifier = Modifier.padding(bottom = 16.dp),
+            )
+            // List of Players
+            Text(
+                text = "Players in Lobby:",
+                style = MaterialTheme.typography.titleMedium,
+                color = Color.White,
+                modifier = Modifier.padding(vertical = 8.dp),
+            )
+
+            LazyColumn(
+                modifier = Modifier.weight(1f), // ocupa o resto do espaço
+            ) {
+                items(currentLobby.players.toList()) { usr ->
+                    Card(
                         modifier =
                             Modifier
                                 .fillMaxWidth()
-                                .padding(12.dp),
-                        verticalAlignment = Alignment.CenterVertically,
+                                .padding(vertical = 4.dp),
+                        shape = MaterialTheme.shapes.medium,
+                        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+                        colors = CardDefaults.cardColors(
+                            containerColor = RetroNavyLight
+                        )
                     ) {
-                        if (usr.name == user.name) {
-                            if (usr.name == host.name) {
-                                Text(
-                                    text = "${user.name} (Host, You)",
-                                    style = MaterialTheme.typography.bodyLarge,
-                                    color = MaterialTheme.colorScheme.primary,
-                                )
+                        Row(
+                            modifier =
+                                Modifier
+                                    .fillMaxWidth()
+                                    .padding(12.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            if (usr.name == user.name) {
+                                if (usr.name == host.name) {
+                                    Text(
+                                        text = "${user.name} (Host, You)",
+                                        style = MaterialTheme.typography.bodyLarge,
+                                        color = RetroGold,
+                                    )
+                                } else {
+                                    Text(
+                                        text = "${user.name} (You)",
+                                        style = MaterialTheme.typography.bodyLarge,
+                                        color = RetroGold,
+                                    )
+                                }
                             } else {
-                                Text(
-                                    text = "${user.name} (You)",
-                                    style = MaterialTheme.typography.bodyLarge,
-                                    color = MaterialTheme.colorScheme.primary,
-                                )
-                            }
-                        } else {
-                            if (usr.name == host.name) {
-                                Text(
-                                    text = "${usr.name} (Host)",
-                                    style = MaterialTheme.typography.bodyLarge,
-                                    color = MaterialTheme.colorScheme.secondary,
-                                )
-                            } else {
-                                Text(text = usr.name, style = MaterialTheme.typography.bodyLarge)
+                                if (usr.name == host.name) {
+                                    Text(
+                                        text = "${usr.name} (Host)",
+                                        style = MaterialTheme.typography.bodyLarge,
+                                        color = RetroTeal,
+                                    )
+                                } else {
+                                    Text(
+                                        text = usr.name,
+                                        style = MaterialTheme.typography.bodyLarge,
+                                        color = Color.White
+                                    )
+                                }
                             }
                         }
                     }
                 }
             }
-        }
 
-        // Countdown Display - Shows when countdown is active
-        countdown?.let {
-            CountdownDisplay(
-                countdown = it,
-                modifier = Modifier.padding(vertical = 16.dp),
-            )
-        }
+            // Countdown Display - Shows when countdown is active
+            countdown?.let {
+                CountdownDisplay(
+                    countdown = it,
+                    modifier = Modifier.padding(vertical = 16.dp),
+                )
+            }
 
-        if (user.id == host.id) {
+            if (user.id == host.id) {
+                Button(
+                    onClick = { viewModel.createGame(currentLobby, currentLobby.settings.numberOfRounds) },
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(top = 16.dp),
+                    shape = MaterialTheme.shapes.medium,
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color.White,
+                        contentColor = AlmostBlack
+                    )
+                ) {
+                    Text("Start Game 🎮", style = MaterialTheme.typography.titleSmall)
+                }
+            }
+
             Button(
-                onClick = { viewModel.createGame(currentLobby, currentLobby.settings.numberOfRounds) },
+                onClick = {
+                    viewModel.leaveLobby(user, currentLobby.id)
+                },
                 modifier =
                     Modifier
                         .fillMaxWidth()
-                        .padding(top = 16.dp),
+                        .padding(top = 8.dp),
                 shape = MaterialTheme.shapes.medium,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = RetroOrange,
+                    contentColor = Color.White
+                )
             ) {
-                Text("Start Game 🎮", style = MaterialTheme.typography.titleSmall)
+                Text("Leave Lobby", style = MaterialTheme.typography.titleSmall)
             }
-        }
-
-        Button(
-            onClick = {
-                viewModel.leaveLobby(user, currentLobby.id)
-            },
-            modifier =
-                Modifier
-                    .fillMaxWidth()
-                    .padding(top = 8.dp),
-            shape = MaterialTheme.shapes.medium,
-        ) {
-            Text("Leave Lobby", style = MaterialTheme.typography.titleSmall)
         }
     }
 }

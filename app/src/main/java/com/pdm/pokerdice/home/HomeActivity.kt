@@ -12,7 +12,6 @@ import com.pdm.pokerdice.ui.theme.PokerDiceTheme
 class HomeActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
         setContent {
             PokerDiceTheme {
                 HomeScreen(

@@ -1,5 +1,6 @@
 package com.pdm.pokerdice.signUp
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -10,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -17,8 +19,17 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.pdm.pokerdice.R
 import com.pdm.pokerdice.domain.user.isValidNewCredentialsData
+import com.pdm.pokerdice.ui.theme.GenericTopAppBar
+import com.pdm.pokerdice.ui.theme.RetroBackgroundEnd
+import com.pdm.pokerdice.ui.theme.RetroBackgroundStart
+import com.pdm.pokerdice.ui.theme.RetroGold
 
 sealed class SignUpNavigation {
     object TitleScreen : SignUpNavigation()
@@ -34,6 +45,12 @@ fun SignUpScreen(
 ) {
     Scaffold(
         modifier = Modifier.fillMaxSize(),
+        topBar = {
+            GenericTopAppBar(
+                title = stringResource(R.string.sign_Up),
+                onBackAction = { /* Optional: Navigate back */ }
+            )
+        }
     ) { innerPadding ->
         val observedState = viewModel.currentState
         LaunchedEffect(observedState) {
@@ -46,6 +63,13 @@ fun SignUpScreen(
             modifier =
                 Modifier
                     .fillMaxSize()
+                    .background(
+                        brush = Brush.linearGradient(
+                            colors = listOf(RetroBackgroundStart, RetroBackgroundEnd),
+                            start = Offset(0f, 0f),
+                            end = Offset(Float.POSITIVE_INFINITY, Float.POSITIVE_INFINITY)
+                        )
+                    )
                     .padding(paddingValues = innerPadding)
                     .padding(horizontal = 48.dp)
                     .imePadding(),
@@ -70,11 +94,12 @@ fun SignUpScreen(
                     Text(
                         text = "Already have an account? ",
                         style = MaterialTheme.typography.bodyMedium,
+                        color = Color.White
                     )
                     Text(
                         text = "Login",
                         style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.primary,
+                        color = RetroGold,
                         modifier =
                             Modifier.clickable {
                                 onNavigate(SignUpNavigation.LoginScreen)

@@ -13,6 +13,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -26,13 +27,12 @@ fun GenericTopAppBar(
     onTitleClick: (() -> Unit)? = null,
     onBackAction: (() -> Unit)? = null,
     actions: @Composable RowScope.() -> Unit = {},
-    scrollBehavior: TopAppBarScrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(),
 ) {
     TopAppBar(
         title = {
             Text(
                 text = title,
-                color = MaterialTheme.colorScheme.onPrimary,
+                color = Color.White,
                 modifier =
                     Modifier
                         .fillMaxHeight()
@@ -54,7 +54,7 @@ fun GenericTopAppBar(
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                         contentDescription = stringResource(R.string.Go_back),
-                        tint = MaterialTheme.colorScheme.onPrimary,
+                        tint = Color.White,
                     )
                 }
             }
@@ -62,9 +62,8 @@ fun GenericTopAppBar(
         actions = { actions() },
         colors =
             TopAppBarDefaults.topAppBarColors(
-                containerColor = MaterialTheme.colorScheme.primary,
+                containerColor = AlmostBlack,
             ),
-        scrollBehavior = scrollBehavior,
         modifier = modifier.statusBarsPadding(),
     )
 }

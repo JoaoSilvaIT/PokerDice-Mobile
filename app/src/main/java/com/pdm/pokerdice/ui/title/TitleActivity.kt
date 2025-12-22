@@ -17,15 +17,12 @@ import com.pdm.pokerdice.ui.theme.PokerDiceTheme
 class TitleActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
         setContent {
             PokerDiceTheme {
-                Scaffold(modifier = Modifier.Companion.fillMaxSize()) { innerPadding ->
-                    TitleScreen(
-                        modifier = Modifier.Companion.padding(innerPadding),
-                        onNavigate = { navigateTo(it) },
-                    )
-                }
+                TitleScreen(
+                    modifier = Modifier,
+                    onNavigate = { navigateTo(it) },
+                )
             }
         }
     }
