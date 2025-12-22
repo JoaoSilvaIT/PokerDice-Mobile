@@ -38,6 +38,10 @@ fun CountdownDisplay(
     countdown: LobbyCountdown,
     modifier: Modifier = Modifier,
 ) {
+    // Debug: Calculate what the time SHOULD be
+    val now = System.currentTimeMillis()
+    val actualRemaining = ((countdown.expiresAt - now) / 1000).coerceAtLeast(0)
+
     Card(
         modifier = modifier.fillMaxWidth(),
         colors =
@@ -65,6 +69,15 @@ fun CountdownDisplay(
                 style = MaterialTheme.typography.displayLarge,
                 color = MaterialTheme.colorScheme.primary,
             )
+
+            // Debug info - remove this later
+            if (countdown.remainingSeconds != actualRemaining) {
+                Text(
+                    text = "DEBUG: Should be ${actualRemaining}s",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.error,
+                )
+            }
 
             Spacer(modifier = Modifier.height(8.dp))
 
@@ -95,9 +108,13 @@ private fun formatCountdown(seconds: Long): String {
 }
 
 private fun calculateProgress(countdown: LobbyCountdown): Float {
-    val totalSeconds = (countdown.expiresAt - (countdown.expiresAt - countdown.remainingSeconds * 1000)) / 1000
+    // Calculate total countdown duration from expiresAt timestamp
+    val now = System.currentTimeMillis()
+    val totalDuration = countdown.expiresAt - (now - countdown.remainingSeconds * 1000)
+    val totalSeconds = totalDuration / 1000
+
     return if (totalSeconds > 0) {
-        (countdown.remainingSeconds.toFloat() / totalSeconds.toFloat())
+        (countdown.remainingSeconds.toFloat() / totalSeconds.toFloat()).coerceIn(0f, 1f)
     } else {
         0f
     }

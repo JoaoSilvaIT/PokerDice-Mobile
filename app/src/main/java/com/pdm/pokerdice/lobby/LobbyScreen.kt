@@ -47,9 +47,14 @@ fun LobbyScreen(
     val currentCreateGameState by viewModel.createGameState.collectAsState(CreateGameState.Idle)
     val countdown by viewModel.countdown.collectAsState()
     val gameStarted by viewModel.gameStarted.collectAsState()
+    val lobbyUpdated by viewModel.lobbyUpdated.collectAsState()
+
+    // Use the updated lobby from SSE events, or fall back to the original lobby
+    val currentLobby = lobbyUpdated ?: lobby
 
     // Start monitoring SSE events (countdown, game started, etc.)
     LaunchedEffect(lobby.id) {
+        viewModel.setInitialLobby(lobby)
         viewModel.startMonitoringLobby(lobby.id)
     }
 
@@ -100,13 +105,13 @@ fun LobbyScreen(
                 .padding(16.dp),
     ) {
         Text(
-            text = lobby.name,
+            text = currentLobby.name,
             style = MaterialTheme.typography.headlineLarge,
             modifier = Modifier.padding(bottom = 4.dp),
         )
 
         Text(
-            text = lobby.description,
+            text = currentLobby.description,
             style = MaterialTheme.typography.bodyLarge,
             modifier = Modifier.padding(bottom = 16.dp),
         )
@@ -120,7 +125,7 @@ fun LobbyScreen(
         LazyColumn(
             modifier = Modifier.weight(1f), // ocupa o resto do espaço
         ) {
-            items(lobby.players.toList()) { usr ->
+            items(currentLobby.players.toList()) { usr ->
                 Card(
                     modifier =
                         Modifier
@@ -176,7 +181,7 @@ fun LobbyScreen(
 
         if (user.id == host.id) {
             Button(
-                onClick = { viewModel.createGame(lobby, 2) },
+                onClick = { viewModel.createGame(currentLobby, currentLobby.settings.numberOfRounds) },
                 modifier =
                     Modifier
                         .fillMaxWidth()
@@ -189,7 +194,7 @@ fun LobbyScreen(
 
         Button(
             onClick = {
-                viewModel.leaveLobby(user, lobby.id)
+                viewModel.leaveLobby(user, currentLobby.id)
             },
             modifier =
                 Modifier

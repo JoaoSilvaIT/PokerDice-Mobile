@@ -71,11 +71,24 @@ class LobbyViewModel(
     private val _gameStarted = MutableStateFlow<Pair<Int, Int>?>(null) // (lobbyId, gameId)
     val gameStarted = _gameStarted.asStateFlow()
 
+    private val _lobbyUpdated = MutableStateFlow<Lobby?>(null)
+    val lobbyUpdated = _lobbyUpdated.asStateFlow()
+
     private var countdownJob: Job? = null
     private var monitoringJob: Job? = null
+    private var pollingJob: Job? = null
+
+    /**
+     * Set the initial lobby state
+     */
+    fun setInitialLobby(lobby: Lobby) {
+
+        _lobbyUpdated.value = lobby
+    }
 
     /**
      * Start monitoring lobby events (countdown, game started, etc.) via SSE
+     * Also starts polling to refresh lobby data every 2 seconds
      */
     fun startMonitoringLobby(lobbyId: Int) {
         monitoringJob?.cancel()
@@ -92,8 +105,7 @@ class LobbyViewModel(
                                 stopCountdown()
                             }
                             is LobbyEvent.LobbyUpdated -> {
-                                // Lobby updated (e.g., players joined/left)
-                                // You can emit this to UI if needed
+                                _lobbyUpdated.value = event.lobby
                             }
                             is LobbyEvent.ConnectionLost -> {
                                 stopCountdown()
@@ -105,25 +117,60 @@ class LobbyViewModel(
                     stopCountdown()
                 }
             }
+
+        // Start polling as fallback
+        startPollingLobby(lobbyId)
+    }
+
+    /**
+     * Poll lobby data every 2 seconds to ensure UI stays synchronized
+     */
+    private fun startPollingLobby(lobbyId: Int) {
+        pollingJob?.cancel()
+        pollingJob =
+            viewModelScope.launch {
+                while (true) {
+                    try {
+                        delay(2000) // Poll every 2 seconds
+
+                        when (val result = lobbyService.getLobby(lobbyId)) {
+                            is Either.Success -> {
+                                val lobby = result.value
+                                _lobbyUpdated.value = lobby
+                            }
+                            is Either.Failure -> {
+                            }
+                        }
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
+                }
+            }
     }
 
     private fun handleCountdownStarted(countdown: LobbyCountdown) {
-        _countdown.value = countdown
+        // Recalculate immediately to ensure we start with accurate time
+        val initialUpdate = countdown.updateRemaining()
+        _countdown.value = initialUpdate
 
         // Start local countdown ticker for smooth UI updates
         countdownJob?.cancel()
         countdownJob =
             viewModelScope.launch {
                 while (true) {
+                    delay(100) // Check every 100ms for better precision
+
                     val current = _countdown.value ?: break
 
-                    if (current.isExpired) {
+                    // Recalculate based on actual current time
+                    val updated = current.updateRemaining()
+                    _countdown.value = updated
+
+                    // Check if expired right after updating
+                    if (updated.isExpired) {
                         _countdown.value = null
                         break
                     }
-
-                    delay(1000)
-                    _countdown.value = current.updateRemaining()
                 }
             }
     }
@@ -135,6 +182,7 @@ class LobbyViewModel(
 
     fun stopMonitoring() {
         monitoringJob?.cancel()
+        pollingJob?.cancel()
         stopCountdown()
     }
 

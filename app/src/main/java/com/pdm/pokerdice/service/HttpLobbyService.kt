@@ -145,6 +145,24 @@ class HttpLobbyService(
         return UserExternalInfo(authInfo.userId, "Me", 0)
     }
 
+    override suspend fun getLobby(lobbyId: Int): Either<LobbyError, Lobby> {
+        return try {
+            val token = getToken() ?: return failure(LobbyError.NetworkError("Not logged in"))
+            val response = client.get("api/lobbies/$lobbyId") {
+                header("Authorization", "Bearer $token")
+            }
+
+            if (response.status != HttpStatusCode.OK) {
+                return failure(LobbyError.NetworkError("Server error: ${response.status}"))
+            }
+
+            val lobbyDto = response.body<LobbyDto>()
+            success(lobbyDto.toDomain())
+        } catch (e: Exception) {
+            failure(LobbyError.NetworkError(e.message ?: "Unknown error"))
+        }
+    }
+
     /**
      * Monitor lobby events via SSE (Server-Sent Events)
      * Receives: CountdownStarted, GameStarted, LobbyUpdated

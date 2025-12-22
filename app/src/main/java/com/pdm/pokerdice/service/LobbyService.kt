@@ -38,6 +38,8 @@ interface LobbyService : Service {
         lobbyId: Int,
     ): Either<LobbyError, Boolean>
 
+    suspend fun getLobby(lobbyId: Int): Either<LobbyError, Lobby>
+
     suspend fun monitorLobbyEvents(lobbyId: Int): Flow<LobbyEvent>
 }
 
@@ -123,6 +125,13 @@ class FakeLobbyService(
 
         return trxManager.run {
             repoUser.getUserById(authInfo.userId)
+        }
+    }
+
+    override suspend fun getLobby(lobbyId: Int): Either<LobbyError, Lobby> {
+        return trxManager.run {
+            val lobby = repoLobby.findById(lobbyId) ?: return@run failure(LobbyError.LobbyNotFound)
+            success(lobby)
         }
     }
 
