@@ -360,7 +360,11 @@ fun OpponentSection(
             Text("Balance: $balance", style = MaterialTheme.typography.bodyMedium)
         }
 
-        Text(if (dice.isNotEmpty()) "Rolled:" else "Waiting...", style = MaterialTheme.typography.bodySmall)
+        Text(
+            text = if (dice.isNotEmpty()) "Rolled:" else "Waiting...",
+            style = MaterialTheme.typography.bodySmall,
+            modifier = Modifier.padding(vertical = 8.dp)
+        )
 
         Row(
             horizontalArrangement = Arrangement.spacedBy(4.dp),

@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -64,7 +65,7 @@ fun WaitingView(
         ) {
             Text(
                 text = "WAITING FOR GAME TO START",
-                fontSize = 36.sp,
+                style = MaterialTheme.typography.displaySmall,
                 fontWeight = FontWeight.Bold,
                 color = textColor,
                 textAlign = TextAlign.Center,
@@ -76,14 +77,14 @@ fun WaitingView(
             // Game Info
             Text(
                 text = "Game #${game.id}",
-                fontSize = 24.sp,
+                style = MaterialTheme.typography.headlineSmall,
                 fontWeight = FontWeight.Bold,
                 color = textColor,
             )
 
             Text(
                 text = "${game.numberOfRounds} Rounds",
-                fontSize = 20.sp,
+                style = MaterialTheme.typography.titleLarge,
                 color = textColor,
             )
 
@@ -92,7 +93,7 @@ fun WaitingView(
             // Players section
             Text(
                 text = "Players (${game.players.size})",
-                fontSize = 22.sp,
+                style = MaterialTheme.typography.headlineSmall,
                 fontWeight = FontWeight.Bold,
                 color = textColor,
             )
