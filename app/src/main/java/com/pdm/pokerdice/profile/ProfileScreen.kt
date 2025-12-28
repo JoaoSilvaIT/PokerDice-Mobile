@@ -18,9 +18,13 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import android.widget.Toast
 import com.pdm.pokerdice.R
 import com.pdm.pokerdice.domain.user.User
 import com.pdm.pokerdice.ui.theme.GenericTopAppBar
@@ -74,6 +78,8 @@ fun ProfileScreen(
                 is ProfileScreenState.Success -> {
                     ProfileContent(
                         user = currentState.user,
+                        inviteCode = currentState.inviteCode,
+                        onCreateInvite = viewModel::createInvite,
                         onLogout = {
                             viewModel.logout { onNavigate(ProfileNavigation.Logout) }
                         },
@@ -98,6 +104,8 @@ fun ProfileScreen(
 @Composable
 private fun ProfileContent(
     user: User,
+    inviteCode: String?,
+    onCreateInvite: () -> Unit,
     onLogout: () -> Unit,
 ) {
     LazyColumn(
@@ -106,7 +114,7 @@ private fun ProfileContent(
             Modifier
                 .fillMaxSize()
                 .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(24.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         // User Header
         item {
@@ -220,6 +228,66 @@ private fun ProfileContent(
                                 label = rank.name.replace("_", " ").lowercase().replaceFirstChar { it.uppercase() },
                                 value = count.toString()
                             )
+                        }
+                    }
+                }
+            }
+        }
+
+        // Invite Friend
+        item {
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = MaterialTheme.shapes.medium,
+                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+                colors = CardDefaults.cardColors(containerColor = RetroNavyLight)
+            ) {
+                Column(
+                    modifier = Modifier.padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp),
+                ) {
+                    Text(
+                        text = "Invite a Friend",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = RetroGold
+                    )
+
+                    if (inviteCode != null) {
+                        val clipboardManager = LocalClipboardManager.current
+                        val context = LocalContext.current
+
+                        Text(
+                            text = "Share this code:",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = Color.White
+                        )
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.Center,
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Text(
+                                text = inviteCode,
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Bold,
+                                color = RetroTeal
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            TextButton(onClick = {
+                                clipboardManager.setText(AnnotatedString(inviteCode))
+                                Toast.makeText(context, "Copied to clipboard", Toast.LENGTH_SHORT).show()
+                            }) {
+                                Text("Copy", color = RetroGold)
+                            }
+                        }
+                    } else {
+                        Button(
+                            onClick = onCreateInvite,
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = ButtonDefaults.buttonColors(containerColor = RetroGold, contentColor = RetroNavyLight)
+                        ) {
+                            Text("Generate Invite Code")
                         }
                     }
                 }

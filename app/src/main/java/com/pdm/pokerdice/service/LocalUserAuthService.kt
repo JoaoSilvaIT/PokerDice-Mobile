@@ -104,6 +104,10 @@ class LocalUserAuthService(
         return failure(AuthTokenError.TokenNotCreated)
     }
 
+    override suspend fun createInvite(): Either<AuthTokenError, String> {
+        return success(java.util.UUID.randomUUID().toString().substring(0, 8))
+    }
+
     private fun isTokenTimeValid(
         clock: Clock,
         token: Token,

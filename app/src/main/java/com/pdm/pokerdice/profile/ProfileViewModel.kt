@@ -18,6 +18,7 @@ sealed interface ProfileScreenState {
 
     data class Success(
         val user: User,
+        val inviteCode: String? = null,
     ) : ProfileScreenState
 
     data class Error(
@@ -44,6 +45,22 @@ class ProfileViewModel(
                 }
                 is Either.Failure -> {
                     _state.value = ProfileScreenState.Error("Failed to load profile info")
+                }
+            }
+        }
+    }
+
+    fun createInvite() {
+        viewModelScope.launch {
+            val currentState = _state.value
+            if (currentState is ProfileScreenState.Success) {
+                when (val result = service.createInvite()) {
+                    is Either.Success -> {
+                        _state.value = currentState.copy(inviteCode = result.value)
+                    }
+                    is Either.Failure -> {
+                        // Keep current state or show error.
+                    }
                 }
             }
         }

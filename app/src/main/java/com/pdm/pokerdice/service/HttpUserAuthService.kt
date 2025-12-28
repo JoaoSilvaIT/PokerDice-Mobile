@@ -147,6 +147,26 @@ class HttpUserAuthService(
             failure(AuthTokenError.TokenNotCreated)
         }
 
+    override suspend fun createInvite(): Either<AuthTokenError, String> {
+        val token = getToken() ?: return failure(AuthTokenError.TokenNotCreated)
+        return try {
+            val response =
+                client.post("/api/users/invite") {
+                    header("Authorization", "Bearer $token")
+                }
+
+            if (response.status.value !in 200..299) {
+                return failure(AuthTokenError.TokenNotCreated)
+            }
+
+            val responseBody = response.body<Map<String, String>>()
+            val inviteCode = responseBody["inviteCode"] ?: ""
+            success(inviteCode)
+        } catch (e: Exception) {
+            failure(AuthTokenError.TokenNotCreated)
+        }
+    }
+
     override suspend fun revokeToken(token: String): Boolean =
         try {
             client.post("/api/users/logout") {

@@ -22,5 +22,7 @@ interface UserAuthService : Service {
 
     suspend fun getUserInfo(): Either<AuthTokenError, User>
 
+    suspend fun createInvite(): Either<AuthTokenError, String>
+
     suspend fun revokeToken(token: String): Boolean
 }

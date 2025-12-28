@@ -44,8 +44,8 @@ class PokerDice :
             }
             install(SSE)
             defaultRequest {
-                url("http://10.0.2.2:8080/")
-            //  url("https://furlable-terica-fluvial.ngrok-free.dev")
+            //    url("http://10.0.2.2:8080/")
+              url("https://furlable-terica-fluvial.ngrok-free.dev")
                 contentType(ContentType.Application.Json)
             }
         }
