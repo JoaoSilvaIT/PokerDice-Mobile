@@ -18,54 +18,44 @@ import io.ktor.client.request.header
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.http.HttpStatusCode
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.flow.flow
 
 class HttpGameService(
     private val client: HttpClient,
     private val authRepo: AuthInfoRepo,
 ) : GameService {
-    private val _currentGame = MutableStateFlow<Game?>(null)
-    override val currentGame: Flow<Game?> = _currentGame.asStateFlow()
-
-    private var pollingJob: Job? = null
-    private val scope = CoroutineScope(Dispatchers.IO)
-
-    private val mutex = Mutex()
+    private var currentGameId: Int? = null
 
     private suspend fun getToken(): String? = authRepo.getAuthInfo()?.authToken
 
-    override suspend fun monitorGame(gameId: Int) {
-        pollingJob?.cancel()
-        pollingJob =
-            scope.launch {
-                while (true) {
-                    try {
-                        val authInfo = authRepo.getAuthInfo()
-                        if (authInfo != null) {
-                            val gameDto =
-                                client
-                                    .get("api/games/$gameId") {
-                                        header("Authorization", "Bearer ${authInfo.authToken}")
-                                    }.body<GameDto>()
-                            mutex.withLock {
-                                _currentGame.value = gameDto.toDomain(authInfo.userId)
-                            }
-                        }
-                    } catch (e: Exception) {
-                        e.printStackTrace()
+    override val currentGame: Flow<Game?> =
+        flow {
+            while (true) {
+                try {
+                    val gameId = currentGameId
+                    val authInfo = authRepo.getAuthInfo()
+                    if (gameId != null && authInfo != null) {
+                        val gameDto =
+                            client
+                                .get("api/games/$gameId") {
+                                    header("Authorization", "Bearer ${authInfo.authToken}")
+                                }.body<GameDto>()
+                        emit(gameDto.toDomain(authInfo.userId))
+                    } else {
+                        emit(null)
                     }
-                    delay(1000) // Poll every 1 second for "real-time" feel
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                    emit(null)
                 }
+                delay(1000) // Poll every 1 second for "real-time" feel
             }
+        }
+
+    override suspend fun monitorGame(gameId: Int) {
+        currentGameId = gameId
     }
 
     override suspend fun createGame(
