@@ -1,4 +1,4 @@
-Project 2 — PokerDice (Android client)
+PokerDice (Android client)
 
 UI: Kotlin + Jetpack Compose, multiple screens/flows (login, home, lobbies list, lobby screen, game screen, profile, about).
 
