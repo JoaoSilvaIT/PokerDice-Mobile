@@ -1,4 +1,14 @@
-[![Review Assignment Due Date](https://classroom.github.com/assets/deadline-readme-button-22041afd0340ce965d47ae6ef1cefeee28c7c493a6346c4f15d667ab976d596c.svg)](https://classroom.github.com/a/e5Yj8iZn)
+PokerDice (Full-stack: API + Web UI)
+
+Backend: Kotlin + Spring Boot, PostgreSQL (via JDBI), token-based auth, invite codes, lobby + game domain logic, multiple REST endpoints.
+
+Real-time updates: Server-Sent Events (SSE) endpoints for lobbies and games.
+
+Frontend: React + TypeScript (Vite), routes for login/signup, lobbies, lobby details, game, profile, about; toast notifications; served behind Nginx reverse proxy.
+
+Infra: Docker Compose orchestrates Postgres + backend + Nginx; Gradle tasks build container images.
+
+Testing: JUnit-based tests for game/lobby/user services (in-memory repos used in tests).
 
 VIDEO :
 https://iplx-my.sharepoint.com/:v:/g/personal/51682_alunos_isel_ipl_pt/IQDGlxbtAOCIS4SlFo6k7JiOAaLHqpjXlwnhOJTIx8ZuTro?e=nJssM5
